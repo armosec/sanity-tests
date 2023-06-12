@@ -115,7 +115,6 @@ jobs:
     
         - name: run-tests-repeated
           if: ${{ inputs.IF_FAILED == true }}
-          continue-on-error: true
           id: StepId2
           run: |
             echo "Test history repeated:"
@@ -137,7 +136,7 @@ jobs:
                 deactivate
 
              
-              if [ $? = 0 ]; then
+              if [ $? != 0 ]; then
                 break
               fi
             sleep 60
