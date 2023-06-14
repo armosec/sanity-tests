@@ -16,7 +16,7 @@ on:
  
   workflow_call:
       inputs:
-        IF_FAILED:
+        RETRY_JOB:
           required: false
           type: boolean
         BINARY_TESTS:
@@ -93,7 +93,7 @@ jobs:
             # verbosity:
 
         - name: run-tests
-          if: ${{ inputs.IF_FAILED == false }}
+          if: ${{ inputs.RETRY_JOB == false }}
           id: StepId1
           uses: nick-fields/retry@v2
           with:
@@ -112,9 +112,11 @@ jobs:
                   --logger DEBUG \
                   --kwargs helm_branch=release \
                 deactivate
+
+            
     
         - name: run-tests-repeated
-          if: ${{ inputs.IF_FAILED == true }}
+          if: ${{ inputs.RETRY_JOB == true }}
           id: StepId2
           run: |
             echo "Test history repeated:"
@@ -139,7 +141,6 @@ jobs:
               if [ $? = 0 ]; then
                 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
                 echo "$timestamp,1" >> ~/sanity_logs.csv
-                # eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
                 break
               fi
             sleep 60
@@ -155,7 +156,7 @@ jobs:
             echo "$timestamp,1" >> ~/sanity_logs.csv
             eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
 
-        - name: Append to CSV if failure
+        - name: Append to CSV 
           if: steps.StepId2.outcome == 'success'
           run: |
             eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"

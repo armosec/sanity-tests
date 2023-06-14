@@ -22,7 +22,7 @@ jobs:
     name: run-sanity-check
     uses: ./.github/workflows/sanity-check.yaml # @sanity_check
     with:
-      IF_FAILED: false
+      RETRY_JOB: false
       BINARY_TESTS: '[ 
                         "scan_nsa"
                       ]'
@@ -52,7 +52,7 @@ jobs:
     name: repeated-test
     uses: ./.github/workflows/sanity-check.yaml # @sanity_check
     with:
-      IF_FAILED: true
+      RETRY_JOB: true
       BINARY_TESTS: '[ 
                         "scan_nsa"
                       ]'
