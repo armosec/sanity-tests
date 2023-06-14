@@ -3,12 +3,12 @@ name: sanity-check-for-BE
   # Controls when the workflow will run
 on:
   workflow_dispatch:
-  # # Triggers the workflow every 30 minutes
-  # schedule:
-  # - cron: "*/30 * * * *"
-  push:
-    branches:
-    - repeated-flow
+  # Triggers the workflow every 30 minutes
+  schedule:
+  - cron: "*/30 * * * *"
+  # push:
+  #   branches:
+  #   - repeated-flow
 
 concurrency:
   group: sanity
@@ -24,7 +24,7 @@ jobs:
     with:
       RETRY_JOB: false
       BINARY_TESTS: '[ 
-                        "scan_nsa-1"
+                        "scan_nsa"
                       ]'
     secrets: inherit
 
@@ -35,13 +35,12 @@ jobs:
     if: failure()
     #if: ${{ contains(needs.*.result, 'failure') }}
     steps:
-      - run: echo "test failed"
-      # - run: |
-      #     curl --request POST \
-      #       --url https://betteruptime.com/api/v2/incidents \
-      #       --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
-      #       --header 'Content-Type: application/json' \
-      #       --data '{"summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed ! "}'
+      - run: |
+          curl --request POST \
+            --url https://betteruptime.com/api/v2/incidents \
+            --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
+            --header 'Content-Type: application/json' \
+            --data '{"summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed ! "}'
 
   call-reran:
     permissions:  

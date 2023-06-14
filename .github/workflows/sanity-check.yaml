@@ -10,7 +10,7 @@ env:
   REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
   # Controls when the workflow will run
 on:
-  # Triggers the workflow every 5 minutes
+  # Triggers the workflow every 30 minutes
   # schedule:
   #   - cron: "*/30 * * * *"
  
@@ -124,8 +124,7 @@ jobs:
             cat /tmp/testhistory
             source systests_python_env/bin/activate
 
-            # while true; do
-            for i in 1 2 3; do
+            while true; do
               # append to local csv if test failed
               timestamp=$(date +"%Y-%m-%d %H:%M:%S")
               echo "$timestamp,0" >> ~/sanity_logs.csv
@@ -139,6 +138,7 @@ jobs:
 
              
               if [ $? = 0 ]; then
+                # append to local csv if test pass
                 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
                 echo "$timestamp,1" >> ~/sanity_logs.csv
                 break
@@ -156,7 +156,7 @@ jobs:
             echo "$timestamp,1" >> ~/sanity_logs.csv
             eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
 
-        - name: Append to CSV 
+        - name: Append to CSV if failed 
           if: steps.StepId2.outcome == 'success'
           run: |
             eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
