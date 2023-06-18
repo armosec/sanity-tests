@@ -4,11 +4,11 @@ name: sanity-check-for-BE
 on:
   workflow_dispatch:
   # Triggers the workflow every 30 minutes
-  schedule:
-  - cron: "*/30 * * * *"
-  # push:
-  #   branches:
-  #   - repeated-flow
+  # schedule:
+  # - cron: "*/30 * * * *"
+  push:
+    branches:
+    - repeated-flow
 
 concurrency:
   group: sanity

@@ -162,7 +162,7 @@ jobs:
             eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
             
         - name: Commit changes
-          uses: EndBug/add-and-commit@v7
+          uses: EndBug/add-and-commit@v9
           with:
             message: "Update sanily logs with new data"
 
