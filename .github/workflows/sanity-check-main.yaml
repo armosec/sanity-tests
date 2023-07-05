@@ -3,7 +3,7 @@ name: sanity-check-for-BE
   # Controls when the workflow will run
 on:
   workflow_dispatch:
-  Triggers the workflow every 30 minutes
+  # Triggers the workflow every 30 minutes
   schedule:
   - cron: "*/30 * * * *"
   # push:
