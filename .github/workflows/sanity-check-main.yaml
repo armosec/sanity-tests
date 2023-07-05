@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   ks-and-repo-test:
+    timeout-minutes: 10
     permissions:  
       contents: write 
       actions: read
@@ -44,6 +45,7 @@ jobs:
       #       --data '{"summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed ! "}'
 
   call-reran:
+    timeout-minutes: 10
     permissions:  
       contents: write 
       actions: read
