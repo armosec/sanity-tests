@@ -35,12 +35,12 @@ jobs:
     if: failure()
     #if: ${{ contains(needs.*.result, 'failure') }}
     steps:
-      - run: |
-          curl --request POST \
-            --url https://betteruptime.com/api/v2/incidents \
-            --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
-            --header 'Content-Type: application/json' \
-            --data '{"summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed ! "}'
+      # - run: |
+      #     curl --request POST \
+      #       --url https://betteruptime.com/api/v2/incidents \
+      #       --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
+      #       --header 'Content-Type: application/json' \
+      #       --data '{"summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed ! "}'
 
   call-reran:
     permissions:  
