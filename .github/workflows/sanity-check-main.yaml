@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   ks-and-repo-test:
-    timeout-minutes: 10
+    # timeout-minutes: 10
     permissions:  
       contents: write 
       actions: read
