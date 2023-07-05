@@ -64,7 +64,6 @@ jobs:
           TEST: ${{ fromJson(needs.wf-preparation.outputs.TEST_NAMES) }}
       needs: wf-preparation
       runs-on: ubuntu-latest
-      timeout-minutes: 10
       steps:
 
         - name: Checkout systests repo
@@ -74,11 +73,13 @@ jobs:
             path: .
 
         - uses: actions/setup-python@v4
+          timeout-minutes: 10
           with:
             python-version: '3.8.13'
             cache: 'pip' 
 
         - name: create env
+          timeout-minutes: 10
           run: ./create_env.sh
 
         - name: Generate uuid
