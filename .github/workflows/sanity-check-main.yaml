@@ -35,6 +35,7 @@ jobs:
     if: failure()
     #if: ${{ contains(needs.*.result, 'failure') }}
     steps:
+    echo "test faield"
       # - run: |
       #     curl --request POST \
       #       --url https://betteruptime.com/api/v2/incidents \
