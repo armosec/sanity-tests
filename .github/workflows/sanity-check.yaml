@@ -73,11 +73,13 @@ jobs:
             path: .
 
         - uses: actions/setup-python@v4
+          timeout-minutes: 10
           with:
             python-version: '3.8.13'
             cache: 'pip' 
 
         - name: create env
+          timeout-minutes: 10
           run: ./create_env.sh
 
         - name: Generate uuid
@@ -98,6 +100,7 @@ jobs:
           uses: nick-fields/retry@v2
           with:
             timeout_seconds: 60
+            retry_wait_seconds: 60
             max_attempts: 2
             retry_on: error
             command: |
@@ -162,7 +165,7 @@ jobs:
             eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
             
         - name: Commit changes
-          uses: EndBug/add-and-commit@v7
+          uses: EndBug/add-and-commit@v9
           with:
             message: "Update sanily logs with new data"
 
