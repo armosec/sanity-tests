@@ -35,7 +35,7 @@ jobs:
     if: failure()
     #if: ${{ contains(needs.*.result, 'failure') }}
     steps:
-      - run:|
+      - run: |
         echo "failed"
       # - run: |
       #     curl --request POST \
