@@ -121,11 +121,11 @@ jobs:
                   --kwargs helm_branch=release \
                 deactivate
 
-              # if [ $? != 0 ]; then
-              #   # append to local csv if test failed
-              #   timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-              #   echo "$timestamp,0" >> ~/sanity_logs.csv
-              # fi    
+              if [ $? != 0 ]; then
+                # append to local csv if test failed
+                timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+                echo "$timestamp,0" >> ~/sanity_logs.csv
+              fi    
     
         - name: run-tests-repeated
           if: ${{ inputs.RETRY_JOB == true }}
