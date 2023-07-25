@@ -94,11 +94,6 @@ jobs:
             # kubectl_version: v1.23.12
             # verbosity:
 
-        - name: Add initial success to CSV
-          run: |
-            timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-            echo "$timestamp,1" >> ~/sanity_logs.csv
-
         - name: run-tests
           if: ${{ inputs.RETRY_JOB == false }}
           id: StepId1
@@ -120,22 +115,6 @@ jobs:
                   --logger DEBUG \
                   --kwargs helm_branch=release \
                 deactivate
-
-              if [ $? != 0 ]; then
-                # append to local csv if test failed
-                timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-                echo "$timestamp,0" >> ~/sanity_logs.csv
-                exit 1
-              fi    
-              # exit $?
-
-        - name: Append to CSV if test failed in first time
-          if: steps.StepId1.outcome == 'failure'
-          run: |
-            # append to local csv if test failed
-            timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-            echo "$timestamp,0" >> ~/sanity_logs.csv
-            eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
             
         - name: run-tests-repeated
           if: ${{ inputs.RETRY_JOB == true }}
