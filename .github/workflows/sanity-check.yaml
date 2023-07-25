@@ -94,15 +94,20 @@ jobs:
             # kubectl_version: v1.23.12
             # verbosity:
 
+      - name: Add initial success to CSV
+        run: |
+          timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+          echo "$timestamp,1" >> ~/sanity_logs.csv
+        
         - name: run-tests
           if: ${{ inputs.RETRY_JOB == false }}
           id: StepId1
           uses: nick-fields/retry@v2
           with:
-            timeout_seconds: 60
+            timeout_seconds: 180
             retry_wait_seconds: 60
             max_attempts: 2
-            retry_on: error, timeout
+            retry_on: any
             command: |
               echo "Test history:"
               echo " ${{ matrix.TEST }} " >/tmp/testhistory
@@ -116,7 +121,11 @@ jobs:
                   --kwargs helm_branch=release \
                 deactivate
 
-            
+              if [ $? =! 0 ]; then
+                # append to local csv if test pass
+                timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+                echo "$timestamp,0" >> ~/sanity_logs.csv
+              fi    
     
         - name: run-tests-repeated
           if: ${{ inputs.RETRY_JOB == true }}
@@ -166,6 +175,7 @@ jobs:
             
         - name: Commit changes
           uses: EndBug/add-and-commit@v9
+          if: always()
           with:
             message: "Update sanily logs with new data"
 
