@@ -24,7 +24,7 @@ jobs:
     with:
       RETRY_JOB: false
       BINARY_TESTS: '[ 
-                        "scan_nsa-a"
+                        "scan_nsa-1"
                       ]'
     secrets: inherit
 
@@ -35,8 +35,7 @@ jobs:
     if: failure()
     #if: ${{ contains(needs.*.result, 'failure') }}
     steps:
-      - run: |
-        echo "failed"
+      - run: echo "test failed"
       # - run: |
       #     curl --request POST \
       #       --url https://betteruptime.com/api/v2/incidents \
