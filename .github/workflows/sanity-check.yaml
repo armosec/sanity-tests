@@ -129,13 +129,14 @@ jobs:
               # exit $?
 
         - name: Append to CSV if test failed in first time
-          if: steps.StepId1.outcome == 'success'
+          needs: [run-tests]
+          if: ${{ contains(needs.*.result, 'failure') }}
           run: |
             # append to local csv if test failed
             timestamp=$(date +"%Y-%m-%d %H:%M:%S")
             echo "$timestamp,0" >> ~/sanity_logs.csv
             eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
-
+            
         - name: run-tests-repeated
           if: ${{ inputs.RETRY_JOB == true }}
           id: StepId2
