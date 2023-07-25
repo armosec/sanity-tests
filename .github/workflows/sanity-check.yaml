@@ -121,16 +121,15 @@ jobs:
                   --kwargs helm_branch=release \
                 deactivate
 
-              # if [ $? != 0 ]; then
-              #   # append to local csv if test failed
-              #   timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-              #   echo "$timestamp,0" >> ~/sanity_logs.csv
-              # fi    
-              # exit $?
+              if [ $? != 0 ]; then
+                # append to local csv if test failed
+                timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+                echo "$timestamp,0" >> ~/sanity_logs.csv
+              fi    
+              exit $?
 
         - name: Append to CSV if test failed in first time
-          needs: [run-tests]
-          if: ${{ contains(needs.*.result, 'failure') }}
+          if: steps.StepId1.outcome == 'failure'
           run: |
             # append to local csv if test failed
             timestamp=$(date +"%Y-%m-%d %H:%M:%S")
