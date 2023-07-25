@@ -93,12 +93,12 @@ jobs:
             cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
             # kubectl_version: v1.23.12
             # verbosity:
-  
+
         - name: Add initial success to CSV
           run: |
             timestamp=$(date +"%Y-%m-%d %H:%M:%S")
             echo "$timestamp,1" >> ~/sanity_logs.csv
-          
+
         - name: run-tests
           if: ${{ inputs.RETRY_JOB == false }}
           id: StepId1
@@ -121,8 +121,8 @@ jobs:
                   --kwargs helm_branch=release \
                 deactivate
 
-              if [ $? =! 0 ]; then
-                # append to local csv if test pass
+              if [ $? != 0 ]; then
+                # append to local csv if test failed
                 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
                 echo "$timestamp,0" >> ~/sanity_logs.csv
               fi    
