@@ -127,9 +127,9 @@ jobs:
               #   echo "$timestamp,0" >> ~/sanity_logs.csv
               # fi    
               # exit $?
-              
+
         - name: Append to CSV if test failed in first time
-          if: steps.StepId1.outcome == 'failure'
+          if: steps.StepId1.outcome == 'success'
           run: |
             # append to local csv if test failed
             timestamp=$(date +"%Y-%m-%d %H:%M:%S")
