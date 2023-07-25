@@ -126,7 +126,8 @@ jobs:
                 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
                 echo "$timestamp,0" >> ~/sanity_logs.csv
               fi    
-    
+              exit $?
+              
         - name: run-tests-repeated
           if: ${{ inputs.RETRY_JOB == true }}
           id: StepId2
