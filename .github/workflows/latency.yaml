@@ -34,6 +34,8 @@ jobs:
     - name: Run letency test and set outputs
       run: |
         OUTPUT=$(python ./latency.py)
+        LATENCY=$(echo $OUTPUT | awk '{print $4}') 
+        LATENCY_WITHOUT_LOGIN=$(echo $OUTPUT | awk '{print $5}')
         TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
         echo "LATENCY=$LATENCY" >> $GITHUB_ENV
         echo "LATENCY_WITHOUT_LOGIN=$LATENCY_WITHOUT_LOGIN" >> $GITHUB_ENV
