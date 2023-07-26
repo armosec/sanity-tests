@@ -30,7 +30,7 @@ jobs:
     - run: pwd
     - run: ls
     - name: Run letency test 
-      run: python ./home/runner/work/sanity-checks/sanity-checks/latency.py
+      run: python ./latency.py
 
     - name: Run script and generate CSV
       run: echo "::set-output name=latency::$(python latency.py)"
