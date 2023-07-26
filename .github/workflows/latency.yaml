@@ -10,7 +10,7 @@ on:
     - latency-test
 
 jobs:
-  login to remediation:
+  login_to_remediation:
 
     runs-on: ubuntu-latest
 
