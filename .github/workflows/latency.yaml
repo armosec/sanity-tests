@@ -39,6 +39,6 @@ jobs:
         eval sed\ s/\$/\\$'\n'/g\ ~/latency_logs.csv | cat >> "logs/latency_logs.csv"
 
     - name: Commit changes
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: "Update latency logs with new data"
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update latency logs with new data"
