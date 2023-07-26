@@ -90,7 +90,8 @@ def write_latency_to_csv(latency, latency_without_login):
 
 
 latency, latency_without_login = measure_latency(driver, wait, "borisv@armosec.io", "Bv110584!", url)
-print("Measured login Latency:", latency, "sec")
-write_latency_to_csv(latency, latency_without_login)
+print(f"{latency},{latency_without_login}")
+# print("Measured login Latency:", latency, "sec")
+# write_latency_to_csv(latency, latency_without_login)
 driver.quit()
 

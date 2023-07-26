@@ -28,15 +28,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run letency test 
-      run: python ./latency.py
+    # - name: Run letency test 
+    #   run: python ./latency.py
 
-    - name: Run script and generate CSV
+    - name: Run letency test and set outputs
       run: |
-        python latency.py > latency.csv
-        echo "LATENCY=$(cat latency.csv)" >> ~/latency_logs.csv
-        echo "$timestamp,1" >> ~/sanity_logs.csv
-        eval sed\ s/\$/\\$'\n'/g\ ~/latency_logs.csv | cat >> "logs/latency_logs.csv"
+        OUTPUT=$(python ./latency.py)
+        IFS=',' read LATENCY LATENCY_WITHOUT_LOGIN <<< "$OUTPUT"
+        echo "LATENCY=$LATENCY" >> $GITHUB_ENV
+        echo "LATENCY_WITHOUT_LOGIN=$LATENCY_WITHOUT_LOGIN" >> $GITHUB_ENV
+
+    - name: Update CSV file
+      run: |
+        echo "${{ env.LATENCY }},${{ env.LATENCY_WITHOUT_LOGIN }}" >> latency_logs.csv
 
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
