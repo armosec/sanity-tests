@@ -48,7 +48,7 @@ jobs:
     - name: Print and Save
       run: |
         echo "$TIMESTAMP,$LATENCY,$LATENCY_WITHOUT_LOGIN"
-        echo "$TIMESTAMP,$LATENCY,$LATENCY_WITHOUT_LOGIN" >> /logs/latency_logs.csv
+        echo "$TIMESTAMP,$LATENCY,$LATENCY_WITHOUT_LOGIN" >> ./logs/latency_logs.csv
 
 
     - name: Commit changes
