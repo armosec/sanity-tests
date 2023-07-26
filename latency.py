@@ -77,15 +77,15 @@ def measure_latency(driver, wait, email, password, url):
     latency = "{:.2f}".format(end_time - start_time)
     return latency , latency_without_login
 
-def write_latency_to_csv(latency, latency_without_login):
-    filename = 'latency_data.csv'
-    file_exists = os.path.isfile(filename)
-    with open('latency_data.csv', 'a', newline='') as file:
-        writer = csv.writer(file)
-        headers = ['Timestamp', 'Latency', 'Latency Without Login']
-        if not file_exists:
-            writer.writerow(headers) 
-        writer.writerow([time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), latency, latency_without_login]) 
+# def write_latency_to_csv(latency, latency_without_login):
+#     filename = 'latency_data.csv'
+#     file_exists = os.path.isfile(filename)
+#     with open('latency_data.csv', 'a', newline='') as file:
+#         writer = csv.writer(file)
+#         headers = ['Timestamp', 'Latency', 'Latency Without Login']
+#         if not file_exists:
+#             writer.writerow(headers) 
+#         writer.writerow([time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), latency, latency_without_login]) 
 
 
 

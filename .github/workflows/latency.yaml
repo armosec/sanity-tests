@@ -34,13 +34,14 @@ jobs:
     - name: Run letency test and set outputs
       run: |
         OUTPUT=$(python ./latency.py)
-        IFS=',' read LATENCY LATENCY_WITHOUT_LOGIN <<< "$OUTPUT"
+        TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
         echo "LATENCY=$LATENCY" >> $GITHUB_ENV
         echo "LATENCY_WITHOUT_LOGIN=$LATENCY_WITHOUT_LOGIN" >> $GITHUB_ENV
+        echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
 
     - name: Update CSV file
       run: |
-        echo "${{ env.LATENCY }},${{ env.LATENCY_WITHOUT_LOGIN }}" >> latency_logs.csv
+         echo "$TIMESTAMP,$LATENCY,$LATENCY_WITHOUT_LOGIN" >> latency_logs.csv
 
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
