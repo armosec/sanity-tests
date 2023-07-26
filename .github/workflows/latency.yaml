@@ -27,13 +27,18 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - run: pwd
-    - run: ls
+
     - name: Run letency test 
       run: python ./latency.py
 
     - name: Run script and generate CSV
-      run: echo "::set-output name=latency::$(python latency.py)"
+      run: |
+        python latency.py > latency.csv
+        echo "LATENCY=$(cat latency.csv)" >> ~/latency_logs.csv
+        echo "$timestamp,1" >> ~/sanity_logs.csv
+        eval sed\ s/\$/\\$'\n'/g\ ~/latency_logs.csv | cat >> "logs/latency_logs.csv"
 
-    - name: Display the output
-      run: echo "The output of the script was ${{ steps.script_output.outputs.latency }}"
+    - name: Commit changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Update latency logs with new data"
