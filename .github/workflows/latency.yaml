@@ -27,9 +27,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-
+    - run: pwd
     - name: Run letency test 
-      run: echo $pwd
+      run: 
 
     - name: Run script and generate CSV
       run: echo "::set-output name=latency::$(python latency.py)"
