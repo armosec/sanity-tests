@@ -20,15 +20,15 @@ wait = WebDriverWait(driver, 30, 0.001)
 #     driver.save_screenshot(screenshot_name)
 
 
-def login(driver, wait, email_4latency, password_4latency):
+def login(driver, wait, email_latency, login_pass_latency):
     driver.get(url)
     wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="frontegg-login-box-container-default"]/div[1]/input')))
     mail_input = driver.find_element(by=By.XPATH, value='//*[@id="frontegg-login-box-container-default"]/div[1]/input')
-    mail_input.send_keys(email_4latency)
+    mail_input.send_keys(email_latency)
     mail_input.send_keys(Keys.ENTER)
     wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/frontegg-app/div[2]/div[2]/input')))
     password_input = driver.find_element(by=By.XPATH, value='/html/body/frontegg-app/div[2]/div[2]/input')
-    password_input.send_keys(password_4latency)
+    password_input.send_keys(login_pass_latency)
     password_input.send_keys(Keys.ENTER)
 
 def navigate_to_dashboard(driver, wait):
@@ -67,9 +67,9 @@ def navigate_to_dashboard(driver, wait):
     # take_screenshot(driver, "Wait until the yaml section is visible")
 
 
-def measure_latency(driver, wait, email_4latency, password_4latency, url):
+def measure_latency(driver, wait, email_latency, login_pass_latency, url):
     start_time = time.time()
-    login(driver, wait, email_4latency, password_4latency)
+    login(driver, wait, email_latency, login_pass_latency)
     login_time = time.time()
     navigate_to_dashboard(driver, wait)
     end_time = time.time()
@@ -89,7 +89,7 @@ def measure_latency(driver, wait, email_4latency, password_4latency, url):
 
 
 
-latency, latency_without_login = measure_latency(driver, wait, "test.platform454@gmail.com", "Platformtest1!", url)
+latency, latency_without_login = measure_latency(driver, wait, os.environ['email_latency'], os.environ['login_pass_latency'], url)
 print(f"{latency},{latency_without_login}")
 # print("Measured login Latency:", latency, "sec")
 # write_latency_to_csv(latency, latency_without_login)
