@@ -3,11 +3,11 @@ name: letency test
 on:
   workflow_dispatch:
 # Triggers the workflow every 30 minutes at 15 and 45 minutes past the hour
-  # schedule:
-  # - cron: "15,45 * * * *"
-  push:
-    branches:
-    - latency-test
+  schedule:
+  - cron: "15,45 * * * *"
+  # push:
+  #   branches:
+  #   - latency-test
 
 jobs:
   login_to_remediation:
