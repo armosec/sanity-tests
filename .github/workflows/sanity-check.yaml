@@ -99,10 +99,10 @@ jobs:
           id: StepId1
           uses: nick-fields/retry@v2
           with:
-            timeout_seconds: 60
+            timeout_seconds: 180
             retry_wait_seconds: 60
             max_attempts: 2
-            retry_on: error
+            retry_on: any
             command: |
               echo "Test history:"
               echo " ${{ matrix.TEST }} " >/tmp/testhistory
