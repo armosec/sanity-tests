@@ -1,4 +1,4 @@
-name: letency test
+name: latency test
 
 on:
   workflow_dispatch:
@@ -30,6 +30,9 @@ jobs:
 
     - name: Run script and capture output
       id: latency_test
+      env:
+        email_latency: ${{ secrets.EMAIL_LATENCY }}
+        login_pass_latency: ${{ secrets.LOGIN_PASS_LATENCY }}
       run: |
         OUTPUT=$(python latency.py)
         echo "Output: $OUTPUT"
