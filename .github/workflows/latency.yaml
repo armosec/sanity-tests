@@ -54,3 +54,6 @@ jobs:
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update latency logs with new data"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
