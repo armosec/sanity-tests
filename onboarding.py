@@ -100,7 +100,6 @@ def main():
     
     onboarding_time = "{:.2f}".format(time.time() - start_time)
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
     print(f"{onboarding_time},{timestamp}")  
     driver.quit()
 
