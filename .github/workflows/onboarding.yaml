@@ -44,9 +44,9 @@ jobs:
             email_onboarding: ${{ secrets.EMAIL_ONBOARDING }}
             login_pass_onboarding: ${{ secrets.LOGIN_PASS_ONBOARDING }}
           run: |
-            OUTPUT=$(python onboarding.py)
-            echo "Output: $OUTPUT"
-            echo "$OUTPUT" >> ./logs/onboarding_logs.csv
+            python onboarding.py
+            # echo "Output: $OUTPUT"
+            # echo "$OUTPUT" >> ./logs/onboarding_logs.csv
 
         - name: Commit changes
           uses: EndBug/add-and-commit@v9

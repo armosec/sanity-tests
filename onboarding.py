@@ -44,17 +44,16 @@ def copy_helm_command(driver, wait):
     return helm_command.strip()
 
 
-def copy_helm_command(driver, wait):
-    css_selector = 'div.command-area > span.ng-star-inserted'  # CSS selector targeting the Helm command
-    helm_command_element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector)))
-    helm_command = helm_command_element.text  # Retrieve the text content of the Helm command
-    return helm_command
+# def copy_helm_command(driver, wait):
+#     css_selector = 'div.command-area > span.ng-star-inserted'  # CSS selector targeting the Helm command
+#     helm_command_element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector)))
+#     helm_command = helm_command_element.text  # Retrieve the text content of the Helm command
+#     return helm_command
 
 def execute_helm_command(helm_command):
-    # print(f"Helm command: {helm_command}")
     try:
         result = subprocess.run(helm_command, shell=True, check=True, stderr=subprocess.PIPE)
-        print("Helm command executed successfully.")
+        # print("Helm command executed successfully.")
     except subprocess.CalledProcessError as e:
         print(f"Helm command execution failed with error: {e}")
         if e.stderr:  # Check if stderr is not None
@@ -103,7 +102,9 @@ def main():
     
     onboarding_time = "{:.2f}".format(time.time() - start_time)
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"{onboarding_time},{timestamp}")  
+    with open("./logs/onboarding_logs.csv", "a") as f:
+        f.write(f"{timestamp},{onboarding_time}\n")
+    print(f"{timestamp},{onboarding_time}")
     driver.quit()
 
 if __name__ == "__main__":
