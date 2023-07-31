@@ -91,7 +91,7 @@ def main():
     start_time = time.time()
     driver = setup_driver()
     wait = WebDriverWait(driver, 125, 0.001)
-    login(driver, wait)
+    login(driver, wait, email_onboarding, login_pass_onboarding)
     click_get_started(driver, wait)
     helm_command = copy_helm_command(driver, wait)
     execute_helm_command(helm_command)
