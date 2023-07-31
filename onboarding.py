@@ -64,7 +64,6 @@ def verify_installation(driver, wait):
     # driver.save_screenshot("verify_button.png")
     driver.execute_script("arguments[0].click();", verify_button)
     
-
 def view_cluster(driver, wait):
     try:
         view_cluster_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-connection-wizard-connection-step-footer .connection-step-button')))
