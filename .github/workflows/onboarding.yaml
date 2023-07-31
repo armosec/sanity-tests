@@ -46,16 +46,7 @@ jobs:
           run: |
             OUTPUT=$(python onboarding.py)
             echo "Output: $OUTPUT"
-            ONBOARDING=$(echo $OUTPUT | awk -F, '{print $1}') 
-            echo "onboarding time: $ONBOARDING"
-            TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
-            echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
-            echo "ONBOARDING=$ONBOARDING" >> $GITHUB_ENV
-
-        - name: Print and Save
-          run: |
-            echo "$TIMESTAMP,$ONBOARDING
-            echo "$TIMESTAMP,$ONBOARDING >> ./logs/onboarding_logs.csv
+            echo "$OUTPUT" >> ./logs/onboarding_logs.csv
 
         - name: Commit changes
           uses: EndBug/add-and-commit@v9

@@ -5,7 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-import time
+import time, datetime
 import os 
 import subprocess
 
@@ -99,8 +99,9 @@ def main():
     view_connected_cluster(driver, wait)
     
     onboarding_time = "{:.2f}".format(time.time() - start_time)
-    # print(f"Total onboarding time: {onboarding_time} seconds")
-    print(f"{onboarding_time}")  
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    print(f"{onboarding_time},{timestamp}")  
     driver.quit()
 
 if __name__ == "__main__":
