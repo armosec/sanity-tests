@@ -17,7 +17,7 @@ jobs:
           id: kind-cluster-install
           uses: helm/kind-action@v1.3.0
           with:
-            cluster_name: ${{ onboarding_cluster_test }}
+            cluster_name: "onboarding_cluster_test"
             # kubectl_version: v1.23.12
             # verbosity:
 
