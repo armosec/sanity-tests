@@ -10,14 +10,14 @@ on:
     - onboarding-check
 
 jobs:
-  run-cluster-install:
+  run-onboarding-test:
       runs-on: ubuntu-latest
       steps:
         - name: Generate uuid
           id: uuid
           run: |
             echo "RANDOM_UUID=systets-$(uuidgen)" >> $GITHUB_OUTPUT
-            
+
         - name: Create k8s Kind Cluster
           id: kind-cluster-install
           uses: helm/kind-action@v1.3.0

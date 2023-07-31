@@ -37,7 +37,7 @@ def copy_helm_command(driver, wait):
     # Use JavaScript to get the text content of the element
     helm_command = driver.execute_script("return arguments[0].textContent;", helm_command_element)
 
-    print(f"Copied helm command: {helm_command.strip()}")  # Print the command
+    # print(f"Copied helm command: {helm_command.strip()}")  # Print the command
     return helm_command.strip()
 
 
@@ -61,28 +61,28 @@ def execute_helm_command(helm_command):
 
 def verify_installation(driver, wait):
     verify_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-dialog-footer .mat-button-wrapper')))
-    driver.save_screenshot("verify_button.png")
+    # driver.save_screenshot("verify_button.png")
     driver.execute_script("arguments[0].click();", verify_button)
     
 
 def view_cluster(driver, wait):
     try:
         view_cluster_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-connection-wizard-connection-step-footer .connection-step-button')))
-        driver.save_screenshot("view_cluster_button.png")
+        # driver.save_screenshot("view_cluster_button.png")
         time.sleep(0.3)
         driver.execute_script("arguments[0].click();", view_cluster_button)
     except TimeoutException as e:
         print("View cluster button was not found or clickable.")
-        driver.save_screenshot("view_cluster_error.png")
+        # driver.save_screenshot("view_cluster_error.png")
 
 
 def view_connected_cluster(driver, wait):
     try:
         delete_cluster_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
-        driver.save_screenshot("view_cluster_connected.png")
+        # driver.save_screenshot("view_cluster_connected.png")
     except TimeoutException as e:
         print("View cluster connected button was not found or clickable.")
-        driver.save_screenshot("view_cluster_connected_error.png")
+        # driver.save_screenshot("view_cluster_connected_error.png")
 
 def main():
     email_onboarding = os.environ.get('email_onboarding')
