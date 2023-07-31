@@ -1,0 +1,63 @@
+name: onboarding test
+
+on:
+  workflow_dispatch:
+# Triggers the workflow every 30 minutes at 15 and 45 minutes past the hour
+  # schedule:
+  # - cron: "15,45 * * * *"
+  push:
+    branches:
+    - onboarding-check
+
+jobs:
+  run-cluster-install:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Create k8s Kind Cluster
+          id: kind-cluster-install
+          uses: helm/kind-action@v1.3.0
+          with:
+            cluster_name: ${{ onboarding_cluster_test }}
+            # kubectl_version: v1.23.12
+            # verbosity:
+
+        - name: Checkout repo
+          uses: actions/checkout@v3
+
+        - name: Set up Python environment
+          uses: actions/setup-python@v4
+          timeout-minutes: 10
+          with:
+            python-version: 3.8
+
+        - name: Install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+
+        - name: Run script and capture output
+          id: onboarding_test
+          env:
+            email_onboarding: ${{ secrets.EMAIL_ONBOARDING }}
+            login_pass_onboarding: ${{ secrets.LOGIN_PASS_ONBOARDING }}
+          run: |
+            OUTPUT=$(python onboarding.py)
+            echo "Output: $OUTPUT"
+            ONBOARDING=$(echo $OUTPUT | awk -F, '{print $1}') 
+            echo "onboarding time: $ONBOARDING"
+            TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
+            echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+            echo "ONBOARDING=$ONBOARDING" >> $GITHUB_ENV
+
+        - name: Print and Save
+          run: |
+            echo "$TIMESTAMP,$ONBOARDING
+            echo "$TIMESTAMP,$ONBOARDING >> ./logs/onboarding_logs.csv
+
+        - name: Commit changes
+          uses: EndBug/add-and-commit@v9
+          with:
+            message: "Update onboarding logs with new data"
+            author_name: bvolovat
+            author_email: borisv@armosec.io
+            commit: --signoff
