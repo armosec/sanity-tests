@@ -13,13 +13,16 @@ jobs:
   run-cluster-install:
       runs-on: ubuntu-latest
       steps:
+        - name: Generate uuid
+          id: uuid
+          run: |
+            echo "RANDOM_UUID=systets-$(uuidgen)" >> $GITHUB_OUTPUT
+            
         - name: Create k8s Kind Cluster
           id: kind-cluster-install
           uses: helm/kind-action@v1.3.0
           with:
-            cluster_name: "onboarding_cluster_test"
-            # kubectl_version: v1.23.12
-            # verbosity:
+            cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
 
         - name: Checkout repo
           uses: actions/checkout@v3
