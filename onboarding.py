@@ -77,6 +77,26 @@ def view_connected_cluster(driver, wait):
         print("View cluster connected button was not found or clickable.")
         # driver.save_screenshot("view_cluster_connected_error.png")
 
+def click_settings_button(driver, wait):
+    settings_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'li.d-flex.align-items-center.pl-4.pointer')))
+    settings_button.click()
+
+def click_more_options_button(driver, wait):
+    more_options_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'mat-icon.material-icons')))
+    more_options_button.click()
+
+def choose_delete_option(driver, wait):
+    delete_button_option = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.mat-menu-item')))
+    delete_button_option.click()
+
+
+def confirm_delete(driver, wait):
+    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.mat-stroked-button.color-warn')))
+    confirm_delete_button.click()
+
+def wait_for_empty_table(driver, wait):
+    wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'td.mat-cell.text-center.ng-star-inserted'), 'No data to display'))
+
 
 def main():
     email_onboarding = os.environ.get('email_onboarding')
@@ -97,7 +117,13 @@ def main():
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open("./logs/onboarding_logs.csv", "a") as f:
         f.write(f"{timestamp},{onboarding_time}\n")
-    print(f"{timestamp},{onboarding_time}")
+    # print(f"{timestamp},{onboarding_time}")
+
+    click_settings_button(driver, wait)
+    click_more_options_button(driver, wait)
+    choose_delete_option(driver, wait)
+    confirm_delete(driver, wait)
+    wait_for_empty_table(driver, wait)
     driver.quit()
 
 if __name__ == "__main__":
