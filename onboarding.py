@@ -32,23 +32,23 @@ def click_get_started(driver, wait):
     get_started_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/button/span[1]')))
     driver.execute_script("arguments[0].click();", get_started_button)
 
-def copy_helm_command(driver, wait):
-    # Replace the following string with the correct CSS selector for the element containing the Helm command
-    css_selector_for_helm_command = '.some-class #some-id'
-    helm_command_element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector_for_helm_command)))
-
-    # Use JavaScript to get the text content of the element
-    helm_command = driver.execute_script("return arguments[0].textContent;", helm_command_element)
-
-    # print(f"Copied helm command: {helm_command.strip()}")  # Print the command
-    return helm_command.strip()
-
-
 # def copy_helm_command(driver, wait):
-#     css_selector = 'div.command-area > span.ng-star-inserted'  # CSS selector targeting the Helm command
-#     helm_command_element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector)))
-#     helm_command = helm_command_element.text  # Retrieve the text content of the Helm command
-#     return helm_command
+#     # Replace the following string with the correct CSS selector for the element containing the Helm command
+#     css_selector_for_helm_command = '.some-class #some-id'
+#     helm_command_element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector_for_helm_command)))
+
+#     # Use JavaScript to get the text content of the element
+#     helm_command = driver.execute_script("return arguments[0].textContent;", helm_command_element)
+
+#     # print(f"Copied helm command: {helm_command.strip()}")  # Print the command
+#     return helm_command.strip()
+
+
+def copy_helm_command(driver, wait):
+    css_selector = 'div.command-area > span.ng-star-inserted'  # CSS selector targeting the Helm command
+    helm_command_element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector)))
+    helm_command = helm_command_element.text  # Retrieve the text content of the Helm command
+    return helm_command
 
 def execute_helm_command(helm_command):
     try:
