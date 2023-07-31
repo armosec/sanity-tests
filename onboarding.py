@@ -99,7 +99,7 @@ def main():
     view_connected_cluster(driver, wait)
     
     onboarding_time = "{:.2f}".format(time.time() - start_time)
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"{onboarding_time},{timestamp}")  
     driver.quit()
 
