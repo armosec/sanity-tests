@@ -10,8 +10,6 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 
 
-
-
 def setup_driver():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -94,9 +92,11 @@ def click_settings_button(driver, wait):
     driver.save_screenshot("click_settings_button.png")
     driver.execute_script("arguments[0].click();", settings_button)
 
+
 def click_more_options_button(driver, wait):
     more_options_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/div[2]/armo-clusters-page/armo-clusters-table/div/table/tbody/tr/td[9]/armo-row-options-button/button/mat-icon')))
     driver.execute_script("arguments[0].click();", more_options_button)
+
 
 def choose_delete_option(driver, wait):
     delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[5]/div[2]/div/div/div/button[2]/div')))
@@ -106,6 +106,7 @@ def choose_delete_option(driver, wait):
 def confirm_delete(driver, wait):
     confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[5]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]')))
     driver.execute_script("arguments[0].click();", confirm_delete_button)
+
 
 def wait_for_empty_table(driver, wait):
     wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'td.mat-cell.text-center.ng-star-inserted'), 'No data to display'))
