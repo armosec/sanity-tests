@@ -128,7 +128,7 @@ def main():
     view_connected_cluster(driver, wait)
     
     onboarding_time = "{:.2f}".format(time.time() - start_time)
-    onboarding_time_without_login = "{:.2f}".format(onboarding_time - login_time)  
+    onboarding_time_without_login = "{:.2f}".format(float(onboarding_time) - login_time) 
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open("./logs/onboarding_logs.csv", "a") as f:
         f.write(f"{timestamp},{onboarding_time},{onboarding_time_without_login}\n")
