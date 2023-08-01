@@ -119,6 +119,7 @@ def main():
     driver = setup_driver()
     wait = WebDriverWait(driver, 125, 0.001)
     login(driver, wait, email_onboarding, login_pass_onboarding)
+    login_time = time.time()
     click_get_started(driver, wait)
     helm_command = copy_helm_command(driver, wait)
     execute_helm_command(helm_command)
@@ -127,10 +128,11 @@ def main():
     view_connected_cluster(driver, wait)
     
     onboarding_time = "{:.2f}".format(time.time() - start_time)
+    onboarding_time_without_login = "{:.2f}".format(onboarding_time - login_time)  
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open("./logs/onboarding_logs.csv", "a") as f:
-        f.write(f"{timestamp},{onboarding_time}\n")
-    print(f"{timestamp},{onboarding_time}")
+        f.write(f"{timestamp},{onboarding_time},{onboarding_time_without_login}\n")
+    print(f"{timestamp},{onboarding_time},{onboarding_time_without_login}\n")
 
     uninstall_kubescape()
     click_settings_button(driver, wait)
