@@ -90,7 +90,7 @@ def click_more_options_button(driver, wait):
 #     driver.execute_script("arguments[0].click();", delete_button_option)
 
 def choose_delete_option(driver, wait):
-    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@mat-menu-item][contains(text(), "Delete")]')))
+    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[5]/div[2]/div/div/div/button[2]")))
     driver.execute_script("arguments[0].click();", delete_button_option)
 
 
