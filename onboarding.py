@@ -77,6 +77,18 @@ def view_connected_cluster(driver, wait):
         print("View cluster connected button was not found or clickable.")
         # driver.save_screenshot("view_cluster_connected_error.png")
 
+
+def uninstall_kubescape():
+    command = "helm uninstall kubescape -n kubescape && kubectl delete ns kubescape"
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    if process.returncode != 0:
+        print(f"Error executing command: {stderr.decode()}")
+    else:
+        print(f"Command executed successfully: {stdout.decode()}")
+
+
 def click_settings_button(driver, wait):
     settings_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/armo-side-nav-menu/nav/div[2]/armo-nav-items-list/div/ul/li/a/span')))
     driver.save_screenshot("click_settings_button.png")
@@ -118,8 +130,9 @@ def main():
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open("./logs/onboarding_logs.csv", "a") as f:
         f.write(f"{timestamp},{onboarding_time}\n")
-    # print(f"{timestamp},{onboarding_time}")
+    print(f"{timestamp},{onboarding_time}")
 
+    uninstall_kubescape()
     click_settings_button(driver, wait)
     click_more_options_button(driver, wait)
     choose_delete_option(driver, wait)
