@@ -85,13 +85,17 @@ def click_more_options_button(driver, wait):
     more_options_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'mat-icon.material-icons')))
     driver.execute_script("arguments[0].click();", more_options_button)
 
-# def choose_delete_option(driver, wait):
-#     delete_button_option = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.mat-menu-item')))
-#     driver.execute_script("arguments[0].click();", delete_button_option)
 
 def choose_delete_option(driver, wait):
-    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[5]/div[2]/div/div/div/button[2]")))
-    driver.execute_script("arguments[0].click();", delete_button_option)
+    # time.sleep(2)  # Let's wait for 2 seconds to give JavaScript time to load elements
+    try:
+        # Finding the Delete button and clicking it
+        delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[text()="Delete"]')))
+        delete_button_option.click()
+    except TimeoutException:
+        print("Unable to find the Delete button.")
+        # Print the HTML content to debug
+        print(driver.page_source)
 
 
 def confirm_delete(driver, wait):
