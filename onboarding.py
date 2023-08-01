@@ -78,34 +78,22 @@ def view_connected_cluster(driver, wait):
         # driver.save_screenshot("view_cluster_connected_error.png")
 
 def click_settings_button(driver, wait):
-    settings_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'li.d-flex.align-items-center.pl-4.pointer')))
+    settings_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/armo-side-nav-menu/nav/div[2]/armo-nav-items-list/div/ul/li/a/span')))
+    driver.save_screenshot("click_settings_button.png")
     driver.execute_script("arguments[0].click();", settings_button)
 
 def click_more_options_button(driver, wait):
-    more_options_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'mat-icon.material-icons')))
+    more_options_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/div[2]/armo-clusters-page/armo-clusters-table/div/table/tbody/tr/td[9]/armo-row-options-button/button/mat-icon')))
     driver.execute_script("arguments[0].click();", more_options_button)
 
-
 def choose_delete_option(driver, wait):
-    # time.sleep(2)  # Let's wait for 2 seconds to give JavaScript time to load elements
-    try:
-        # Finding the Delete button using CSS selector for the second button
-        delete_button_option = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div.mat-menu-content > button:nth-child(2)')))
-        # Using JavaScript to perform the click
-        driver.execute_script("arguments[0].click();", delete_button_option)
-    except TimeoutException:
-        print("Unable to find the Delete button.")
+    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[5]/div[2]/div/div/div/button[2]/div')))
+    driver.execute_script("arguments[0].click();", delete_button_option)
 
 
 def confirm_delete(driver, wait):
-    try:
-        # Finding the confirm delete button using CSS selector
-        confirm_delete_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.mat-stroked-button.color-warn')))
-        # Using JavaScript to perform the click
-        driver.execute_script("arguments[0].click();", confirm_delete_button)
-    except TimeoutException:
-        print("Unable to find the Confirm Delete button.")
-
+    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[5]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]')))
+    driver.execute_script("arguments[0].click();", confirm_delete_button)
 
 def wait_for_empty_table(driver, wait):
     wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'td.mat-cell.text-center.ng-star-inserted'), 'No data to display'))
