@@ -97,10 +97,15 @@ def choose_delete_option(driver, wait):
         print("Unable to find the Delete button.")
 
 
-
 def confirm_delete(driver, wait):
-    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.mat-stroked-button.color-warn')))
-    driver.execute_script("arguments[0].click();", confirm_delete_button)
+    try:
+        # Finding the confirm delete button using CSS selector
+        confirm_delete_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.mat-stroked-button.color-warn')))
+        # Using JavaScript to perform the click
+        driver.execute_script("arguments[0].click();", confirm_delete_button)
+    except TimeoutException:
+        print("Unable to find the Confirm Delete button.")
+
 
 def wait_for_empty_table(driver, wait):
     wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'td.mat-cell.text-center.ng-star-inserted'), 'No data to display'))
