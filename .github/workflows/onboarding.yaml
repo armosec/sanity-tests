@@ -3,11 +3,11 @@ name: onboarding test
 on:
   workflow_dispatch:
 # Triggers the workflow every 30 minutes at 15 and 45 minutes past the hour
-  # schedule:
-  # - cron: "15,45 * * * *"
-  push:
-    branches:
-    - onboarding-check
+  schedule:
+  - cron: "22,52 * * * *"
+  # push:
+  #   branches:
+  #   - onboarding-check
 
 jobs:
   run-onboarding-test:
