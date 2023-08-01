@@ -72,7 +72,7 @@ def view_connected_cluster(driver, wait):
         delete_cluster_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
         # driver.save_screenshot("view_cluster_connected.png")
     except TimeoutException as e:
-        print("View cluster connected button was not found or clickable.")
+        print("View cluster connected button was not found.")
         # driver.save_screenshot("view_cluster_connected_error.png")
 
 
@@ -89,7 +89,7 @@ def uninstall_kubescape():
 
 def click_settings_button(driver, wait):
     settings_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/armo-side-nav-menu/nav/div[2]/armo-nav-items-list/div/ul/li/a/span')))
-    driver.save_screenshot("click_settings_button.png")
+    # driver.save_screenshot("click_settings_button.png")
     driver.execute_script("arguments[0].click();", settings_button)
 
 
