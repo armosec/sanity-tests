@@ -85,13 +85,21 @@ def click_more_options_button(driver, wait):
     more_options_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'mat-icon.material-icons')))
     driver.execute_script("arguments[0].click();", more_options_button)
 
+# def choose_delete_option(driver, wait):
+#     delete_button_option = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.mat-menu-item')))
+#     driver.execute_script("arguments[0].click();", delete_button_option)
+
 def choose_delete_option(driver, wait):
-    delete_button_option = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.mat-menu-item')))
+    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@mat-menu-item][contains(text(), "Delete")]')))
     driver.execute_script("arguments[0].click();", delete_button_option)
+
 
 def confirm_delete(driver, wait):
     confirm_delete_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.mat-stroked-button.color-warn')))
     driver.execute_script("arguments[0].click();", confirm_delete_button)
+
+def wait_for_empty_table(driver, wait):
+    wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'td.mat-cell.text-center.ng-star-inserted'), 'No data to display'))
 
 
 def main():
