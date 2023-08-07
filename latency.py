@@ -1,18 +1,19 @@
-import csv
-import time
 import os
+import time, datetime
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 url = "https://cloud.armosec.io/dashboard"
 chrome_options = Options()
-chrome_options.add_argument("--headless")
+# chrome_options.add_argument("--headless")
 driver = webdriver.Chrome(options=chrome_options)
+driver.set_window_size(1512, 982)
 wait = WebDriverWait(driver, 30, 0.001)
+
 
 # def take_screenshot(driver, description):
 #     timestamp = time.strftime("%Y%m%d-%H%M%S")
@@ -45,8 +46,8 @@ def navigate_to_dashboard(driver, wait):
     # take_screenshot(driver, "Click on the cluster")
 
     # Click on the fix button
-    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="framework-control-table-failed-0"]/div/span[2]')))
-    fix_button = driver.find_element(By.XPATH, '//*[@id="framework-control-table-failed-0"]/div/span[2]')
+    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="framework-control-table-failed-4"]/div/span[2]')))
+    fix_button = driver.find_element(By.XPATH, '//*[@id="framework-control-table-failed-4"]/div/span[2]')
     driver.execute_script("arguments[0].click();", fix_button)
     # take_screenshot(driver, "Click on the fix button")
 
@@ -77,21 +78,12 @@ def measure_latency(driver, wait, email_latency, login_pass_latency, url):
     latency = "{:.2f}".format(end_time - start_time)
     return latency , latency_without_login
 
-# def write_latency_to_csv(latency, latency_without_login):
-#     filename = 'latency_data.csv'
-#     file_exists = os.path.isfile(filename)
-#     with open('latency_data.csv', 'a', newline='') as file:
-#         writer = csv.writer(file)
-#         headers = ['Timestamp', 'Latency', 'Latency Without Login']
-#         if not file_exists:
-#             writer.writerow(headers) 
-#         writer.writerow([time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), latency, latency_without_login]) 
-
-
 
 latency, latency_without_login = measure_latency(driver, wait, os.environ['email_latency'], os.environ['login_pass_latency'], url)
-print(f"{latency},{latency_without_login}")
-# print("Measured login Latency:", latency, "sec")
-# write_latency_to_csv(latency, latency_without_login)
+timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+with open("./logs/latency_logs.csv", "a") as f:
+    f.write(f"{timestamp},{latency},{latency_without_login}\n")
+    print(f"{timestamp}\n"
+          f"Latency time: {latency} sec\n"
+          f"Latency time without login: {latency_without_login} sec\n")
 driver.quit()
-
