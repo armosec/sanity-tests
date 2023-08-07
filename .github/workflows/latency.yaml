@@ -20,6 +20,7 @@ jobs:
 
     - name: Set up Python environment
       uses: actions/setup-python@v4
+      timeout-minutes: 10
       with:
         python-version: 3.8
 
@@ -28,27 +29,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run script and capture output
+    - name: Run latency test
       id: latency_test
       env:
         email_latency: ${{ secrets.EMAIL_LATENCY }}
         login_pass_latency: ${{ secrets.LOGIN_PASS_LATENCY }}
       run: |
-        OUTPUT=$(python latency.py)
-        echo "Output: $OUTPUT"
-        LATENCY=$(echo $OUTPUT | awk -F, '{print $1}') 
-        LATENCY_WITHOUT_LOGIN=$(echo $OUTPUT | awk -F, '{print $2}')
-        echo "Latency: $LATENCY"
-        echo "Latency without login: $LATENCY_WITHOUT_LOGIN"
-        TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
-        echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
-        echo "LATENCY=$LATENCY" >> $GITHUB_ENV
-        echo "LATENCY_WITHOUT_LOGIN=$LATENCY_WITHOUT_LOGIN" >> $GITHUB_ENV
-
-    - name: Print and Save
-      run: |
-        echo "$TIMESTAMP,$LATENCY,$LATENCY_WITHOUT_LOGIN"
-        echo "$TIMESTAMP,$LATENCY,$LATENCY_WITHOUT_LOGIN" >> ./logs/latency_logs.csv
+        python latency.py
 
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
