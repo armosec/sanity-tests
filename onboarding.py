@@ -13,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 def setup_driver():
     chrome_options = Options()
-    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")
     driver = webdriver.Chrome(options=chrome_options)
     driver.set_window_size(1512, 982)
 
