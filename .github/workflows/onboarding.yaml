@@ -10,7 +10,7 @@ on:
   # - cron: "22,52 * * * *"
   push:
     branches:
-    - release-check
+    - release-test
 
 jobs:
   run-onboarding-test:
