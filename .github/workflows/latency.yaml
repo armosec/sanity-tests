@@ -2,12 +2,16 @@ name: latency test
 
 on:
   workflow_dispatch:
+    inputs:
+      URL:
+        type: string
+
 # Triggers the workflow every 30 minutes at 15 and 45 minutes past the hour
   schedule:
   - cron: "15,45 * * * *"
   # push:
   #   branches:
-  #   - latency-test
+  #   - release-test
 
 jobs:
   login_to_remediation:
@@ -34,10 +38,12 @@ jobs:
       env:
         email_latency: ${{ secrets.EMAIL_LATENCY }}
         login_pass_latency: ${{ secrets.LOGIN_PASS_LATENCY }}
+        URL: ${{ github.event.inputs.URL }}
       run: |
-        python latency.py
+        python latency.py $URL
 
     - name: Commit changes
+    if: github.event.inputs.URL == ''
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update latency logs with new data"

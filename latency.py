@@ -1,4 +1,5 @@
 import os
+import sys
 import time, datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -7,7 +8,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-url = "https://cloud.armosec.io/dashboard"
+prod_url = "https://cloud.armosec.io/dashboard"
+url = sys.argv[1] if len(sys.argv) > 1 else prod_url
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 driver = webdriver.Chrome(options=chrome_options)
