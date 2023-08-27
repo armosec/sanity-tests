@@ -2,12 +2,15 @@ name: onboarding test
 
 on:
   workflow_dispatch:
+    inputs:
+      URL:
+        type: string
 # Triggers the workflow every 30 minutes at 15 and 45 minutes past the hour
   schedule:
   - cron: "22,52 * * * *"
-  # push:
-  #   branches:
-  #   - onboarding-check
+  push:
+    branches:
+    - release-check
 
 jobs:
   run-onboarding-test:
@@ -43,11 +46,13 @@ jobs:
           env:
             email_onboarding: ${{ secrets.EMAIL_ONBOARDING }}
             login_pass_onboarding: ${{ secrets.LOGIN_PASS_ONBOARDING }}
+            URL: ${{ github.event.inputs.URL }}
           run: |
-            python onboarding.py
+            python onboarding.py $URL
 
         - name: Commit changes
           uses: EndBug/add-and-commit@v9
+          if: github.event.inputs.URL == ''
           with:
             message: "Update onboarding logs with new data"
             author_name: bvolovat

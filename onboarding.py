@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 import time, datetime
 from selenium import webdriver
@@ -16,15 +17,14 @@ def setup_driver():
     chrome_options.add_argument("--headless")
     driver = webdriver.Chrome(options=chrome_options)
     driver.set_window_size(1512, 982)
-
     return driver
 
 def get_current_timestamp():
     return datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
 
-def login(driver, wait, email_onboarding, login_pass_onboarding):
-    url = "https://cloud.armosec.io/dashboard"
+def login(driver, wait, email_onboarding, login_pass_onboarding, url):
+    # url = "https://cloud.armosec.io/dashboard"
     driver.get(url)
     email_input_box = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="frontegg-login-box-container-default"]/div[1]/input')))
     email_input_box.send_keys(email_onboarding)
@@ -142,11 +142,13 @@ def perform_cleanup(driver, wait):
 def main():
     email_onboarding = os.environ.get('email_onboarding')
     login_pass_onboarding = os.environ.get('login_pass_onboarding')
-
+    prod_url = "https://cloud.armosec.io/dashboard"
+    url = sys.argv[1] if len(sys.argv) > 1 else prod_url
+    
     start_time = time.time()
     driver = setup_driver()
     wait = WebDriverWait(driver, 90, 0.001)
-    login(driver, wait, email_onboarding, login_pass_onboarding)
+    login(driver, wait, email_onboarding, login_pass_onboarding, url)
     login_time = time.time()
     click_get_started(driver, wait)
     helm_command = copy_helm_command(driver, wait)
