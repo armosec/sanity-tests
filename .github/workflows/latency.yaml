@@ -43,7 +43,7 @@ jobs:
         python latency.py $URL
 
     - name: Commit changes
-    if: github.event.inputs.URL == ''
+      if: github.event.inputs.URL == ''
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update latency logs with new data"
