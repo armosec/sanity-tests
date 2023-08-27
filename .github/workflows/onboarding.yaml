@@ -6,8 +6,8 @@ on:
       URL:
         type: string
 # Triggers the workflow every 30 minutes at 15 and 45 minutes past the hour
-  schedule:
-  - cron: "22,52 * * * *"
+  # schedule:
+  # - cron: "22,52 * * * *"
   push:
     branches:
     - release-check
