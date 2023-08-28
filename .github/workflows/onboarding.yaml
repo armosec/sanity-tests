@@ -1,6 +1,10 @@
 name: onboarding test
 
 on:
+  workflow_call:
+    inputs:
+      URL:
+        type: string
   workflow_dispatch:
     inputs:
       URL:
