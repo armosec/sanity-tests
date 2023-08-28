@@ -24,6 +24,7 @@ def get_current_timestamp():
 
 
 def login(driver, wait, email_onboarding, login_pass_onboarding, url):
+    print(f"Scanning BE URL: {url}"}
     # url = "https://cloud.armosec.io/dashboard"
     driver.get(url)
     email_input_box = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="frontegg-login-box-container-default"]/div[1]/input')))
@@ -87,6 +88,7 @@ def view_connected_cluster(driver, wait):
 
 
 def uninstall_kubescape():
+    print("Uninstalling kubescape...")
     command = "helm uninstall kubescape -n kubescape && kubectl delete ns kubescape"
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
