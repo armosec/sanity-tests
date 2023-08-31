@@ -10,7 +10,7 @@ on:
       URL:
         type: string
     secrets:
-      token:
+      GH_ACCESS_TOKEN:
         required: true
 # Triggers the workflow every 30 minutes at 15 and 45 minutes past the hour
   # schedule:
@@ -40,7 +40,7 @@ jobs:
             repository: armosec/sanity-tests
             ref: release-test-yonatan
             path: .
-            token: ${{ secrets.token }}
+            token: ${{ secrets.GH_ACCESS_TOKEN }}
 
         - name: Set up Python environment
           uses: actions/setup-python@v4
