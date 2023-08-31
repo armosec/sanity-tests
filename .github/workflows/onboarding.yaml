@@ -18,6 +18,8 @@ on:
 
 jobs:
   run-onboarding-test:
+      env:
+        URL: ${{ github.event.inputs.URL }}
       runs-on: ubuntu-latest
       steps:
         - name: Generate uuid
@@ -54,17 +56,21 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r requirements.txt
 
-        - name: Print URL
+        - name: Set URL environment variable if not set
+          if: env.URL == null || env.URL == ''
           run: |
-            echo "URL is: ${{ inputs.URL }}"
-            echo "URL 2 is: ${{ github.event.inputs.URL }}"
+            echo "URL=$${{ inputs.URL }}" >> $GITHUB_ENV
 
+        - name: Print URL environment variable
+          run: |
+            echo "inputs.URL: ${{ inputs.URL }}"
+            echo "github.event.inputs.URL: ${{ github.event.inputs.URL }}"
+        
         - name: Run onboarding test
           id: onboarding_test
           env:
             email_onboarding: ${{ secrets.EMAIL_ONBOARDING }}
             login_pass_onboarding: ${{ secrets.LOGIN_PASS_ONBOARDING }}
-            URL: ${{ github.event.inputs.URL }}
           run: |
             python onboarding.py $URL
 
