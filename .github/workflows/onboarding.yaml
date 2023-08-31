@@ -9,6 +9,9 @@ on:
     inputs:
       URL:
         type: string
+    secrets:
+      token:
+        required: true
 # Triggers the workflow every 30 minutes at 15 and 45 minutes past the hour
   # schedule:
   # - cron: "22,52 * * * *"
@@ -33,6 +36,11 @@ jobs:
 
         - name: Checkout repo
           uses: actions/checkout@v3
+          with:
+            repository: armosec/sanity-tests
+            ref: release-test-yonatan
+            path: .
+            token: ${{ secrets.token }}
 
         - name: Set up Python environment
           uses: actions/setup-python@v4
