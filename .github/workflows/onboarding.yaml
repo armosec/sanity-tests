@@ -62,6 +62,8 @@ jobs:
             login_pass_onboarding: ${{ secrets.LOGIN_PASS_ONBOARDING }}
             URL: ${{ github.event.inputs.URL }}
           run: |
+            echo "URL is: ${{ inputs.URL }}"
+            echo "URL 2 is: ${{ github.event.inputs.URL }}"
             python onboarding.py $URL
 
         - name: Commit changes
