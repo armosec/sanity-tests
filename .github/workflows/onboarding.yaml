@@ -36,17 +36,12 @@ jobs:
             echo "event_name = ${{ github.event_name }}"
 
         - name: Checkout repo on workflow_call
-          if: ${{ github.event_name == 'workflow_call' }}
           uses: actions/checkout@v3
           with:
             repository: armosec/sanity-tests
             ref: release-test-yonatan
             path: .
             token: ${{ secrets.GH_ACCESS_TOKEN }}
-
-        - name: Checkout repo
-          if: ${{ github.event_name != 'workflow_call' }}
-          uses: actions/checkout@v3
 
         - name: Set up Python environment
           uses: actions/setup-python@v4
