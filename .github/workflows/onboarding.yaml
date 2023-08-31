@@ -9,9 +9,6 @@ on:
     inputs:
       URL:
         type: string
-    # secrets:
-    #   GH_ACCESS_TOKEN:
-    #     required: true
 # Triggers the workflow every 30 minutes at 15 and 45 minutes past the hour
   # schedule:
   # - cron: "22,52 * * * *"
@@ -34,13 +31,18 @@ jobs:
           with:
             cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
 
-        - name: Checkout repo
+        - name: Checkout repo on workflow_call
+          if: ${{ github.event_name == 'workflow_call' }}
           uses: actions/checkout@v3
           with:
             repository: armosec/sanity-tests
             ref: release-test-yonatan
             path: .
             token: ${{ secrets.GH_ACCESS_TOKEN }}
+
+        - name: Checkout repo
+          if: ${{ github.event_name != 'workflow_call' }}
+          uses: actions/checkout@v3
 
         - name: Set up Python environment
           uses: actions/setup-python@v4
@@ -50,8 +52,6 @@ jobs:
 
         - name: Install dependencies
           run: |
-            ls
-            pwd
             python -m pip install --upgrade pip
             pip install -r requirements.txt
 
