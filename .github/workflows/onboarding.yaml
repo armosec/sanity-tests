@@ -55,6 +55,11 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r requirements.txt
 
+        - name: Print URL
+          run: |
+            echo "URL is: ${{ inputs.URL }}"
+            echo "URL 2 is: ${{ github.event.inputs.URL }}"
+
         - name: Run onboarding test
           id: onboarding_test
           env:
@@ -62,8 +67,6 @@ jobs:
             login_pass_onboarding: ${{ secrets.LOGIN_PASS_ONBOARDING }}
             URL: ${{ github.event.inputs.URL }}
           run: |
-            echo "URL is: ${{ inputs.URL }}"
-            echo "URL 2 is: ${{ github.event.inputs.URL }}"
             python onboarding.py $URL
 
         - name: Commit changes
