@@ -59,7 +59,7 @@ jobs:
         - name: Set URL environment variable if not set
           if: env.URL == null || env.URL == ''
           run: |
-            echo "URL=$${{ inputs.URL }}" >> $GITHUB_ENV
+            echo "URL=${{ inputs.URL }}" >> $GITHUB_ENV
 
         - name: Print URL environment variable
           run: |
