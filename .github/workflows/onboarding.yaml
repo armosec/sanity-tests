@@ -72,7 +72,7 @@ jobs:
             email_onboarding: ${{ secrets.EMAIL_ONBOARDING }}
             login_pass_onboarding: ${{ secrets.LOGIN_PASS_ONBOARDING }}
           run: |
-            python onboarding.py $URL
+            python onboarding.py "$URL"
 
         - name: Commit changes
           uses: EndBug/add-and-commit@v9
