@@ -146,7 +146,7 @@ def main():
     login_pass_onboarding = os.environ.get('login_pass_onboarding')
     prod_url = "https://cloud.armosec.io/dashboard"
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
-    
+
     start_time = time.time()
     driver = setup_driver()
     wait = WebDriverWait(driver, 90, 0.001)
