@@ -137,7 +137,7 @@ def choose_delete_option(driver, wait):
 
 
 def confirm_delete(driver, wait):
-    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[5]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]')))
+    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[6]/div[3]/div/mat-dialog-container/armo-notification/div[3]/button[2]')))
     driver.execute_script("arguments[0].click();", confirm_delete_button)
 
 
