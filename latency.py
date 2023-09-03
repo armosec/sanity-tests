@@ -33,6 +33,28 @@ def login(driver, wait, email_latency, login_pass_latency):
     password_input = driver.find_element(by=By.XPATH, value='/html/body/frontegg-app/div[2]/div[2]/input')
     password_input.send_keys(login_pass_latency)
     password_input.send_keys(Keys.ENTER)
+    # check if onboarding-role page is displayed
+    element = driver.find_element_by_xpath("//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")
+    if element:
+        role_page(driver, wait) # call role_page function if the element exists
+    else:    
+        print("Onboarding role page is not displayed - not a sign up user")
+
+        
+def role_page(driver, wait):
+    role_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[1]/armo-onboarding-survey-buttons-upper/div/div[1]/div[1]')))
+    driver.execute_script("arguments[0].click();", role_button)
+    people_amount_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[2]/armo-onboarding-survey-buttons-lower/div/div[1]/div[1]')))
+    driver.execute_script("arguments[0].click();", people_amount_button)
+    continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[3]/button/span[2]'))) 
+    driver.execute_script("arguments[0].click();", continue_button)
+    experience_checkbox = driver.find_element_by_id('mat-checkbox-2-input')
+    experience_checkbox.click()
+    continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-features-page/div/div[2]/div/div[3]/button/span[2]')))
+    driver.execute_script("arguments[0].click();", continue_button) 
+    #close the helm installation window
+    close_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="mat-dialog-0"]/armo-config-scanning-connection-wizard-dialog/armo-onboarding-dialog/armo-dialog-header/mat-icon')))
+    driver.execute_script("arguments[0].click();", close_button) 
 
 def navigate_to_dashboard(driver, wait):
     # Click on the compliance
