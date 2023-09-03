@@ -21,7 +21,7 @@ def setup_driver():
     return driver
 
 def get_current_timestamp():
-    return datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 
 def login(driver, wait, email_onboarding, login_pass_onboarding, url):
