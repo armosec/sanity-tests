@@ -177,10 +177,8 @@ def perform_cleanup(driver, wait):
 
 
 def main():
-    # email_onboarding = os.environ.get('email_onboarding')
-    # login_pass_onboarding = os.environ.get('login_pass_onboarding')
-    email_onboarding = "borisv@armosec.io"
-    login_pass_onboarding = "Bv110584!"
+    email_onboarding = os.environ.get('email_onboarding')
+    login_pass_onboarding = os.environ.get('login_pass_onboarding')
     prod_url = "https://cloud.armosec.io/dashboard"
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
 
