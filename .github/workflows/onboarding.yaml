@@ -10,11 +10,11 @@ on:
       URL:
         type: string
 # Triggers the workflow every 30 minutes at 15 and 45 minutes past the hour
-  schedule:
-  - cron: "22,52 * * * *"
-  # push:
-  #   branches:
-  #   - release-test
+  # schedule:
+  # - cron: "22,52 * * * *"
+  push:
+    branches:
+    - release-test
 
 jobs:
   run-onboarding-test:
@@ -54,6 +54,13 @@ jobs:
           run: |
             python onboarding.py $URL
 
+        - name: upload screenshots
+          uses: actions/upload-artifact@v3
+          with:
+            name: screenshots
+            path: |    
+              ./*.png
+
         - name: Commit changes
           uses: EndBug/add-and-commit@v9
           if: github.event.inputs.URL == ''
@@ -62,3 +69,4 @@ jobs:
             author_name: bvolovat
             author_email: borisv@armosec.io
             commit: --signoff
+            add: ./logs/*
