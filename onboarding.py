@@ -34,10 +34,9 @@ def login(driver, wait, email_onboarding, login_pass_onboarding, url):
     password_input_box.send_keys(login_pass_onboarding)
     password_input_box.send_keys(Keys.ENTER)
     # check if onboarding-role page is displayed
-    element = driver.find_element_by_xpath("//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")
-    if element:
-        role_page(driver, wait) # call role_page function if the element exists
-    else:    
+    try:
+        element = wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")))
+    except:
         print("Onboarding role page is not displayed - not a sign up user")
 
         
