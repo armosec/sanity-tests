@@ -181,30 +181,30 @@ def main():
     prod_url = "https://cloud.armosec.io/dashboard"
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
 
-    start_time = time.time()
+    # start_time = time.time()
     driver = setup_driver()
     wait = WebDriverWait(driver, 90, 0.001)
     login(driver, wait, email_onboarding, login_pass_onboarding, url)
-    login_time = time.time()
-    click_get_started(driver, wait)
-    helm_command = copy_helm_command(driver, wait)
-    execute_helm_command(helm_command)
-    verify_installation(driver, wait)
-    view_cluster_button(driver, wait)
-    view_connected_cluster(driver, wait)
-    end_time = time.time()
-    uninstall_kubescape()
+    # login_time = time.time()
+    # click_get_started(driver, wait)
+    # helm_command = copy_helm_command(driver, wait)
+    # execute_helm_command(helm_command)
+    # verify_installation(driver, wait)
+    # view_cluster_button(driver, wait)
+    # view_connected_cluster(driver, wait)
+    # end_time = time.time()
+    # uninstall_kubescape()
     perform_cleanup(driver, wait)
     driver.quit()
     
-    onboarding_time = "{:.2f}".format(end_time - start_time)
-    lonboarding_time_without_login = "{:.2f}".format(end_time - login_time)
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open("./logs/onboarding_logs.csv", "a") as f:
-        f.write(f"{timestamp},{onboarding_time},{lonboarding_time_without_login}\n")
-    print(f"{timestamp}\n"
-          f"Onboarding time: {onboarding_time}\n"
-          f"Onboarding time without login: {lonboarding_time_without_login}\n")
+    # onboarding_time = "{:.2f}".format(end_time - start_time)
+    # lonboarding_time_without_login = "{:.2f}".format(end_time - login_time)
+    # timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # with open("./logs/onboarding_logs.csv", "a") as f:
+    #     f.write(f"{timestamp},{onboarding_time},{lonboarding_time_without_login}\n")
+    # print(f"{timestamp}\n"
+    #       f"Onboarding time: {onboarding_time}\n"
+    #       f"Onboarding time without login: {lonboarding_time_without_login}\n")
     
 
 
