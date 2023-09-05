@@ -25,7 +25,6 @@ def get_current_timestamp():
 
 
 def login(driver, wait, email_onboarding, login_pass_onboarding, url):
-    # url = "https://cloud.armosec.io/dashboard"
     driver.get(url)
     email_input_box = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="frontegg-login-box-container-default"]/div[1]/input')))
     email_input_box.send_keys(email_onboarding)
@@ -35,9 +34,13 @@ def login(driver, wait, email_onboarding, login_pass_onboarding, url):
     password_input_box.send_keys(Keys.ENTER)
     # check if onboarding-role page is displayed
     try:
-        element = wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")))
+        wait_for_element = WebDriverWait(driver, 5, 0.001)
+        element = wait_for_element.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")))
     except:
         print("Onboarding role page is not displayed - not a sign up user")
+    else:
+        print("Onboarding role page is displayed - sign up user (first login)")
+        role_page(driver, wait) 
 
         
 def role_page(driver, wait):
@@ -99,7 +102,7 @@ def view_cluster_button(driver, wait):
 
 
 def view_connected_cluster(driver, wait):
-    wait = WebDriverWait(driver, 30, 0.001)
+    wait = WebDriverWait(driver, 60, 0.001)
     try:
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
     except TimeoutException as e:
@@ -136,7 +139,7 @@ def choose_delete_option(driver, wait):
 
 
 def confirm_delete(driver, wait):
-    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[6]/div[3]/div/mat-dialog-container/armo-notification/div[3]/button[2]')))
+    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[5]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]')))
     driver.execute_script("arguments[0].click();", confirm_delete_button)
 
 
@@ -149,9 +152,9 @@ def perform_cleanup(driver, wait):
     max_retries = 2
     for _ in range(max_retries):
         try:
-            print("Clicking settings button...")
+            print("Deleting cluster from ARMO platform\n"
+                  "Clicking settings button...")
             click_settings_button(driver, wait)
-
             print("Clicking more options button...")
             click_more_options_button(driver, wait)
 
@@ -174,6 +177,18 @@ def perform_cleanup(driver, wait):
             driver.save_screenshot(cleanup_error_screenshot)
 
 
+def execute_test(driver, wait, retrying):
+    if retrying:
+        driver.get("https://cloud.armosec.io/dashboard") 
+    
+    click_get_started(driver, wait)
+    helm_command = copy_helm_command(driver, wait)
+    execute_helm_command(helm_command)
+    verify_installation(driver, wait)
+    view_cluster_button(driver, wait)
+    view_connected_cluster(driver, wait)
+
+
 
 def main():
     email_onboarding = os.environ.get('email_onboarding')
@@ -181,32 +196,39 @@ def main():
     prod_url = "https://cloud.armosec.io/dashboard"
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
 
-    # start_time = time.time()
     driver = setup_driver()
-    wait = WebDriverWait(driver, 90, 0.001)
-    login(driver, wait, email_onboarding, login_pass_onboarding, url)
-    # login_time = time.time()
-    # click_get_started(driver, wait)
-    # helm_command = copy_helm_command(driver, wait)
-    # execute_helm_command(helm_command)
-    # verify_installation(driver, wait)
-    # view_cluster_button(driver, wait)
-    # view_connected_cluster(driver, wait)
-    # end_time = time.time()
-    # uninstall_kubescape()
+    wait = WebDriverWait(driver, 30, 0.001)
+    start_time = time.time()
+
+    retrying = False
+    login(driver, wait, email_onboarding, login_pass_onboarding, url) 
+    login_time = time.time()
+    try:
+        execute_test(driver, wait, retrying)
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        print(traceback.format_exc())
+        print("Attempting to cleanup...")
+        perform_cleanup(driver, wait)
+        print("Cleanup successful. Retrying test...")
+        retrying = True
+        start_time = time.time()  # Resetting the test start time for retry
+        execute_test(driver, wait, retrying)
+
+    end_time = time.time()
+    uninstall_kubescape()
     perform_cleanup(driver, wait)
     driver.quit()
     
-    # onboarding_time = "{:.2f}".format(end_time - start_time)
-    # lonboarding_time_without_login = "{:.2f}".format(end_time - login_time)
-    # timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # with open("./logs/onboarding_logs.csv", "a") as f:
-    #     f.write(f"{timestamp},{onboarding_time},{lonboarding_time_without_login}\n")
-    # print(f"{timestamp}\n"
-    #       f"Onboarding time: {onboarding_time}\n"
-    #       f"Onboarding time without login: {lonboarding_time_without_login}\n")
+    onboarding_time = "{:.2f}".format(end_time - start_time)
+    onboarding_time_without_login = "{:.2f}".format(end_time - login_time)
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open("./logs/onboarding_logs.csv", "a") as f:
+        f.write(f"{timestamp},{onboarding_time},{onboarding_time_without_login}\n")
+    print(f"{timestamp}\n"
+          f"Onboarding time: {onboarding_time}\n"
+          f"Onboarding time without login: {onboarding_time_without_login}\n")
     
-
 
 if __name__ == "__main__":
     main()

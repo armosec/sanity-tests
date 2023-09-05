@@ -34,11 +34,14 @@ def login(driver, wait, email_latency, login_pass_latency):
     password_input.send_keys(login_pass_latency)
     password_input.send_keys(Keys.ENTER)
     # check if onboarding-role page is displayed
-    element = driver.find_element_by_xpath("//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")
-    if element:
-        role_page(driver, wait) # call role_page function if the element exists
-    else:    
+    try:
+        wait_for_element = WebDriverWait(driver, 5, 0.001)
+        element = wait_for_element.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")))
+    except:
         print("Onboarding role page is not displayed - not a sign up user")
+    else:
+        print("Onboarding role page is displayed - sign up user (first login)")
+        role_page(driver, wait)
 
         
 def role_page(driver, wait):
@@ -102,12 +105,13 @@ def measure_latency(driver, wait, email_latency, login_pass_latency, url):
     latency = "{:.2f}".format(end_time - start_time)
     return latency , latency_without_login
 
-
+email_latency = "borisv@armosec.io"
+login_pass_onboarding = "Bv110584@@"
 latency, latency_without_login = measure_latency(driver, wait, os.environ['email_latency'], os.environ['login_pass_latency'], url)
 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 with open("./logs/latency_logs.csv", "a") as f:
-    f.write(f"{timestamp},{latency},{latency_without_login}\n")
-    print(f"{timestamp}\n"
-          f"Latency time: {latency} sec\n"
-          f"Latency time without login: {latency_without_login} sec\n")
+     f.write(f"{timestamp},{latency},{latency_without_login}\n")
+print(f"{timestamp}\n"
+      f"Latency time: {latency} sec\n"
+      f"Latency time without login: {latency_without_login} sec\n")
 driver.quit()
