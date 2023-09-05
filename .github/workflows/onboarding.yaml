@@ -31,8 +31,17 @@ jobs:
           with:
             cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
 
+        - name: Print Event name
+          run: |
+            echo "event_name = ${{ github.event_name }}"
+
         - name: Checkout repo
           uses: actions/checkout@v3
+          with:
+            repository: armosec/sanity-tests
+            ref: release-test-yonatan
+            path: .
+            token: ${{ secrets.ARMOSEC_GITHUB_ACCESS_TOKEN }}
 
         - name: Set up Python environment
           uses: actions/setup-python@v4
@@ -45,12 +54,13 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r requirements.txt
 
+        
         - name: Run onboarding test
           id: onboarding_test
           env:
+            URL: ${{ inputs.URL }}
             email_onboarding: ${{ secrets.EMAIL_ONBOARDING }}
             login_pass_onboarding: ${{ secrets.LOGIN_PASS_ONBOARDING }}
-            URL: ${{ github.event.inputs.URL }}
           run: |
             python onboarding.py $URL
 
@@ -63,7 +73,7 @@ jobs:
 
         - name: Commit changes
           uses: EndBug/add-and-commit@v9
-          if: github.event.inputs.URL == ''
+          if: inputs.URL == ''
           with:
             message: "Update onboarding logs with new data"
             author_name: bvolovat

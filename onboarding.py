@@ -25,6 +25,7 @@ def get_current_timestamp():
 
 
 def login(driver, wait, email_onboarding, login_pass_onboarding, url):
+    print(f"Scanning BE URL: {url}")
     driver.get(url)
     email_input_box = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="frontegg-login-box-container-default"]/div[1]/input')))
     email_input_box.send_keys(email_onboarding)
@@ -195,7 +196,7 @@ def main():
     login_pass_onboarding = os.environ.get('login_pass_onboarding')
     prod_url = "https://cloud.armosec.io/dashboard"
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
-
+    start_time = time.time()
     driver = setup_driver()
     wait = WebDriverWait(driver, 30, 0.001)
     start_time = time.time()
