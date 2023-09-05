@@ -105,8 +105,6 @@ def measure_latency(driver, wait, email_latency, login_pass_latency, url):
     latency = "{:.2f}".format(end_time - start_time)
     return latency , latency_without_login
 
-email_latency = "borisv@armosec.io"
-login_pass_onboarding = "Bv110584@@"
 latency, latency_without_login = measure_latency(driver, wait, os.environ['email_latency'], os.environ['login_pass_latency'], url)
 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 with open("./logs/latency_logs.csv", "a") as f:
