@@ -33,6 +33,31 @@ def login(driver, wait, email_latency, login_pass_latency):
     password_input = driver.find_element(by=By.XPATH, value='/html/body/frontegg-app/div[2]/div[2]/input')
     password_input.send_keys(login_pass_latency)
     password_input.send_keys(Keys.ENTER)
+    # check if onboarding-role page is displayed
+    try:
+        wait_for_element = WebDriverWait(driver, 5, 0.001)
+        element = wait_for_element.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")))
+    except:
+        print("Onboarding role page is not displayed - not a sign up user")
+    else:
+        print("Onboarding role page is displayed - sign up user (first login)")
+        role_page(driver, wait)
+
+        
+def role_page(driver, wait):
+    role_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[1]/armo-onboarding-survey-buttons-upper/div/div[1]/div[1]')))
+    driver.execute_script("arguments[0].click();", role_button)
+    people_amount_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[2]/armo-onboarding-survey-buttons-lower/div/div[1]/div[1]')))
+    driver.execute_script("arguments[0].click();", people_amount_button)
+    continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[3]/button/span[2]'))) 
+    driver.execute_script("arguments[0].click();", continue_button)
+    experience_checkbox = driver.find_element_by_id('mat-checkbox-2-input')
+    experience_checkbox.click()
+    continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-features-page/div/div[2]/div/div[3]/button/span[2]')))
+    driver.execute_script("arguments[0].click();", continue_button) 
+    #close the helm installation window
+    close_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="mat-dialog-0"]/armo-config-scanning-connection-wizard-dialog/armo-onboarding-dialog/armo-dialog-header/mat-icon')))
+    driver.execute_script("arguments[0].click();", close_button) 
 
 def navigate_to_dashboard(driver, wait):
     # Click on the compliance
@@ -80,12 +105,13 @@ def measure_latency(driver, wait, email_latency, login_pass_latency, url):
     latency = "{:.2f}".format(end_time - start_time)
     return latency , latency_without_login
 
-
+email_latency = "borisv@armosec.io"
+login_pass_onboarding = "Bv110584@@"
 latency, latency_without_login = measure_latency(driver, wait, os.environ['email_latency'], os.environ['login_pass_latency'], url)
 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 with open("./logs/latency_logs.csv", "a") as f:
-    f.write(f"{timestamp},{latency},{latency_without_login}\n")
-    print(f"{timestamp}\n"
-          f"Latency time: {latency} sec\n"
-          f"Latency time without login: {latency_without_login} sec\n")
+     f.write(f"{timestamp},{latency},{latency_without_login}\n")
+print(f"{timestamp}\n"
+      f"Latency time: {latency} sec\n"
+      f"Latency time without login: {latency_without_login} sec\n")
 driver.quit()
