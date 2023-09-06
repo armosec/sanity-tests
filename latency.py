@@ -51,8 +51,8 @@ def role_page(driver, wait):
     driver.execute_script("arguments[0].click();", people_amount_button)
     continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[3]/button/span[2]'))) 
     driver.execute_script("arguments[0].click();", continue_button)
-    experience_checkbox = driver.find_element_by_id('mat-checkbox-2-input')
-    experience_checkbox.click()
+    experience_checkbox = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-features-page/div/div[2]/div/div[2]/armo-onboarding-how-best-help-buttons/div[1]/div')))
+    driver.execute_script("arguments[0].click();", experience_checkbox)
     continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-features-page/div/div[2]/div/div[3]/button/span[2]')))
     driver.execute_script("arguments[0].click();", continue_button) 
     #close the helm installation window
