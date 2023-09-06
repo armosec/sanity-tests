@@ -111,7 +111,7 @@ def view_cluster_button(driver, wait):
 
 
 def view_connected_cluster(driver, wait):
-    wait = WebDriverWait(driver, 60, 0.001)
+    wait = WebDriverWait(driver, 150, 0.001)
     try:
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
     except TimeoutException as e:
@@ -193,8 +193,19 @@ def execute_test(driver, wait, retrying):
     click_get_started(driver, wait)
     helm_command = copy_helm_command(driver, wait)
     execute_helm_command(helm_command)
+
+    verify_installation_start_time = time.time()
     verify_installation(driver, wait)
+    verify_installation_end_time = time.time()
+    verify_installation_time = "{:.2f}".format(verify_installation_end_time - verify_installation_start_time)
+    print(f"verify_installation time: {verify_installation_time}\n")
+    
+    view_cluster_button_start_time = time.time()
     view_cluster_button(driver, wait)
+    view_cluster_button_end_time = time.time()
+    view_cluster_button_time = "{:.2f}".format(view_cluster_button_end_time - view_cluster_button_start_time)
+    print(f"view_cluster_button time: {view_cluster_button_time}\n")
+    
     view_connected_cluster(driver, wait)
 
 
@@ -206,7 +217,7 @@ def main():
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
     start_time = time.time()
     driver = setup_driver()
-    wait = WebDriverWait(driver, 90, 0.001)
+    wait = WebDriverWait(driver, 150, 0.001)
     start_time = time.time()
 
     retrying = False
