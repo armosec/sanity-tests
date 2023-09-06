@@ -79,4 +79,5 @@ jobs:
             author_name: bvolovat
             author_email: borisv@armosec.io
             commit: --signoff
+            pull: '--ff-only'
             add: ./logs/*

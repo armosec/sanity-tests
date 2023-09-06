@@ -170,6 +170,7 @@ jobs:
             message: "Update sanity logs with new data"
             author_name: bvolovat
             author_email: borisv@armosec.io
+            pull: '--ff-only'
             commit: --signoff
 
         - name: Test Report
