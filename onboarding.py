@@ -45,24 +45,32 @@ def login(driver, wait, email_onboarding, login_pass_onboarding, url):
 
         
 def role_page(driver, wait):
-    role_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[1]/armo-onboarding-survey-buttons-upper/div/div[1]/div[1]')))
-    driver.execute_script("arguments[0].click();", role_button)
-    people_amount_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[2]/armo-onboarding-survey-buttons-lower/div/div[1]/div[1]')))
-    driver.execute_script("arguments[0].click();", people_amount_button)
-    continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[3]/button/span[2]'))) 
-    driver.execute_script("arguments[0].click();", continue_button)
-    experience_checkbox = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-features-page/div/div[2]/div/div[2]/armo-onboarding-how-best-help-buttons/div[1]/div')))
-    driver.execute_script("arguments[0].click();", experience_checkbox)
-    continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-features-page/div/div[2]/div/div[3]/button/span[2]')))
-    driver.execute_script("arguments[0].click();", continue_button) 
-    #close the helm installation window
-    close_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="mat-dialog-0"]/armo-config-scanning-connection-wizard-dialog/armo-onboarding-dialog/armo-dialog-header/mat-icon')))
-    driver.execute_script("arguments[0].click();", close_button) 
+    try:
+        role_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[1]/armo-onboarding-survey-buttons-upper/div/div[1]/div[1]')))
+        driver.execute_script("arguments[0].click();", role_button)
+        people_amount_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[2]/armo-onboarding-survey-buttons-lower/div/div[1]/div[1]')))
+        driver.execute_script("arguments[0].click();", people_amount_button)
+        continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[3]/button/span[2]'))) 
+        driver.execute_script("arguments[0].click();", continue_button)
+        experience_checkbox = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-features-page/div/div[2]/div/div[2]/armo-onboarding-how-best-help-buttons/div[1]/div')))
+        driver.execute_script("arguments[0].click();", experience_checkbox)
+        continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-features-page/div/div[2]/div/div[3]/button/span[2]')))
+        driver.execute_script("arguments[0].click();", continue_button) 
+        #close the helm installation window
+        close_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="mat-dialog-0"]/armo-config-scanning-connection-wizard-dialog/armo-onboarding-dialog/armo-dialog-header/mat-icon')))
+        driver.execute_script("arguments[0].click();", close_button)
+    except TimeoutException as e:
+        print("Onboarding role page was not found or clickable.")
+        driver.save_screenshot(f"./onboarding_role_page_error_{get_current_timestamp()}.png")
 
 
 def click_get_started(driver, wait):
-    get_started_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/button/span[1]')))
-    driver.execute_script("arguments[0].click();", get_started_button)
+    try:
+        get_started_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/button/span[1]')))
+        driver.execute_script("arguments[0].click();", get_started_button)
+    except TimeoutException as e:
+        print("Get started button was not found or clickable.")
+        driver.save_screenshot(f"./get_started_button_error_{get_current_timestamp()}.png")
 
 
 def copy_helm_command(driver, wait):
