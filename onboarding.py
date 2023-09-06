@@ -206,7 +206,7 @@ def main():
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
     start_time = time.time()
     driver = setup_driver()
-    wait = WebDriverWait(driver, 60, 0.001)
+    wait = WebDriverWait(driver, 90, 0.001)
     start_time = time.time()
 
     retrying = False
