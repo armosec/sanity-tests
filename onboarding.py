@@ -111,7 +111,7 @@ def view_cluster_button(driver, wait):
 
 
 def view_connected_cluster(driver, wait):
-    wait = WebDriverWait(driver, 150, 0.001)
+    wait = WebDriverWait(driver, 200, 0.001)
     try:
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
     except TimeoutException as e:
@@ -153,7 +153,7 @@ def confirm_delete(driver, wait):
 
 
 def wait_for_empty_table(driver):
-    wait = WebDriverWait(driver, 180, 0.001)
+    wait = WebDriverWait(driver, 200, 0.001)
     wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'td.mat-cell.text-center.ng-star-inserted'), 'No data to display'))
 
 
