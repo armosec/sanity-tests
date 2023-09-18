@@ -70,6 +70,7 @@ def navigate_to_dashboard(driver, wait):
     # take_screenshot(driver, "Click on the compliance")
 
     # Click on the cluster (the first one)
+    time.sleep(1)
     wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')))
     cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
     driver.execute_script("arguments[0].click();", cluster)
