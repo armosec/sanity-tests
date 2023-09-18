@@ -6,8 +6,8 @@ on:
   schedule:
   - cron: "15,45 * * * *"
   # push:
-  #   branches:
-  #   - latency-test
+    branches:
+    - latency-flow
 
 jobs:
   login_to_remediation:
