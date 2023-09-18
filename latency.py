@@ -134,6 +134,7 @@ def measure_latency(driver, wait, email, login_pass, url):
 
     return login_latency, complaince_page_latency, vulnerabilities_page_latency
 
+
 def main(url):
     driver = init_driver()
     wait = WebDriverWait(driver, 30, 0.001)
