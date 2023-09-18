@@ -11,10 +11,27 @@ on:
 
 jobs:
   login_to_remediation:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Generate uuid
+      id: uuid
+      run: |
+        echo "RANDOM_UUID=$(uuidgen)" >> $GITHUB_OUTPUT
+        echo "UUID is: $(uuidgen)"
 
-    runs-on: ubuntu-latest
-
-    steps:
+    - name: Create k8s Kind Cluster
+      id: kind-cluster-install
+      uses: helm/kind-action@d08cf6ff1575077dee99962540d77ce91c62387d # ratchet:helm/kind-action@v1.3.0
+      with:
+        cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
+    
+    - name: Deploy Kubescape
+      env: ${{ secrets.LATENCY_ACCOUNT_ID }}
+      run: |
+        helm repo add kubescape https://kubescape.github.io/helm-charts/
+        helm repo update
+        helm upgrade --install kubescape kubescape/kubescape-cloud-operator -n kubescape --create-namespace --set clusterName=`kubectl config current-context` --set account=${{ secrets.LATENCY_ACCOUNT_ID }} --set capabilities.relevancy=detect --set clusterServer=`kubectl config view -o jsonpath="{.clusters[?(@.name=='$(kubectl config current-context)')].cluster.server}"`
+        
     - name: Checkout repo
       uses: actions/checkout@v3
 
@@ -34,8 +51,9 @@ jobs:
       env:
         email_latency: ${{ secrets.EMAIL_LATENCY }}
         login_pass_latency: ${{ secrets.LOGIN_PASS_LATENCY }}
+        URL: ${{ github.event.inputs.URL }}
       run: |
-        python latency.py
+        python latency.py $URL
 
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
@@ -43,4 +61,5 @@ jobs:
         message: "Update latency logs with new data"
         author_name: bvolovat
         author_email: borisv@armosec.io
+        pull: '--ff-only'
         commit: --signoff
