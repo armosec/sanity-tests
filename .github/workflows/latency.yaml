@@ -30,7 +30,6 @@ jobs:
             cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
 
         - name: Deploy Kubescape
-          env: ${{ secrets.LATENCY_ACCOUNT_ID }}
           run: |
             helm repo add kubescape https://kubescape.github.io/helm-charts/
             helm repo update
