@@ -10,7 +10,7 @@ on:
     - latency-flow
 
 jobs:
-  login_to_remediation:
+  latency-test:
       runs-on: ubuntu-latest
       steps:
         - name: Generate uuid
