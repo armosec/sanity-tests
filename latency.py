@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # Constants
-PROD_URL = "https://cloud.armosec.io/dashboard"
+PROD_URL = "https://cloud.armosec.io/compliance"
 LOG_FILE = "./logs/latency_logs.csv"
 EMAIL_LATENCY = os.environ['email_latency']
 LOGIN_PASS_LATENCY = os.environ['login_pass_latency']
