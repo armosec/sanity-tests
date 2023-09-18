@@ -128,6 +128,7 @@ def measure_latency(driver, wait, email, login_pass, url):
     navigate_to_vulnerabilities(driver, wait)
     end_time = time.time()
 
+    #need to add cleanup cluster
     login_latency = "{:.2f}".format(login_time - start_time)
     complaince_page_latency = "{:.2f}".format(end_time_dashboard - login_time)
     vulnerabilities_page_latency = "{:.2f}".format(end_time - end_time_dashboard)
