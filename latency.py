@@ -41,7 +41,7 @@ def handle_role_page(driver, wait):
     close_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="mat-dialog-0"]/armo-config-scanning-connection-wizard-dialog/armo-onboarding-dialog/armo-dialog-header/mat-icon')))
     driver.execute_script("arguments[0].click();", close_button)
 
-def handle_login(driver, wait, email_latency, login_pass_latency):
+def handle_login(driver, wait, email_latency, login_pass_latency, url):
     driver.get(url)
     wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="frontegg-login-box-container-default"]/div[1]/input')))
     mail_input = driver.find_element(by=By.XPATH, value='//*[@id="frontegg-login-box-container-default"]/div[1]/input')
@@ -119,9 +119,9 @@ def navigate_to_vulnerabilities(driver, wait):
 
 
 
-def measure_latency(driver, wait, email, login_pass):
+def measure_latency(driver, wait, email, login_pass, url):
     start_time = time.time() 
-    handle_login(driver, wait, email, login_pass)
+    handle_login(driver, wait, email, login_pass, url)
     login_time = time.time()
     navigate_to_dashboard(driver, wait)
     end_time_dashboard = time.time()
