@@ -16,6 +16,7 @@ from selenium.webdriver.support import expected_conditions as EC
 def setup_driver():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
+    # chrome_options.add_argument('--incognito')
     driver = webdriver.Chrome(options=chrome_options)
     driver.set_window_size(1512, 982)
     return driver
@@ -46,19 +47,45 @@ def login(driver, wait, email_onboarding, login_pass_onboarding, url):
         
 def role_page(driver, wait):
     try:
-        role_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[1]/armo-onboarding-survey-buttons-upper/div/div[1]/div[1]')))
+        role_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[1]/armo-onboarding-survey-buttons-upper/div/div[1]/div[2]')))
         driver.execute_script("arguments[0].click();", role_button)
+        print("Click on role button.")
+        driver.save_screenshot(f"./role_button_{get_current_timestamp()}.png")
+    except TimeoutException as e:
+        print("Role button was not found or clickable.")
+        driver.save_screenshot(f"./role_button_error_{get_current_timestamp()}.png")
+    try:
         people_amount_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[2]/armo-onboarding-survey-buttons-lower/div/div[1]/div[1]')))
         driver.execute_script("arguments[0].click();", people_amount_button)
+        print("Click on people amount button.")
+    except TimeoutException as e:
+        print("People amount button was not found or clickable.")
+        driver.save_screenshot(f"./people_amount_button_error_{get_current_timestamp()}.png")
+    try:    
         continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[3]/button/span[2]'))) 
         driver.execute_script("arguments[0].click();", continue_button)
+        print("Click on continue button.")
+    except TimeoutException as e:
+        print("Continue button was not found or clickable.")
+        driver.save_screenshot(f"./continue_button_error_{get_current_timestamp()}.png")
+    try:
         experience_checkbox = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-features-page/div/div[2]/div/div[2]/armo-onboarding-how-best-help-buttons/div[1]/div')))
         driver.execute_script("arguments[0].click();", experience_checkbox)
+        print("Click on experience checkbox.")
+    except TimeoutException as e:
+        print("Experience checkbox was not found or clickable.")
+        driver.save_screenshot(f"./experience_checkbox_error_{get_current_timestamp()}.png")
+    try:    
         continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-features-page/div/div[2]/div/div[3]/button/span[2]')))
         driver.execute_script("arguments[0].click();", continue_button) 
-        #close the helm installation window
-        close_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="mat-dialog-0"]/armo-config-scanning-connection-wizard-dialog/armo-onboarding-dialog/armo-dialog-header/mat-icon')))
+        print("Click on continue button.")
+    except TimeoutException as e:
+        print("Continue button was not found or clickable.")
+        driver.save_screenshot(f"./continue_button_error_{get_current_timestamp()}.png")
+    try:    #close the helm installation window
+        close_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="mat-dialog-0"]/armo-config-scanning-connection-wizard-dialog/armo-onboarding-dialog/armo-dialog-header/header/mat-icon')))
         driver.execute_script("arguments[0].click();", close_button)
+        print("Click on close button.")
     except TimeoutException as e:
         print("Onboarding role page was not found or clickable.")
         driver.save_screenshot(f"./onboarding_role_page_error_{get_current_timestamp()}.png")
@@ -68,6 +95,7 @@ def click_get_started(driver, wait):
     try:
         get_started_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/button/span[1]')))
         driver.execute_script("arguments[0].click();", get_started_button)
+        print("Click on get started button.")
     except TimeoutException as e:
         print("Get started button was not found or clickable.")
         driver.save_screenshot(f"./get_started_button_error_{get_current_timestamp()}.png")
@@ -93,6 +121,7 @@ def verify_installation(driver, wait):
     try:
         verify_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-dialog-footer .mat-button-wrapper')))
         driver.execute_script("arguments[0].click();", verify_button)
+        print("Click on verify button.")
     except TimeoutException as e:
         print("Verify-button was not found or clickable.")
         driver.save_screenshot(f"./verify_button_erro_{get_current_timestamp()}.png")
@@ -101,9 +130,10 @@ def verify_installation(driver, wait):
 def view_cluster_button(driver, wait):
     try:
         view_cluster_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-connection-wizard-connection-step-footer .armo-button'))) 
-        wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="mat-dialog-0"]/armo-config-scanning-connection-wizard-dialog/armo-onboarding-dialog/main/main/armo-connection-wizard-dialog-connection-step/div/img')))
+        wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="mat-dialog-2"]/armo-config-scanning-connection-wizard-dialog/armo-onboarding-dialog/main/main/armo-connection-wizard-dialog-connection-step/div/img')))
         time.sleep(1)
         driver.execute_script("arguments[0].click();", view_cluster_button)
+        print("Click on view cluster button.")
     except TimeoutException as e:
         print("View cluster button was not found or clickable.")
         driver.save_screenshot(f"./view_cluster_button_error_{get_current_timestamp()}.png")
@@ -114,10 +144,13 @@ def view_connected_cluster(driver, wait):
     wait = WebDriverWait(driver, 60, 0.001)
     try:
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
+        print("cluster connected.")
     except TimeoutException as e:
         print("Failed to find view cluster connected after retries. Refreshing page.")
         driver.save_screenshot(f"./view_connected_cluster_error_{get_current_timestamp()}.png")
         driver.refresh()
+        time.sleep(0.5)
+        driver.save_screenshot(f"./view_connected_cluster_error_after_refresh{get_current_timestamp()}.png")
 
 
 def uninstall_kubescape():
@@ -186,9 +219,9 @@ def perform_cleanup(driver, wait):
             driver.save_screenshot(cleanup_error_screenshot)
 
 
-def execute_test(driver, wait, retrying):
+def execute_test(driver, wait, retrying,url):
     if retrying:
-        driver.get("https://cloud.armosec.io/dashboard") 
+        driver.get(url) 
     
     click_get_started(driver, wait)
     helm_command = copy_helm_command(driver, wait)
@@ -204,9 +237,8 @@ def main():
     login_pass_onboarding = os.environ.get('login_pass_onboarding')
     prod_url = "https://cloud.armosec.io/dashboard"
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
-    start_time = time.time()
     driver = setup_driver()
-    wait = WebDriverWait(driver, 60, 0.001)
+    wait = WebDriverWait(driver, 90, 0.001)
     start_time = time.time()
 
     retrying = False
@@ -221,7 +253,6 @@ def main():
         perform_cleanup(driver, wait)
         print("Cleanup successful. Retrying test...")
         retrying = True
-        start_time = time.time()  # Resetting the test start time for retry
         execute_test(driver, wait, retrying)
 
     end_time = time.time()
