@@ -3,8 +3,8 @@ name: latency test
 on:
   workflow_dispatch:
 # Triggers the workflow every 30 minutes at 15 and 45 minutes past the hour
-  schedule:
-  - cron: "15,45 * * * *"
+  # schedule:
+  # - cron: "15,45 * * * *"
   # push:
     branches:
     - latency-flow
@@ -18,34 +18,34 @@ jobs:
           run: |
             echo "RANDOM_UUID=$(uuidgen)" >> $GITHUB_OUTPUT
             echo "UUID is: $(uuidgen)"
-    
+
         - name: Create k8s Kind Cluster
           id: kind-cluster-install
           uses: helm/kind-action@d08cf6ff1575077dee99962540d77ce91c62387d # ratchet:helm/kind-action@v1.3.0
           with:
             cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
-        
+
         - name: Deploy Kubescape
           env: ${{ secrets.LATENCY_ACCOUNT_ID }}
           run: |
             helm repo add kubescape https://kubescape.github.io/helm-charts/
             helm repo update
             helm upgrade --install kubescape kubescape/kubescape-cloud-operator -n kubescape --create-namespace --set clusterName=`kubectl config current-context` --set account=${{ secrets.LATENCY_ACCOUNT_ID }} --set capabilities.relevancy=detect --set clusterServer=`kubectl config view -o jsonpath="{.clusters[?(@.name=='$(kubectl config current-context)')].cluster.server}"`
-            
+
         - name: Checkout repo
           uses: actions/checkout@v3
-    
+
         - name: Set up Python environment
           uses: actions/setup-python@v4
           timeout-minutes: 10
           with:
             python-version: 3.8
-    
+
         - name: Install dependencies
           run: |
             python -m pip install --upgrade pip
             pip install -r requirements.txt
-    
+
         - name: Run latency test
           id: latency_test
           env:
@@ -54,7 +54,7 @@ jobs:
             URL: ${{ github.event.inputs.URL }}
           run: |
             python latency.py $URL
-    
+
         - name: Commit changes
           uses: EndBug/add-and-commit@v9
           with:
