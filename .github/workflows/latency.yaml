@@ -56,11 +56,12 @@ jobs:
 
         - name: upload screenshots
           uses: actions/upload-artifact@v3
+          if: always()
           with:
             name: screenshots
             path: |    
               ./*.png
-              
+
         - name: Commit changes
           uses: EndBug/add-and-commit@v9
           with:
