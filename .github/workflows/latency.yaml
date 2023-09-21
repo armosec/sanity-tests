@@ -54,6 +54,13 @@ jobs:
           run: |
             python latency.py $URL
 
+        - name: upload screenshots
+          uses: actions/upload-artifact@v3
+          with:
+            name: screenshots
+            path: |    
+              ./*.png
+              
         - name: Commit changes
           uses: EndBug/add-and-commit@v9
           with:
