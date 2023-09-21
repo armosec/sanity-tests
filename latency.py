@@ -108,8 +108,9 @@ def navigate_to_dashboard(driver, wait):
     # Click on the cluster (the first one)
     wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')))
     cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
+    driver.save_screenshot(f"./click_on_cluster_{get_current_timestamp()}.png")
     driver.execute_script("arguments[0].click();", cluster)
-    # take_screenshot(driver, "Click on the cluster")
+    
 
     # Click on the fix button
     wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="framework-control-table-failed-4"]/div/span[2]')))
@@ -229,12 +230,12 @@ def measure_latency(driver, wait, email, login_pass, url):
     except Exception as e:
         print(f"Latency test failed with error: {e}")
         print(traceback.format_exc())
-        print("performing cleanup...")
-        perform_cleanup(driver, wait)
-        driver.save_screenshot(f"latency_error_{get_current_timestamp()}.png")
+        # print("performing cleanup...")
+        # perform_cleanup(driver, wait)
+        # driver.save_screenshot(f"latency_error_{get_current_timestamp()}.png")
         
     end_time = time.time()
-    perform_cleanup(driver, wait)
+    # perform_cleanup(driver, wait)
     login_latency = "{:.2f}".format(login_time - start_time)
     complaince_page_latency = "{:.2f}".format(end_time_dashboard - login_time)
     vulnerabilities_page_latency = "{:.2f}".format(end_time - end_time_dashboard)
