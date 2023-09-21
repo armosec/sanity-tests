@@ -219,14 +219,21 @@ def perform_cleanup(driver, wait):
             driver.save_screenshot(cleanup_error_screenshot)
 
 def measure_latency(driver, wait, email, login_pass, url):
-    start_time = time.time() 
-    handle_login(driver, wait, email, login_pass, url)
-    login_time = time.time()
-    navigate_to_dashboard(driver, wait)
-    end_time_dashboard = time.time()
-    navigate_to_vulnerabilities(driver, wait)
+    try:
+        start_time = time.time() 
+        handle_login(driver, wait, email, login_pass, url)
+        login_time = time.time()
+        navigate_to_dashboard(driver, wait)
+        end_time_dashboard = time.time()
+        navigate_to_vulnerabilities(driver, wait)
+    except Exception as e:
+        print(f"Latency test failed with error: {e}")
+        print(traceback.format_exc())
+        print("performing cleanup...")
+        perform_cleanup(driver, wait)
+        driver.save_screenshot(f"latency_error_{get_current_timestamp()}.png")
+        
     end_time = time.time()
-
     perform_cleanup(driver, wait)
     login_latency = "{:.2f}".format(login_time - start_time)
     complaince_page_latency = "{:.2f}".format(end_time_dashboard - login_time)
