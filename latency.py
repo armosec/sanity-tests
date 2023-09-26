@@ -12,7 +12,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 
 # Constants
-PROD_URL = "https://cloud-ci-stg.cademo.cyberarmorsoft.com/compliance"
+# PROD_URL = "https://cloud-ci-stg.cademo.cyberarmorsoft.com/compliance"
+PROD_URL = "https://cloud.armosec.io/compliance"
 LOG_FILE = "./logs/latency_logs.csv"
 EMAIL_LATENCY = os.environ['email_latency']
 LOGIN_PASS_LATENCY = os.environ['login_pass_latency']
