@@ -35,7 +35,7 @@ def login(driver, wait, email_onboarding, login_pass_onboarding):
 
 
 def click_get_started(driver, wait):
-    get_started_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/button/span[1]')))
+    get_started_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/armo-button/button')))
     driver.execute_script("arguments[0].click();", get_started_button)
 
 
