@@ -46,8 +46,8 @@ def navigate_to_dashboard(driver, wait):
     # take_screenshot(driver, "Click on the cluster")
 
     # Click on the fix button
-    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="framework-control-table-failed-4"]/div/span[2]')))
-    fix_button = driver.find_element(By.XPATH, '//*[@id="framework-control-table-failed-4"]/div/span[2]')
+    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="framework-control-table-failed-0"]/div/span[2]')))
+    fix_button = driver.find_element(By.XPATH, '//*[@id="framework-control-table-failed-0"]/div/span[2]')
     driver.execute_script("arguments[0].click();", fix_button)
     # take_screenshot(driver, "Click on the fix button")
 
