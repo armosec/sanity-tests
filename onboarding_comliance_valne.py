@@ -143,7 +143,7 @@ def main():
         vulnerabilities_time = time.time() - vul_start_time
 
         log_data = {
-            'timestamp': ClusterManager.get_current_timestamp("speacial"),
+            'timestamp': ClusterManager.get_current_timestamp("special"),
             'login_time': f"{login_time:.2f}",
             'onboarding_time': f"{onboarding_time:.2f}",
             'onboarding_time_excluding_login': f"{(onboarding_time - login_time):.2f}",
@@ -151,11 +151,11 @@ def main():
             'vulnerabilities_time': f"{vulnerabilities_time:.2f}"
         }
         print(f"Timestamp: {log_data['timestamp']}\n"
-              f"Login Time: {log_data['login_time']}\n"
-              f"Onboarding Time: {log_data['onboarding_time']}\n"
-              f"Onboarding Time (Excluding Login): {log_data['onboarding_time_excluding_login']}\n"
+              f"Login Time: {log_data['login_time']} sec\n"
+              f"Onboarding Time: {log_data['onboarding_time']} sec\n"
+              f"Onboarding Time (Excluding Login): {log_data['onboarding_time_excluding_login']} sec\n"
               f"Compliance Time: {log_data['compliance_time']}\n"
-              f"Vulnerabilities Time: {log_data['vulnerabilities_time']}\n")
+              f"Vulnerabilities Time: {log_data['vulnerabilities_time']} sec\n")
 
 
         with open("./logs/onboarding_logs.csv", "a") as f:

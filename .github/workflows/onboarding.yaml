@@ -10,7 +10,7 @@ on:
     - update-sanity
 
 jobs:
-  run-onboarding-test:
+  run-flowUser-test:
       runs-on: ubuntu-latest
       steps:
         - name: Generate uuid
@@ -38,7 +38,7 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r requirements.txt
 
-        - name: Run onboarding test
+        - name: Run user flow test
           id: onboarding_test
           env:
             URL: ${{ inputs.URL }}
