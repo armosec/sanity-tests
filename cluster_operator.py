@@ -152,7 +152,7 @@ class ConnectCluster:
         try:
             self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
         except TimeoutException as e:
-            print("Failed to find view cluster connected after retries. Refreshing page.")
+            print("Failed to find view cluster connected, Refreshing page.")
             self.driver.save_screenshot(f"./view_connected_cluster_error_{ClusterManager.get_current_timestamp()}.png")
             self.driver.refresh()
 
