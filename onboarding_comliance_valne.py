@@ -71,12 +71,16 @@ def navigate_to_vulnerabilities(driver, wait):
     except:
         print("failed to click on the first row")
         driver.save_screenshot(f"./failed_to_click_on_the_first_row_on_vulne{ClusterManager.get_current_timestamp()}.png")
-        exit(1)
+        
 
     #click on ignore of the first CVE
-    first =wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-vce-report-page/div/armo-vce-table/table/tbody/tr[1]/td[9]/armo-ignore-rules-button/button')))                                    
-    driver.execute_script("arguments[0].click();", first)
-    time.sleep(0.5)
+    try:
+        first =wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-vce-report-page/div/armo-vce-table/table/tbody/tr[1]/td[9]/armo-ignore-rules-button/button')))                                    
+        driver.execute_script("arguments[0].click();", first)
+        time.sleep(0.5)
+    except:
+        print("failed to click on ignore of the first CVE")
+        driver.save_screenshot(f"./failed_to_click_on_ignore_of_the_first_CVE_{ClusterManager.get_current_timestamp()}.png")
 
     # close the ignore window
     try:
