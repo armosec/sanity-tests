@@ -21,7 +21,6 @@ def navigate_to_dashboard(driver, wait):
     # Click on the cluster (the first one)
     wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')))
     cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
-    # driver.save_screenshot(f"./click_on_cluster_{ClusterManager.get_current_timestamp()}.png")
     driver.execute_script("arguments[0].click();", cluster)
     
 
@@ -144,7 +143,7 @@ def main():
         vulnerabilities_time = time.time() - vul_start_time
 
         log_data = {
-            'timestamp': ClusterManager.get_current_timestamp(),
+            'timestamp': ClusterManager.get_current_timestamp("speacial"),
             'login_time': f"{login_time:.2f}",
             'onboarding_time': f"{onboarding_time:.2f}",
             'onboarding_time_excluding_login': f"{(onboarding_time - login_time):.2f}",
@@ -163,7 +162,7 @@ def main():
             f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
             
     finally:
-        # Cleanup
+        # Cleanup cluster from Armo platrom
         perform_cleanup(driver)
         driver.quit()        
 

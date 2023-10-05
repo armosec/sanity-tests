@@ -56,7 +56,6 @@ class ClusterManager:
             role_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-role-page/div/div[2]/div/div[1]/armo-onboarding-survey-buttons-upper/div/div[1]/div[2]')))
             driver.execute_script("arguments[0].click();", role_button)
             print("Click on role button.")
-            # driver.save_screenshot(f"./role_button_{ClusterManager.get_current_timestamp()}.png")
         except TimeoutException as e:
             print("Role button was not found or clickable.")
             driver.save_screenshot(f"./role_button_error_{ClusterManager.get_current_timestamp()}.png")
@@ -97,8 +96,11 @@ class ClusterManager:
             driver.save_screenshot(f"./onboarding_role_page_error_{ClusterManager.get_current_timestamp()}.png")
 
     @staticmethod
-    def get_current_timestamp():
-        return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    def get_current_timestamp(format_type="default"):
+        if format_type == "special":
+            return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        
 
 class ConnectCluster:
     def __init__(self,driver):
@@ -108,7 +110,6 @@ class ConnectCluster:
     def click_get_started(self):
         print("Click on get started button.")
         try:
-            # get_started_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/button/span[1]')))
             get_started_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/armo-button/button')))
             self.driver.execute_script("arguments[0].click();", get_started_button)
         except TimeoutException as e:
@@ -183,9 +184,6 @@ class Cleanup:
         print("Click on more options button.")
 
     def choose_delete_option(self):
-        # delete_button_option = self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="mat-menu-panel-107"]/div/button[2]/div')))
-        # delete_button_option = self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="mat-menu-panel-73"]/div/button[2]/div')))
-        # self.driver.execute_script("arguments[0].click();", delete_button_option)
         delete_button = self.driver.find_element(By.XPATH, "//button[text()='Delete']")
         delete_button.click()
         print("Click on delete button option.")
