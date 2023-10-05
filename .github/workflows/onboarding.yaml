@@ -41,15 +41,26 @@ jobs:
         - name: Run onboarding test
           id: onboarding_test
           env:
+            URL: ${{ inputs.URL }}
             email_onboarding: ${{ secrets.EMAIL_ONBOARDING }}
             login_pass_onboarding: ${{ secrets.LOGIN_PASS_ONBOARDING }}
           run: |
-            python onboarding.py
+            python onboarding_comliance_valne.py $URL
+
+        - name: upload screenshots
+          uses: actions/upload-artifact@v3
+          with:
+            name: screenshots
+            path: |    
+              ./*.png
 
         - name: Commit changes
           uses: EndBug/add-and-commit@v9
+          if: inputs.URL == ''
           with:
-            message: "Update onboarding logs with new data"
+            message: "Update logs with new data"
             author_name: bvolovat
             author_email: borisv@armosec.io
             commit: --signoff
+            pull: '--ff-only'
+            add: ./logs/*
