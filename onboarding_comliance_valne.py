@@ -136,13 +136,13 @@ def main():
     vulnerabilities_time = time.time() - vul_start_time
 
     log_data = {
-    'timestamp': ClusterManager.get_current_timestamp(),
-    'login_time': login_time,
-    'onboarding_time': onboarding_time,
-    'onboarding_time_excluding_login': onboarding_time - login_time,
-    'compliance_time': compalince_time,
-    'vulnerabilities_time': vulnerabilities_time
-}
+        'timestamp': ClusterManager.get_current_timestamp(),
+        'login_time': f"{login_time:.2f}",
+        'onboarding_time': f"{onboarding_time:.2f}",
+        'onboarding_time_excluding_login': f"{(onboarding_time - login_time):.2f}",
+        'compliance_time': f"{compalince_time:.2f}",
+        'vulnerabilities_time': f"{vulnerabilities_time:.2f}"
+    }
     print(f"Timestamp: {log_data['timestamp']}\n"
       f"Login Time: {log_data['login_time']:.2f}\n"
       f"Onboarding Time: {log_data['onboarding_time']:.2f}\n"

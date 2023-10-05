@@ -98,7 +98,7 @@ class ClusterManager:
 
     @staticmethod
     def get_current_timestamp():
-        return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 class ConnectCluster:
     def __init__(self,driver):
