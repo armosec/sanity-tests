@@ -158,7 +158,7 @@ def main():
               f"Vulnerabilities Time: {log_data['vulnerabilities_time']} sec\n")
 
 
-        with open("./logs/onboarding_logs.csv", "a") as f:
+        with open("./logs/flow_user_logs.csv", "a") as f:
             f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
             
     finally:
