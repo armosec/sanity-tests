@@ -117,52 +117,55 @@ def main():
     driver = initialize_driver()
     wait = WebDriverWait(driver, 160, 0.001)
 
-    # Login
-    start_time = time.time()
-    cluster_manager = ClusterManager(driver)
-    cluster_manager.login(email_onboarding, login_pass_onboarding, url)
-    login_time = time.time() - start_time
+    try:
+        # Login
+        start_time = time.time()
+        cluster_manager = ClusterManager(driver)
+        cluster_manager.login(email_onboarding, login_pass_onboarding, url)
+        login_time = time.time() - start_time
 
-    # Connecting the cluster
-    connect_cluster = ConnectCluster(driver)
-    connect_cluster.click_get_started()
-    connect_cluster.connect_cluster_helm()
-    connect_cluster.verify_installation()
-    connect_cluster.view_cluster_button()
-    connect_cluster.view_connected_cluster()
-    onboarding_time = time.time() - start_time
+        # Connecting the cluster
+        connect_cluster = ConnectCluster(driver)
+        connect_cluster.click_get_started()
+        connect_cluster.connect_cluster_helm()
+        connect_cluster.verify_installation()
+        connect_cluster.view_cluster_button()
+        connect_cluster.view_connected_cluster()
+        onboarding_time = time.time() - start_time
 
-    # Navigating to dashboard
-    comp_start_time = time.time()
-    navigate_to_dashboard(driver, wait)
-    compalince_time = time.time() - comp_start_time
+        # Navigating to dashboard
+        comp_start_time = time.time()
+        navigate_to_dashboard(driver, wait)
+        compalince_time = time.time() - comp_start_time
 
-    # Navigating to vulnerabilities 
-    vul_start_time = time.time()
-    navigate_to_vulnerabilities(driver, wait)
-    vulnerabilities_time = time.time() - vul_start_time
+        # Navigating to vulnerabilities 
+        vul_start_time = time.time()
+        navigate_to_vulnerabilities(driver, wait)
+        vulnerabilities_time = time.time() - vul_start_time
 
-    log_data = {
-        'timestamp': ClusterManager.get_current_timestamp(),
-        'login_time': f"{login_time:.2f}",
-        'onboarding_time': f"{onboarding_time:.2f}",
-        'onboarding_time_excluding_login': f"{(onboarding_time - login_time):.2f}",
-        'compliance_time': f"{compalince_time:.2f}",
-        'vulnerabilities_time': f"{vulnerabilities_time:.2f}"
-    }
-    print(f"Timestamp: {log_data['timestamp']}\n"
-      f"Login Time: {log_data['login_time']:.2f}\n"
-      f"Onboarding Time: {log_data['onboarding_time']:.2f}\n"
-      f"Onboarding Time (Excluding Login): {log_data['onboarding_time_excluding_login']:.2f}\n"
-      f"Compliance Time: {log_data['compliance_time']:.2f}\n"
-      f"Vulnerabilities Time: {log_data['vulnerabilities_time']:.2f}\n") 
-    
-    with open("./logs/onboarding_logs.csv", "a") as f:
-        f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
+        log_data = {
+            'timestamp': ClusterManager.get_current_timestamp(),
+            'login_time': f"{login_time:.2f}",
+            'onboarding_time': f"{onboarding_time:.2f}",
+            'onboarding_time_excluding_login': f"{(onboarding_time - login_time):.2f}",
+            'compliance_time': f"{compalince_time:.2f}",
+            'vulnerabilities_time': f"{vulnerabilities_time:.2f}"
+        }
+        print(f"Timestamp: {log_data['timestamp']}\n"
+              f"Login Time: {log_data['login_time']}\n"
+              f"Onboarding Time: {log_data['onboarding_time']}\n"
+              f"Onboarding Time (Excluding Login): {log_data['onboarding_time_excluding_login']}\n"
+              f"Compliance Time: {log_data['compliance_time']}\n"
+              f"Vulnerabilities Time: {log_data['vulnerabilities_time']}\n")
 
-    # Cleanup
-    perform_cleanup(driver)
-    driver.quit()        
+
+        with open("./logs/onboarding_logs.csv", "a") as f:
+            f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
+            
+    finally:
+        # Cleanup
+        perform_cleanup(driver)
+        driver.quit()        
 
 if __name__ == "__main__":
     main()
