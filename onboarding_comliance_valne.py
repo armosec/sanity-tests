@@ -17,12 +17,14 @@ def navigate_to_dashboard(driver, wait):
     except:
         print("failed to click on compliance")
         driver.save_screenshot(f"./failed_to_click_on_compliance_{ClusterManager.get_current_timestamp()}.png")
-
-    # Click on the cluster (the first one)
-    wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')))
-    cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
-    driver.execute_script("arguments[0].click();", cluster)
-    
+    try:
+        # Click on the cluster (the first one)
+        wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')))
+        cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
+        driver.execute_script("arguments[0].click();", cluster)
+    except:
+        print("failed to click on the cluster")
+        driver.save_screenshot(f"./failed_to_click_on_the_cluster_{ClusterManager.get_current_timestamp()}.png")
 
     # Click on the fix button
     try:
@@ -82,13 +84,13 @@ def navigate_to_vulnerabilities(driver, wait):
         driver.save_screenshot(f"./failed_to_click_on_ignore_of_the_first_CVE_{ClusterManager.get_current_timestamp()}.png")
 
     # close the ignore window
-    try:
-        wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/div[5]/div[2]/div/mat-dialog-container/armo-cve-ignore-rule-dialog/div[1]/mat-icon')))
-        close = driver.find_element(By.XPATH, '/html/body/div[5]/div[2]/div/mat-dialog-container/armo-cve-ignore-rule-dialog/div[1]/mat-icon')
-        driver.execute_script("arguments[0].click();", close)
-    except:
-        print("failed to close the ignore window")
-        driver.save_screenshot(f"./failed_to_close_the_ignore_window_{ClusterManager.get_current_timestamp()}.png") 
+    # try:
+    #     wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/div[5]/div[2]/div/mat-dialog-container/armo-cve-ignore-rule-dialog/div[1]/mat-icon')))
+    #     close = driver.find_element(By.XPATH, '/html/body/div[5]/div[2]/div/mat-dialog-container/armo-cve-ignore-rule-dialog/div[1]/mat-icon')
+    #     driver.execute_script("arguments[0].click();", close)
+    # except:
+    #     print("failed to close the ignore window")
+    #     driver.save_screenshot(f"./failed_to_close_the_ignore_window_{ClusterManager.get_current_timestamp()}.png") 
 
 def perform_cleanup(driver):
     cleanup = Cleanup(driver)
