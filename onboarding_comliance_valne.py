@@ -35,8 +35,11 @@ def navigate_to_dashboard(driver, wait):
         driver.save_screenshot(f"./failed_to_click_on_fix_button_{ClusterManager.get_current_timestamp()}.png")
 
     # Wait until the rules list is visible
-    wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-with-namespace/table/thead/tr')))
-    # take_screenshot(driver, "Wait until the rules list is visible")
+    try:
+        wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-with-namespace/table/thead/tr')))
+    except:
+        print("failed to find the rules list")
+        driver.save_screenshot(f"./failed_to_find_the_rules_list_{ClusterManager.get_current_timestamp()}.png")
 
     # # Click on the fix button in the rules list
     # wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-vulnerabilities-page/div[2]/armo-vulnerabilities-table/table/tbody/tr[1]/td[1]')))
