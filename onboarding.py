@@ -143,9 +143,6 @@ def main():
     email_onboarding = os.environ.get('email_onboarding')
     login_pass_onboarding = os.environ.get('login_pass_onboarding')
 
-    email_onboarding = 'borisv@armosec.io'
-    login_pass_onboarding = 'Bv110584!'
-
     start_time = time.time()
     driver = setup_driver()
     wait = WebDriverWait(driver, 90, 0.001)
