@@ -20,7 +20,7 @@ def setup_driver():
     return driver
 
 def get_current_timestamp():
-    return datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 
 def login(driver, wait, email_onboarding, login_pass_onboarding):
@@ -108,12 +108,12 @@ def click_more_options_button(driver, wait):
 
 
 def choose_delete_option(driver, wait):
-    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[6]/div[2]/div/div/div/button[2]')))
+    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[7]/div[2]/div/div/div/button[2]')))
     driver.execute_script("arguments[0].click();", delete_button_option)
 
 
 def confirm_delete(driver, wait):
-    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[6]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]/span[2]')))
+    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[7]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]')))
     driver.execute_script("arguments[0].click();", confirm_delete_button)
 
 
