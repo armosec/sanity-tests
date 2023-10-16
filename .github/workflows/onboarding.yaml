@@ -10,10 +10,10 @@ on:
   #   - onboarding-check
 
 jobs:
-  run-onboarding-test:
+  onboarding_test:
 
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Generate uuid
       id: uuid
