@@ -13,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 def setup_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")
     driver = webdriver.Chrome(options=chrome_options)
     driver.set_window_size(1512, 982)
 
@@ -61,7 +61,7 @@ def verify_installation(driver, wait):
         driver.execute_script("arguments[0].click();", verify_button)
     except TimeoutException as e:
         print("Verify button was not found or clickable.")
-        driver.save_screenshot(f"./logs/screenshots/verify_button_erro_{get_current_timestamp()}.png")
+        driver.save_screenshot(f"./verify_button_erro_{get_current_timestamp()}.png")
 
 
 def view_cluster_button(driver, wait):
@@ -72,7 +72,7 @@ def view_cluster_button(driver, wait):
         driver.execute_script("arguments[0].click();", view_cluster_button)
     except TimeoutException as e:
         print("View cluster button was not found or clickable.")
-        driver.save_screenshot(f"./logs/screenshots/view_cluster_button_error_{get_current_timestamp()}.png")
+        driver.save_screenshot(f"./view_cluster_button_error_{get_current_timestamp()}.png")
         
 
 
@@ -82,7 +82,7 @@ def view_connected_cluster(driver, wait):
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
     except TimeoutException as e:
         print("Failed to find view cluster connected after retries. Refreshing page.")
-        driver.save_screenshot(f"./logs/screenshots/view_connected_cluster_error_{get_current_timestamp()}.png")
+        driver.save_screenshot(f"./view_connected_cluster_error_{get_current_timestamp()}.png")
         driver.refresh()
 
 
@@ -103,17 +103,17 @@ def click_settings_button(driver, wait):
 
 
 def click_more_options_button(driver, wait):
-    more_options_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/div[2]/armo-clusters-page/armo-clusters-table/div/table/tbody/tr/td[9]/armo-row-options-button/button/mat-icon')))
+    more_options_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/div[2]/armo-clusters-page/armo-clusters-table/div/table/tbody/tr/td[9]/armo-row-options-button/armo-icon-button/armo-button/button/armo-icon')))
     driver.execute_script("arguments[0].click();", more_options_button)
 
 
 def choose_delete_option(driver, wait):
-    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[5]/div[2]/div/div/div/button[2]/div')))
+    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[6]/div[2]/div/div/div/button[2]')))
     driver.execute_script("arguments[0].click();", delete_button_option)
 
 
 def confirm_delete(driver, wait):
-    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[5]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]')))
+    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[6]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]/span[2]')))
     driver.execute_script("arguments[0].click();", confirm_delete_button)
 
 
@@ -126,7 +126,7 @@ def perform_cleanup(driver, wait):
     max_retries = 2
     for _ in range(max_retries):
         try:
-            uninstall_kubescape()
+            # uninstall_kubescape()
             click_settings_button(driver, wait)
             click_more_options_button(driver, wait)
             choose_delete_option(driver, wait)
@@ -135,13 +135,16 @@ def perform_cleanup(driver, wait):
             break
         except Exception as e:
             print(f"Cleanup cluster attempt failed with error: {e}, retrying...")
-            driver.save_screenshot(f"./logs/screenshots/cleanup_cluster_error_{get_current_timestamp()}.png")
+            driver.save_screenshot(f"./cleanup_cluster_error_{get_current_timestamp()}.png")
 
 
 
 def main():
     email_onboarding = os.environ.get('email_onboarding')
     login_pass_onboarding = os.environ.get('login_pass_onboarding')
+
+    email_onboarding = 'borisv@armosec.io'
+    login_pass_onboarding = 'Bv110584!'
 
     start_time = time.time()
     driver = setup_driver()
@@ -156,6 +159,7 @@ def main():
     view_connected_cluster(driver, wait)
     end_time = time.time()
     perform_cleanup(driver, wait)
+    time.sleep(5)
     driver.quit()
     
     onboarding_time = "{:.2f}".format(end_time - start_time)
