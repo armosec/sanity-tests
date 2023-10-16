@@ -35,8 +35,13 @@ def login(driver, wait, email_onboarding, login_pass_onboarding):
 
 
 def click_get_started(driver, wait):
-    get_started_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/armo-button/button')))
-    driver.execute_script("arguments[0].click();", get_started_button)
+    try:
+        get_started_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/armo-button/button')))
+        driver.execute_script("arguments[0].click();", get_started_button)
+    except TimeoutException as e:
+        print("Get started button was not found or clickable.")
+        driver.save_screenshot(f"./get_started_button_error_{get_current_timestamp()}.png")
+        exit(1) 
 
 
 def copy_helm_command(driver, wait):
@@ -113,7 +118,8 @@ def choose_delete_option(driver, wait):
 
 
 def confirm_delete(driver, wait):
-    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[5]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]/span[2]')))
+    time.sleep(0.5)
+    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[6]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]/span[2]')))
     driver.execute_script("arguments[0].click();", confirm_delete_button)                                                                       
 
 
