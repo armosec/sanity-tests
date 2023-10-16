@@ -108,13 +108,13 @@ def click_more_options_button(driver, wait):
 
 
 def choose_delete_option(driver, wait):
-    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[7]/div[2]/div/div/div/button[2]')))
+    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[6]/div[2]/div/div/div/button[2]')))
     driver.execute_script("arguments[0].click();", delete_button_option)
 
 
 def confirm_delete(driver, wait):
-    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[7]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]')))
-    driver.execute_script("arguments[0].click();", confirm_delete_button)
+    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[6]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]')))
+    driver.execute_script("arguments[0].click();", confirm_delete_button)                                                                       
 
 
 def wait_for_empty_table(driver):
@@ -125,8 +125,9 @@ def wait_for_empty_table(driver):
 def perform_cleanup(driver, wait):
     max_retries = 2
     for _ in range(max_retries):
+        print("Performing cleanup.")
         try:
-            # uninstall_kubescape()
+            uninstall_kubescape()
             click_settings_button(driver, wait)
             click_more_options_button(driver, wait)
             choose_delete_option(driver, wait)
@@ -156,7 +157,6 @@ def main():
     view_connected_cluster(driver, wait)
     end_time = time.time()
     perform_cleanup(driver, wait)
-    time.sleep(5)
     driver.quit()
     
     onboarding_time = "{:.2f}".format(end_time - start_time)
