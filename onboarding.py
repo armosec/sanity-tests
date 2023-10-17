@@ -80,15 +80,18 @@ def view_cluster_button(driver, wait):
         driver.save_screenshot(f"./view_cluster_button_error_{get_current_timestamp()}.png")
         
 
-
-def view_connected_cluster(driver, wait):
-    wait = WebDriverWait(driver, 30, 0.001)
+def view_connected_cluster(driver, wait, max_attempts=2):
     try:
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
+        print("View cluster connected found.")
     except TimeoutException as e:
-        print("Failed to find view cluster connected after retries. Refreshing page.")
-        driver.save_screenshot(f"./view_connected_cluster_error_{get_current_timestamp()}.png")
-        driver.refresh()
+        if max_attempts > 0:
+            print(f"Failed to find view cluster connected. Refreshing page (Attempts left: {max_attempts}).")
+            driver.save_screenshot(f"./view_connected_cluster_error_{get_current_timestamp()}.png")
+            driver.refresh()
+            view_connected_cluster(driver, wait, max_attempts - 1)
+        else:
+            raise Exception("Element not found after maximum retry attempts.")
 
 
 def uninstall_kubescape():
@@ -105,23 +108,28 @@ def uninstall_kubescape():
 def click_settings_button(driver, wait):
     settings_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/armo-side-nav-menu/nav/div[2]/armo-nav-items-list/div/ul/li/a/span')))
     driver.execute_script("arguments[0].click();", settings_button)
+    print("Click on settings button.")
 
 
 def click_more_options_button(driver, wait):
     more_options_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/div/div/div[2]/armo-clusters-page/armo-clusters-table/div/table/tbody/tr/td[9]/armo-row-options-button/armo-icon-button/armo-button/button/armo-icon')))
     driver.execute_script("arguments[0].click();", more_options_button)
+    print("Click on more options button.")
 
 
 def choose_delete_option(driver, wait):
-    delete_button_option = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[6]/div[2]/div/div/div/button[2]')))
-    driver.execute_script("arguments[0].click();", delete_button_option)
+    time.sleep(0.3)
+    delete_button = driver.find_element(By.XPATH, "//button[text()='Delete']")
+    delete_button.click()
+    print("Click on delete button option.")
 
 
 def confirm_delete(driver, wait):
     time.sleep(0.5)
-    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[6]/div[2]/div/mat-dialog-container/armo-notification/div[3]/button[2]/span[2]')))
-    driver.execute_script("arguments[0].click();", confirm_delete_button)                                                                       
-
+    confirm_delete_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.mat-stroked-button[color='warn']")))
+    confirm_delete_button.click()
+    print("Click on confirm delete button.")
+   
 
 def wait_for_empty_table(driver):
     wait = WebDriverWait(driver, 180, 0.001)
@@ -134,8 +142,8 @@ def perform_cleanup(driver, wait):
         print("Performing cleanup.")
         try:
             uninstall_kubescape()
-            click_settings_button(driver, wait)
-            click_more_options_button(driver, wait)
+            click_settings_button(driver, wait)  
+            click_more_options_button(driver, wait)  
             choose_delete_option(driver, wait)
             confirm_delete(driver, wait)
             wait_for_empty_table(driver)
