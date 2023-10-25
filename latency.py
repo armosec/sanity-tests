@@ -15,10 +15,10 @@ driver.set_window_size(1512, 982)
 wait = WebDriverWait(driver, 30, 0.001)
 
 
-# def take_screenshot(driver, description):
-#     timestamp = time.strftime("%Y%m%d-%H%M%S")
-#     screenshot_name = f"{timestamp}_{description}.png"
-#     driver.save_screenshot(screenshot_name)
+def take_screenshot(driver, description):
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    screenshot_name = f"{timestamp}_{description}.png"
+    driver.save_screenshot(screenshot_name)
 
 
 def login(driver, wait, email_latency, login_pass_latency):
@@ -62,10 +62,12 @@ def navigate_to_dashboard(driver, wait):
     driver.execute_script("arguments[0].click();", fix_button_on_remide)
     window_handles = driver.window_handles
     driver.switch_to.window(window_handles[-1])
-
-    # Wait until the yaml section is visible
-    wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-failed-resource-page/armo-yaml-section/div/div/button[2]')))
+     
+    # Wait until the side by side is visible
+    wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-side-by-side-remediation-page/div/armo-comparison-wrapper/div/div/div[2]')))
     # take_screenshot(driver, "Wait until the yaml section is visible")
+    
+    
 
 
 def measure_latency(driver, wait, email_latency, login_pass_latency, url):
@@ -79,7 +81,8 @@ def measure_latency(driver, wait, email_latency, login_pass_latency, url):
     return latency , latency_without_login
 
 
-latency, latency_without_login = measure_latency(driver, wait, os.environ['email_latency'], os.environ['login_pass_latency'], url)
+# latency, latency_without_login = measure_latency(driver, wait, os.environ['email_latency'], os.environ['login_pass_latency'], url)
+latency, latency_without_login = measure_latency(driver, wait,' test.platform454@gmail.com' , 'Platformtest1!', url)
 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 with open("./logs/latency_logs.csv", "a") as f:
     f.write(f"{timestamp},{latency},{latency_without_login}\n")
