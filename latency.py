@@ -81,8 +81,7 @@ def measure_latency(driver, wait, email_latency, login_pass_latency, url):
     return latency , latency_without_login
 
 
-# latency, latency_without_login = measure_latency(driver, wait, os.environ['email_latency'], os.environ['login_pass_latency'], url)
-latency, latency_without_login = measure_latency(driver, wait,' test.platform454@gmail.com' , 'Platformtest1!', url)
+latency, latency_without_login = measure_latency(driver, wait, os.environ['email_latency'], os.environ['login_pass_latency'], url)
 timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 with open("./logs/latency_logs.csv", "a") as f:
     f.write(f"{timestamp},{latency},{latency_without_login}\n")
