@@ -1,91 +1,92 @@
 import os
-import time, datetime
-from selenium import webdriver
-from selenium.webdriver.common.by import By
+import time
+import datetime
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from dataclasses import dataclass
+from interaction_manager import InteractionManager, InteractionManagerConfig
+import logging
 
-url = "https://cloud.armosec.io/dashboard"
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-driver = webdriver.Chrome(options=chrome_options)
-driver.set_window_size(1512, 982)
-wait = WebDriverWait(driver, 30, 0.001)
+ARMO_PLATFORM_URL = "https://cloud.armosec.io/dashboard"
+
+logging.basicConfig(level=logging.INFO)
+_logger = logging.getLogger(__name__)
 
 
-def take_screenshot(driver, description):
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-    screenshot_name = f"{timestamp}_{description}.png"
-    driver.save_screenshot(screenshot_name)
+@dataclass
+class LatencyDetails:
+    latency: float
+    latency_without_login: float
+
+    def to_file(self, file_path: str) -> None:
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(file_path, "a") as f:
+            f.write(f"{timestamp},{self.latency},{self.latency_without_login}\n")
+
+    def __str__(self) -> str:
+        return f"Latency: {self.latency}, Latency without login: {self.latency_without_login}"
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
 
-def login(driver, wait, email_latency, login_pass_latency):
-    driver.get(url)
-    wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="frontegg-login-box-container-default"]/div[1]/input')))
-    mail_input = driver.find_element(by=By.XPATH, value='//*[@id="frontegg-login-box-container-default"]/div[1]/input')
-    mail_input.send_keys(email_latency)
-    mail_input.send_keys(Keys.ENTER)
-    wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/frontegg-app/div[2]/div[2]/input')))
-    password_input = driver.find_element(by=By.XPATH, value='/html/body/frontegg-app/div[2]/div[2]/input')
-    password_input.send_keys(login_pass_latency)
-    password_input.send_keys(Keys.ENTER)
+class LatencyTest:
+    def __init__(self) -> None:
+        _config = InteractionManagerConfig.from_env()
+        self._interaction_manager = InteractionManager(_config)
 
-def navigate_to_dashboard(driver, wait):
-    # Click on the compliance
-    wait.until(EC.presence_of_element_located((By.ID, 'configuration-scanning-left-menu-item')))
-    compliance = driver.find_element(By.ID, 'configuration-scanning-left-menu-item')
-    driver.execute_script("arguments[0].click();", compliance)
-    # take_screenshot(driver, "Click on the compliance")
+    def _take_screen_shot(self, description: str) -> None:
+        _logger.info(f"Taking screenshot: {description}")
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        screenshot_name = f"{timestamp}_{description}.png"
+        result = self._interaction_manager.driver.save_screenshot(
+            screenshot_name)
+        if result is False:
+            _logger.error("Failed to take screenshot")  # pragma: no cover
+            raise RuntimeError("Failed to take screenshot")
+        _logger.info(f"Screenshot saved to: {screenshot_name}")
 
-    # Click on the cluster (the first one)
-    wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')))
-    cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
-    driver.execute_script("arguments[0].click();", cluster)
-    # take_screenshot(driver, "Click on the cluster")
+    def _login(self) -> None:
+        _logger.info("Logging in to Armo")
+        self._interaction_manager.navigate(ARMO_PLATFORM_URL)
+        mail_input = self._interaction_manager.wait_until_interactable(
+            '//*[@id="frontegg-login-box-container-default"]/div[1]/input'
+        )
+        mail_input.send_keys(os.environ['email_latency'])
+        mail_input.send_keys(Keys.ENTER)
+        password_input = self._interaction_manager.wait_until_interactable(
+            '/html/body/frontegg-app/div[2]/div[2]/input'
+        )
+        password_input.send_keys(os.environ['login_pass_latency'])
+        password_input.send_keys(Keys.ENTER)
+        _logger.info("Logged in to Armo")
 
-    # Click on the fix button
-    wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="framework-control-table-failed-0"]/div/span[2]')))
-    fix_button = driver.find_element(By.XPATH, '//*[@id="framework-control-table-failed-0"]/div/span[2]')
-    driver.execute_script("arguments[0].click();", fix_button)
-    # take_screenshot(driver, "Click on the fix button")
+    def _navigate_to_dashboard(self) -> None:
+        _logger.info("Navigating to dashboard")
+        # Click on the compliance tab.
+        self._interaction_manager.click('//*[@id="configuration-scanning-left-menu-item"]')
+        # Click on the cluster (the first one).
+        self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
+        # Click on the fix button.
+        self._interaction_manager.click('//*[@id="framework-control-table-failed-0"]/div/span[2]', click_delay=1)
+        # Click on the fix button in the rules list.
+        self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-with-namespace/table/thead/tr')
+        # Switch to the last window.
+        self._interaction_manager.switch_to_window(-1)
 
-    # Wait until the rules list is visible
-    wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-with-namespace/table/thead/tr')))
-    # take_screenshot(driver, "Wait until the rules list is visible")
+        _logger.info("Navigated to dashboard")
 
-    # Click on the fix button in the rules list
-    wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-with-namespace/table/tbody/tr[1]/td[3]/armo-resource-ignore-rules-cell/div/div[2]/armo-fix-button/armo-button/button')))
-    # take_screenshot(driver, "Click on the fix button in the rules list")
-    fix_button_on_remide = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-with-namespace/table/tbody/tr[1]/td[3]/armo-resource-ignore-rules-cell/div/div[2]/armo-fix-button/armo-button/button')
-    driver.execute_script("arguments[0].click();", fix_button_on_remide)
-    window_handles = driver.window_handles
-    driver.switch_to.window(window_handles[-1])
-     
-    # Wait until the side by side is visible
-    wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-side-by-side-remediation-page/div/armo-comparison-wrapper/div/div/div[2]')))
-    # take_screenshot(driver, "Wait until the yaml section is visible")
-    
-    
+    def run(self) -> None:
+        start_time = time.time()
+        self._login()
+        login_time = time.time()
+        self._navigate_to_dashboard()
+        end_time = time.time()
+        latency_without_login = "{:.2f}".format(end_time - login_time)
+        latency = "{:.2f}".format(end_time - start_time)
+        latency_details = LatencyDetails(latency, latency_without_login)
+        latency_details.to_file("./logs/latency_logs.csv")
+        _logger.info(f"Latency details: {latency_details}")
+        self._interaction_manager.quit()
 
-
-def measure_latency(driver, wait, email_latency, login_pass_latency, url):
-    start_time = time.time()
-    login(driver, wait, email_latency, login_pass_latency)
-    login_time = time.time()
-    navigate_to_dashboard(driver, wait)
-    end_time = time.time()
-    latency_without_login = "{:.2f}".format(end_time - login_time)
-    latency = "{:.2f}".format(end_time - start_time)
-    return latency , latency_without_login
-
-
-latency, latency_without_login = measure_latency(driver, wait, os.environ['email_latency'], os.environ['login_pass_latency'], url)
-timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-with open("./logs/latency_logs.csv", "a") as f:
-    f.write(f"{timestamp},{latency},{latency_without_login}\n")
-    print(f"{timestamp}\n"
-          f"Latency time: {latency} sec\n"
-          f"Latency time without login: {latency_without_login} sec\n")
-driver.quit()
+if __name__ == "__main__":
+    LatencyTest().run()
