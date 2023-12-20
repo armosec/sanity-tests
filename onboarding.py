@@ -109,7 +109,7 @@ class OnboardingTest:
         try:
             self._interaction_manager._timeout = 90
             self._interaction_manager.click(
-                "//armo-connection-wizard-connection-step-footer//*[contains(@class, 'armo-button')]", click_delay=2
+                "//armo-connection-wizard-connection-step-footer//*[contains(@class, 'armo-button')]", click_delay=3
             )
             self._interaction_manager._timeout = self._interaction_manager._config.timeout
         except TimeoutException as e:
@@ -127,11 +127,17 @@ class OnboardingTest:
                 "//armo-cluster-scans-table//*[contains(@class, 'mat-tooltip-trigger')]"
             )
         except TimeoutException as e:
-            _logger.error("View cluster connected was not found.",
-                          exc_info=True, stack_info=True, extra={'screenshot': True})
-            self._interaction_manager.driver.save_screenshot(
-                f"./view_connected_cluster_error_{self._get_current_timestamp()}.png")
-            raise e
+            try:
+                self._interaction_manager.driver.refresh()
+                self._interaction_manager.wait_until_interactable(
+                    "//armo-cluster-scans-table//*[contains(@class, 'mat-tooltip-trigger')]"
+                )
+            except TimeoutException as ex:
+                _logger.error("View cluster connected was not found.",
+                              exc_info=True, stack_info=True, extra={'screenshot': True})
+                self._interaction_manager.driver.save_screenshot(
+                    f"./view_connected_cluster_error_{self._get_current_timestamp()}.png")
+                raise ex
         _logger.info("Verified connected cluster")
 
     def _uninstall_kubescape(self) -> None:
