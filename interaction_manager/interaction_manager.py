@@ -105,6 +105,8 @@ class InteractionManager:
 
         element = self.wait_until_interactable(xpath)
         try:
+            if click_delay:
+                sleep(click_delay)
             element.click()
         except ElementClickInterceptedException as e:
             _logger.error(

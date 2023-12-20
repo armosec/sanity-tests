@@ -109,7 +109,7 @@ class OnboardingTest:
         try:
             self._interaction_manager._timeout = 90
             self._interaction_manager.click(
-                "//armo-connection-wizard-connection-step-footer//*[contains(@class, 'armo-button')]"
+                "//armo-connection-wizard-connection-step-footer//*[contains(@class, 'armo-button')]", click_delay=2
             )
             self._interaction_manager._timeout = self._interaction_manager._config.timeout
         except TimeoutException as e:
