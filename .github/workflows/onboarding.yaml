@@ -46,6 +46,20 @@ jobs:
           run: |
             python onboarding.py
 
+        - better-up-time:
+          needs: [Run onboarding test]
+          name: better-up-time
+          runs-on: ubuntu-latest
+          if: failure()
+          #if: ${{ contains(needs.*.result, 'failure') }}
+          steps:
+            - run: |
+                curl --request POST \
+                  --url https://betteruptime.com/api/v2/incidents \
+                  --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
+                  --header 'Content-Type: application/json' \
+                  --data '{"summary": "Production Incident Onboarding failed","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "On-boarding test failed ! "}'
+
         - name: upload screenshots
           uses: actions/upload-artifact@v3
           if: always()
