@@ -38,7 +38,7 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r requirements.txt
 
-        - name: Run onboarding test
+        - name: run-onboarding-test
           id: onboarding_test
           env:
             email_onboarding: ${{ secrets.EMAIL_ONBOARDING }}
@@ -65,7 +65,7 @@ jobs:
             add: ./logs/*
 
   better-up-time:
-    needs: [Run onboarding test]
+    needs: [run-onboarding-test]
     name: better-up-time
     runs-on: ubuntu-latest
     if: failure()
