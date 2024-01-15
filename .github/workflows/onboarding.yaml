@@ -45,10 +45,9 @@ jobs:
             login_pass_onboarding: ${{ secrets.LOGIN_PASS_ONBOARDING }}
           run: |
             python onboarding.py
-
-        - better-up-time:
+          
+        - name: better-up-time
           needs: [Run onboarding test]
-          name: better-up-time
           runs-on: ubuntu-latest
           if: failure()
           #if: ${{ contains(needs.*.result, 'failure') }}
