@@ -53,12 +53,12 @@ jobs:
           if: failure()
           #if: ${{ contains(needs.*.result, 'failure') }}
           steps:
-            - run: |
-                curl --request POST \
-                  --url https://betteruptime.com/api/v2/incidents \
-                  --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
-                  --header 'Content-Type: application/json' \
-                  --data '{"summary": "Production Incident Onboarding failed","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "On-boarding test failed ! "}'
+            run: |
+            curl --request POST \
+              --url https://betteruptime.com/api/v2/incidents \
+              --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
+              --header 'Content-Type: application/json' \
+              --data '{"summary": "Production Incident Onboarding failed","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "On-boarding test failed ! "}'
 
         - name: upload screenshots
           uses: actions/upload-artifact@v3
@@ -72,7 +72,7 @@ jobs:
           uses: EndBug/add-and-commit@v9
           with:
             message: "Update onboarding logs with new data"
-            author_name: bvolovat
+            author_name: bvolovatgit 
             author_email: borisv@armosec.io
             commit: --signoff
             pull: '--ff-only'
