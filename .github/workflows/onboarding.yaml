@@ -49,7 +49,6 @@ jobs:
         - name: better-up-time
           # if: failure()
           if: failure() && steps.run-onboarding-test.outcome == 'failure'
-          steps:
           run: |
             curl --request POST \
               --url https://betteruptime.com/api/v2/incidents \
