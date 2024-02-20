@@ -156,7 +156,7 @@ class OnboardingTest:
     def _click_settings_button(self) -> None:
         _logger.info("Clicking on settings button")
         self._interaction_manager.click(
-            '/html/body/armo-root/div/armo-side-nav-menu/nav/div[2]/armo-nav-items-list/div/ul/li/a/span'
+            '/html/body/armo-root/div/armo-side-nav-menu/nav/div[2]/armo-nav-items-list/ul[3]/li'
         )
         _logger.info("Clicked on settings button")
 
