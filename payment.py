@@ -83,14 +83,12 @@ class PaymenyTest:
         mail_input = self._interaction_manager.wait_until_interactable(
             '//*[@id="frontegg-login-box-container-default"]/div[1]/input'
         )
-        # mail_input.send_keys(os.environ['email_onboarding'])
-        mail_input.send_keys('sofede7080@seosnaps.com')
+        mail_input.send_keys(os.environ['email_onboarding'])
         mail_input.send_keys(Keys.ENTER)
         password_input = self._interaction_manager.wait_until_interactable(
             '/html/body/frontegg-app/div[2]/div[2]/input'
         )
-        # password_input.send_keys(os.environ['login_pass_onboarding'])
-        password_input.send_keys('ZME59Rh&BaipW@')
+        password_input.send_keys(os.environ['login_pass_onboarding'])
         password_input.send_keys(Keys.ENTER)
 
     def _chose_user(self) -> None: 
