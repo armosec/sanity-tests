@@ -1,0 +1,133 @@
+{
+    "env": {
+      "dev": [
+        {
+          "accountID": "e801620f-b4f8-4886-bc01-cd92e69a44b1",
+          "type": "free_trial"
+        },
+        {
+          "accountID": "c94d0522-904f-46be-9a19-1bce44ff8f5f",
+          "type": "paying"
+        },
+        {
+          "accountID": "050f9c9e-6cff-42e9-a4d5-60d8ddc26c18",
+          "type": "Limited - finished trial"
+        },
+        {
+          "accountID": "eca16e66-bcdb-45e9-8e1c-f9c096fe3d71",
+          "type": "extended trial"
+        },
+        {
+          "accountID": "8e2d47ec-5893-4c6a-9c0b-ead9e4077fb9",
+          "type": "blocked"
+        }
+      ],
+      "staging": [
+        {
+          "accountID": "6450f982-6118-4ac4-80d9-40b1bf9033e4",
+          "type": "free_trial"
+        },
+        {
+          "accountID": "f60d54f2-29a2-48b2-8f6e-65808d1521e6",
+          "type": "paying"
+        },
+        {
+          "accountID": "e1324e75-5a08-4954-9462-67ddc4566af6",
+          "type": "Limited - finished trial"
+        },
+        {
+          "accountID": "78ada50a-046a-4d33-9db2-e5f9a7401258",
+          "type": "extended trial"
+        },
+        {
+          "accountID": "aa913341-0a88-4f18-a578-73248e10d363",
+          "type": "blocked"
+        }
+      ],
+      "prod": [
+        {
+          "accountID": "6b2c028d-0330-4530-a9e9-77575b87f8c9",
+          "type": "free_trial"
+        },
+        {
+          "accountID": "f57d4113-8a26-42ad-a1e4-541164482490",
+          "type": "paying"
+        },
+        {
+          "accountID": "3623556d-33fb-4c45-98b6-e2a5fadceb9c",
+          "type": "Limited - finished trial"
+        },
+        {
+          "accountID": "852b0f92-7435-4243-a02a-da6517a2d2c3",
+          "type": "extended trial"
+        },
+        {
+          "accountID": "727c9c34-1dfd-4632-b779-c3bf6b704623",
+          "type": "blocked"
+        }
+      ]
+    },
+    "access": {
+      "free_trial": {
+        "dashboard": 1,
+        "compliance": 1,
+        "A.C_main_page": 1,
+        "A.C_details_page": 1,
+        "Vuln": 1,
+        "NP": 1,
+        "RBAC": 1,
+        "risk_accept": 1,
+        "repo_scan": 1,
+        "registry_scan": 1
+      },
+      "paying": {
+        "dashboard": 1,
+        "compliance": 1,
+        "A.C_main_page": 1,
+        "A.A.C_details_page": 1,
+        "Vuln": 1,
+        "NP": 1,
+        "RBAC": 1,
+        "risk_accept": 1,
+        "repo_scan": 1,
+        "registry_scan": 1
+      },
+      "Limited - finished trial": {
+        "dashboard": 1,
+        "compliance": 1,
+        "A.C_main_page": 1,
+        "A.A.C_details_page": 0,
+        "Vuln": 0,
+        "NP": 0,
+        "RBAC": 0,
+        "risk_accept": 0,
+        "repo_scan": 0,
+        "registry_scan": 0
+      },
+      "extended trial": {
+        "dashboard": 1,
+        "compliance": 1,
+        "A.C_main_page": 1,
+        "A.C_details_page": 1,
+        "Vuln": 1,
+        "NP": 1,
+        "RBAC": 1,
+        "risk_accept": 1,
+        "repo_scan": 1,
+        "registry_scan": 1
+      },
+      "blocked": {
+        "dashboard": 0,
+        "compliance": 0,
+        "A.C_main_page": 0,
+        "A.C_details_page": 0,
+        "Vuln": 0,
+        "NP": 0,
+        "RBAC": 0,
+        "risk_accept": 0,
+        "repo_scan": 0,
+        "registry_scan": 0
+      }
+    }
+  }
+  
