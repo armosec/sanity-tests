@@ -5,7 +5,9 @@ from typing import Optional
 from .selenium_config import InteractionManagerConfig
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
@@ -97,6 +99,16 @@ class InteractionManager:
             EC.presence_of_element_located((By.XPATH, xpath))
         )
         return element
+    
+    def element_exists(self, xpath: str, timeout: Optional[int] = None) -> bool:
+        """Check if an element specified by xpath exists and is visible."""
+        try:
+            if timeout is None:
+                timeout = self._timeout
+            WebDriverWait(self._driver, timeout).until(EC.visibility_of_element_located((By.XPATH, xpath)))
+            return True
+        except (NoSuchElementException, TimeoutException):
+            return False
 
     def click(self, xpath: str, click_delay: Optional[float] = None) -> WebElement:
         _logger.info(f'Clicking "{xpath}"')
@@ -159,6 +171,34 @@ class InteractionManager:
         _logger.info(f'Switching to window index {windows_index}')
         self._driver.switch_to.window(
             self._driver.window_handles[windows_index])
+    
+    def find_elements_by_css_selector(self, css_selector: str):
+        return self._driver.find_elements(By.CSS_SELECTOR, css_selector)
+
+    def force_click(self, xpath: str):
+        """Executes a force click on the element specified by xpath."""
+        element = self.wait_until_exists(xpath)
+        self._driver.execute_script("arguments[0].click();", element)
+
+    def click_by_xpath_with_js(self, xpath: str):
+        """Clicks on an element specified by XPath using JavaScript."""
+        element = self.wait_until_exists(xpath)
+        self._driver.execute_script("arguments[0].click();", element)
+
+    def press_esc(self):
+       """Presses the Esc key."""
+       self._driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.ESCAPE)
+
+    def wait_until_css_exists(self, css_selector: str, timeout: Optional[int] = None):
+        """
+        Wait until an element identified by a CSS selector exists on the DOM
+        """
+        if not timeout:
+            timeout = self._timeout
+        element = WebDriverWait(self._driver, timeout).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, css_selector))
+        )
+        return element
 
     def navigate(self, url: str) -> None:
         self._driver.get(url)

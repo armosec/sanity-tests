@@ -96,7 +96,7 @@
         "dashboard": 1,
         "compliance": 1,
         "A.C_main_page": 1,
-        "A.A.C_details_page": 0,
+        "A.C_details_page": 0,
         "Vuln": 0,
         "NP": 0,
         "RBAC": 0,
