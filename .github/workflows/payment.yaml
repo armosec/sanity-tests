@@ -18,7 +18,7 @@ jobs:
       id: set-matrix
       run: |
         echo "Reading account IDs from JSON for specified environment..."
-        ACCOUNT_IDS=$(python parse_json.py --env env_dev) 
+        ACCOUNT_IDS=$(python fetch_account_ids.py --env env_dev) 
         echo "# ----------------- ACCOUNT IDS----------------- #"
         echo "$ACCOUNT_IDS"
         echo "# ------------------------------------------------ #"
