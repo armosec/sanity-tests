@@ -17,7 +17,7 @@ on:
           - prod
 
 env:
-  jsonAccountDataPath: "./Payment/sanity-tests/accountsData.json"
+  jsonAccountDataPath: "./accountsData.json"
 
 
 jobs:
