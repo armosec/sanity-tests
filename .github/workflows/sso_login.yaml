@@ -31,9 +31,9 @@ jobs:
           id: sso-login-test
           env:
             email_SSO: ${{ secrets.EMAIL_SSO }}
-            login_pass_SSO: ${{ secrets.LOGIN_PASS_SSO}}
+            login_pass_SSO: ${{ secrets.LOGIN_PASS_SSO }}
           run: |
-            python sso_login.py --email $email_SSO --password $login_pass_SSO
+            python sso_login.py --email ${{ env.email_SSO }} --password ${{ env.login_pass_SSO }}
 
         - name: better-up-time
           # if: failure()
