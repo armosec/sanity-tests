@@ -16,8 +16,8 @@ on:
           - staging
           - prod
 
-  env:
-    jsonAccountDataPath: "./Payment/sanity-tests/accountsData.json"
+env:
+  jsonAccountDataPath: "./Payment/sanity-tests/accountsData.json"
 
 
 jobs:
