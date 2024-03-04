@@ -1,6 +1,15 @@
 name: Run Python Script in Parallel
 
 on: [push, pull_request]
+workflow_dispatch:
+  inputs:
+    environment:
+      description: 'Environment to run the tests in'
+      required: true
+      default: 'prod'
+env:
+  jsonAccountDataPath: { ./Payment/sanity-tests/accountsData.json }
+
 
 jobs:
   setup_matrix:
@@ -18,7 +27,7 @@ jobs:
       id: set-matrix
       run: |
         echo "Reading account IDs from JSON for specified environment..."
-        ACCOUNT_IDS=$(python fetch_account_ids.py --env env_dev) 
+        ACCOUNT_IDS=$(python fetch_account_ids.py --environment ${{ inputs.environment }} --jsonFile ${{ env.jsonAccountDataPath }} 
         echo "# ----------------- ACCOUNT IDS----------------- #"
         echo "$ACCOUNT_IDS"
         echo "# ------------------------------------------------ #"
