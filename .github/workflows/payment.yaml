@@ -6,7 +6,11 @@ workflow_dispatch:
     environment:
       description: 'Environment to run the tests in'
       required: true
-      default: 'prod'
+      type: choice
+      options:
+        - dev
+        - staging
+        - prod
 env:
   jsonAccountDataPath: { ./Payment/sanity-tests/accountsData.json }
 
