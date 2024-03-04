@@ -1,5 +1,5 @@
 import time
-import sys
+import argparse
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -44,12 +44,19 @@ def main(SSO_MAIL, SSO_PASSWORD):
     driver.quit()
 
 if __name__ == "__main__":
-    # Check if the correct number of arguments are provided
-    if len(sys.argv) != 3:
-        print("Usage: python script.py <SSO_MAIL> <SSO_PASSWORD>")
-        sys.exit(1)
-    
-    SSO_MAIL = sys.argv[1]
-    SSO_PASSWORD = sys.argv[2]
 
-    main(SSO_MAIL, SSO_PASSWORD)
+    parser = argparse.ArgumentParser(description='SSO Login Script')
+  
+    parser.add_argument('--email',
+                        type=str,
+                        required=True,
+                        help='The email address for SSO login')
+                        
+    parser.add_argument('--password',
+                        type=str,
+                        required=True,
+                        help='The password for SSO login')
+
+    args = parser.parse_args()
+
+    main(args.email, args.password)
