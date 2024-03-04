@@ -1,0 +1,54 @@
+name: sso login test
+
+on:
+  workflow_dispatch:
+# Triggers the workflow every day at 15:00
+  schedule:
+  - cron: '0 15 * * *'
+  # push:
+  #   branches:
+  #   - onboarding-check
+
+jobs:
+  run-sso-login-test:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repo
+          uses: actions/checkout@v3
+
+        - name: Set up Python environment
+          uses: actions/setup-python@v4
+          timeout-minutes: 10
+          with:
+            python-version: 3.8
+
+        - name: Install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+
+        - name: run-sso-login-test
+          id: sso-login-test
+          env:
+            email_SSO: ${{ secrets.EMAIL_SSO }}
+            login_pass_SSO: ${{ secrets.LOGIN_PASS_SSO}}
+          run: |
+            python sso_login.py --email $email_SSO --password $login_pass_SSO
+
+        - name: better-up-time
+          # if: failure()
+          if: failure() && steps.sso-login-test.outcome == 'failure'
+          run: |
+            curl --request POST \
+              --url https://betteruptime.com/api/v2/incidents \
+              --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
+              --header 'Content-Type: application/json' \
+              --data '{"summary": "Production Incident","sms": "true", "email": "true", "call": "false", "requester_email": "borisv@armosec.io", "description": "SSO login test failed ! "}'
+
+        - name: upload screenshots
+          uses: actions/upload-artifact@v3
+          if: always()
+          with:
+            name: screenshots
+            path: | 
+              ./*.png
