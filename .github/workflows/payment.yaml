@@ -5,16 +5,17 @@ env:
   jsonAccountDataPath: "./Payment/sanity-tests/accountsData.json"
 
 on: [push, pull_request]
-workflow_dispatch:
-  inputs:
-    environment:
-      description: 'Environment to run the tests in'
-      required: true
-      type: choice
-      options:
-        - dev
-        - staging
-        - prod
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run the tests in'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
 
 
 jobs:
