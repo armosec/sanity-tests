@@ -1,5 +1,9 @@
 name: Run Python Script in Parallel
 
+
+env:
+  jsonAccountDataPath: "./Payment/sanity-tests/accountsData.json"
+
 on: [push, pull_request]
 workflow_dispatch:
   inputs:
@@ -11,8 +15,6 @@ workflow_dispatch:
         - dev
         - staging
         - prod
-env:
-  jsonAccountDataPath: { ./Payment/sanity-tests/accountsData.json }
 
 
 jobs:
