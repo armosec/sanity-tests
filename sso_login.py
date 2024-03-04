@@ -27,7 +27,8 @@ def main(SSO_MAIL, SSO_PASSWORD):
     password_field = WebDriverWait(driver, 10).until(EC.element_to_be_clickable(PASSWORDFIELD))
     password_field.send_keys(SSO_PASSWORD)
     password_field.send_keys(Keys.ENTER) # Press Enter to login
-    time.sleep(1)  
+    time.sleep(1)
+    driver.save_screenshot("sso_login.png")
     # WebDriverWait(driver, 10).until(EC.element_to_be_clickable(NEXTBUTTON)).click() # Click the next button
     NEXTBUTTON = (By.ID, "idSIButton9")
     yes_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,NEXTBUTTON )))
