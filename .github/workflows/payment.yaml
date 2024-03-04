@@ -1,9 +1,5 @@
 name: Run Python Script in Parallel
 
-
-env:
-  jsonAccountDataPath: "./Payment/sanity-tests/accountsData.json"
-
 on: [push, pull_request]
 
   workflow_dispatch:
@@ -16,6 +12,9 @@ on: [push, pull_request]
           - dev
           - staging
           - prod
+
+  env:
+    jsonAccountDataPath: "./Payment/sanity-tests/accountsData.json"
 
 
 jobs:
@@ -58,6 +57,6 @@ jobs:
     - name: Run script for each account ID
       run: |
         echo "Running script for account ID: ${{ matrix.account }}"
-        python fetch_account_ids.py --account-id ${{ matrix.account }}
+        python payment.py --account-id ${{ matrix.account }}
 
 
