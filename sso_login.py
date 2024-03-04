@@ -28,8 +28,11 @@ def main(SSO_MAIL, SSO_PASSWORD):
     password_field.send_keys(SSO_PASSWORD)
     password_field.send_keys(Keys.ENTER) # Press Enter to login
     time.sleep(1)  
-    WebDriverWait(driver, 10).until(EC.element_to_be_clickable(NEXTBUTTON)).click() # Click the next button
-    
+    # WebDriverWait(driver, 10).until(EC.element_to_be_clickable(NEXTBUTTON)).click() # Click the next button
+    NEXTBUTTON = (By.ID, "idSIButton9")
+    yes_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,NEXTBUTTON )))
+    yes_button.send_keys(Keys.ENTER)
+
     # Wait for the element to appear to verify the login
     try:
         element = WebDriverWait(driver, 15).until(
