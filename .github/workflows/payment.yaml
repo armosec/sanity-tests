@@ -1,6 +1,9 @@
 name: Run Python Script in Parallel
 
-on: [push, pull_request]
+on: 
+  push:
+    branches:
+    - payment
 
   workflow_dispatch:
     inputs:
