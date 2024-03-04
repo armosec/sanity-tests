@@ -1,0 +1,49 @@
+name: Run Python Script in Parallel
+
+on: [push, pull_request]
+
+jobs:
+  setup_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: pip install json # or any other dependencies you might need
+    - name: Generate matrix for account IDs
+      id: set-matrix
+      run: |
+        echo "Reading account IDs from JSON for specified environment..."
+        ACCOUNT_IDS=$(python parse_json.py --env env_dev) 
+        echo "# ----------------- ACCOUNT IDS----------------- #"
+        echo "$ACCOUNT_IDS"
+        echo "# ------------------------------------------------ #"
+        echo "matrix=$ACCOUNT_IDS" >> $GITHUB_OUTPUT
+        
+
+
+  run_script:
+    needs: setup_matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        account: ${{fromJson(needs.setup_matrix.outputs.matrix)}}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Run script for each account ID
+      run: |
+        echo "Running script for account ID: ${{ matrix.account }}"
+        python fetch_account_ids.py --account-id ${{ matrix.account }}
+
+        
