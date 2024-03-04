@@ -19,6 +19,7 @@ on:
 
 env:
   jsonAccountDataPath: "./accountsData.json"
+  ENVIRONMENT: 'prod'
 
 
 jobs:
@@ -37,7 +38,7 @@ jobs:
       id: set-matrix
       run: |
         echo "Reading account IDs from JSON for specified environment..."
-        ACCOUNT_IDS=$(python fetch_account_ids.py --environment ${{ inputs.environment }} --jsonFile ${{ env.jsonAccountDataPath }})
+        ACCOUNT_IDS=$(python fetch_account_ids.py --environment ${{ env.ENVIRONMENT }} --jsonFile ${{ env.jsonAccountDataPath }})
         echo "# ----------------- ACCOUNT IDS----------------- #"
         echo "$ACCOUNT_IDS"
         echo "# ------------------------------------------------ #"
