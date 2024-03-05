@@ -81,4 +81,12 @@ jobs:
           echo "Running script for account ID: ${{ matrix.account }}"
           python payment.py --account-id ${{ matrix.account }}
 
+      - name: upload screenshots
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: screenshots
+          path: | 
+            ./*.png
+
 
