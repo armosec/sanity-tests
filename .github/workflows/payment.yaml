@@ -48,6 +48,7 @@ jobs:
           pip install -r requirements.txt  
 
   setup_matrix:
+    needs: setup_clusters
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
