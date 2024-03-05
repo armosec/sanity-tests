@@ -44,7 +44,7 @@ jobs:
         echo "# ------------------------------------------------ #"
         echo "matrix=$ACCOUNT_IDS" >> $GITHUB_OUTPUT
 
-  setup_clusters:
+  run_tests:
     needs: setup_matrix
     runs-on: ubuntu-latest
     strategy:
@@ -62,6 +62,7 @@ jobs:
           cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
       - name: Checkout repo
         uses: actions/checkout@v3
+        
       - name: Set up Python environment
         uses: actions/setup-python@v4
         timeout-minutes: 10
@@ -71,23 +72,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt 
-        
-  run_script:
-    needs: setup_matrix
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        account: ${{fromJson(needs.setup_matrix.outputs.matrix)}}
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-    - name: Run script for each account ID
-      run: |
-        echo "Running script for account ID: ${{ matrix.account }}"
-        python payment.py --account-id ${{ matrix.account }}
+
+      - name: Run test for each account ID
+        run: |
+          echo "Running script for account ID: ${{ matrix.account }}"
+          python payment.py --account-id ${{ matrix.account }}
 
 
