@@ -83,6 +83,8 @@ class PaymenyTest:
         )
         mail_input.send_keys(os.environ['email_sso'])
         mail_input.send_keys(Keys.ENTER)
+        self._interaction_manager.driver.save_screenshot(
+                    f"./mail_input_error_{self._get_current_timestamp()}.png")
         password_input = self._interaction_manager.wait_until_interactable(
             '/html/body/frontegg-app/div[2]/div[2]/input'
         )
