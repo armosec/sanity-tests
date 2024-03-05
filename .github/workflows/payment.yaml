@@ -48,8 +48,8 @@ jobs:
     needs: setup_matrix
     runs-on: ubuntu-latest
     strategy:
-    matrix:
-      account: ${{fromJson(needs.setup_matrix.outputs.matrix)}}
+      matrix:
+        account: ${{fromJson(needs.setup_matrix.outputs.matrix)}}
     steps:
       - name: Generate uuid
         id: uuid
