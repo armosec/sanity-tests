@@ -74,6 +74,9 @@ jobs:
           pip install -r requirements.txt 
 
       - name: Run test for each account ID
+        env:
+          email_sso: ${{ secrets.EMAIL_SSO }}
+          login_pass_sso: ${{ secrets.LOGIN_PASS_SSO }}
         run: |
           echo "Running script for account ID: ${{ matrix.account }}"
           python payment.py --account-id ${{ matrix.account }}

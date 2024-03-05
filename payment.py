@@ -55,9 +55,6 @@ class PaymenyTest:
         self.account_data = self.load_json(ACCOUNT_DATA_JSON_PATH)  
         self.access_data = self.account_data['access'] 
 
-    def __str__(self) -> str:
-        return f"Onboarding time: {self.onboarding_time}, Onboarding time without login: {self.onboarding_time_without_login}"
-
     def __repr__(self) -> str:
         return self.__str__()
     
@@ -84,12 +81,12 @@ class PaymenyTest:
         mail_input = self._interaction_manager.wait_until_interactable(
             '//*[@id="frontegg-login-box-container-default"]/div[1]/input'
         )
-        mail_input.send_keys(os.environ['email_onboarding'])
+        mail_input.send_keys(os.environ['email_sso'])
         mail_input.send_keys(Keys.ENTER)
         password_input = self._interaction_manager.wait_until_interactable(
             '/html/body/frontegg-app/div[2]/div[2]/input'
         )
-        password_input.send_keys(os.environ['login_pass_onboarding'])
+        password_input.send_keys(os.environ['login_pass_sso'])
         password_input.send_keys(Keys.ENTER)
 
     def _chose_user(self) -> None: 
