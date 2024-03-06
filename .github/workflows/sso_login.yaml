@@ -2,9 +2,9 @@ name: sso login test
 
 on:
   workflow_dispatch:
-# Triggers the workflow every day at 15:00
+# Triggers the workflow every day at 13:00
   schedule:
-  - cron: '0 15 * * *'
+  - cron: '0 13 * * *'
   # push:
   #   branches:
   #   - onboarding-check
