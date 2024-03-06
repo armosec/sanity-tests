@@ -490,6 +490,7 @@ class PaymenyTest:
                 _logger.info(f"{page}: PASS (Expected: {expected_access}, Actual: {actual_access})")
             else:
                 _logger.error(f"{page}: FAIL (Expected: {expected_access}, Actual: {actual_access})")
+                exit(1)
 
 
 
