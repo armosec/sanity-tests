@@ -51,14 +51,12 @@ class LatencyTest:
         mail_input = self._interaction_manager.wait_until_interactable(
             '//*[@id="frontegg-login-box-container-default"]/div[1]/input'
         )
-        # mail_input.send_keys(os.environ['email_latency'])
-        mail_input.send_keys("test.platform454@gmail.com")
+        mail_input.send_keys(os.environ['email_latency'])
         mail_input.send_keys(Keys.ENTER)
         password_input = self._interaction_manager.wait_until_interactable(
             '/html/body/frontegg-app/div[2]/div[2]/input'
         )
-        # password_input.send_keys(os.environ['login_pass_latency'])
-        password_input.send_keys("Platformtest1!")
+        password_input.send_keys(os.environ['login_pass_latency'])
         password_input.send_keys(Keys.ENTER)
         _logger.info("Logged in to Armo")
 
