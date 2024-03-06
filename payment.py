@@ -84,15 +84,10 @@ class PaymenyTest:
         )
         mail_input.send_keys(email)
         mail_input.send_keys(Keys.ENTER)
-        time.sleep(3)
-        self._interaction_manager.driver.save_screenshot(
-                    f"./mail_input_error_{self._get_current_timestamp()}.png")
         password_input = self._interaction_manager.wait_until_interactable(
             '/html/body/frontegg-app/div[2]/div[2]/input'
         )
         password_input.send_keys(password)
-        self._interaction_manager.driver.save_screenshot(
-                    f"./password_input_error_{self._get_current_timestamp()}.png")
         password_input.send_keys(Keys.ENTER)
 
     def _chose_user(self) -> None: 
@@ -249,6 +244,7 @@ class PaymenyTest:
         command = f"kubectl apply -f {manifest_path}"
         try:
             result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            _logger.info("Creating attack path.")
             _logger.info("Command output: %s", result.stdout.decode())
         except subprocess.CalledProcessError as e:
             _logger.error("Error occurred:", e.stderr.decode())
@@ -261,12 +257,14 @@ class PaymenyTest:
             self.actual_results["A.C_main_page"] = 0
             _logger.info("Can not access to the attack path page", exc_info=True)  
         try:
+            self._interaction_manager._timeout = 60
             _logger.info("Clicking on the fix button of the attack path.")
             self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-attack-chains-page/armo-attack-chains-list/div[1]/armo-attack-chain-item/div[3]/armo-fix-button/armo-button/button')
             self.actual_results["A.C_main_page"] = 1
         except:
             _logger.error("Failed to click on fix button of the attack path", exc_info=True)
             self.actual_results["A.C_main_page"] = 0
+            self._interaction_manager.save_screenshot(f"./Failed_to_click_on_fix_button_AC_{self._get_current_timestamp()}.png")
         try:
             _logger.info("Navigate to details page of the attach path.")
             self._interaction_manager._timeout = 5
@@ -277,7 +275,6 @@ class PaymenyTest:
                 _logger.info("Can not get the details page of the attach path")
         except: 
             _logger.error("Unexpected error occurred when trying to navigate to vulnerabilities.", exc_info=True)
-        print(self.actual_results)
 
     def _navigate_to_compliance(self) -> None:
         _logger.info("Navigating to compliance")
@@ -297,7 +294,6 @@ class PaymenyTest:
                 self.actual_results["compliance"] = 0
             else:
                 _logger.error("Unexpected error occurred when trying to navigate to complaince", exc_info=True)
-        print(self.actual_results)
 
 
     def _navigate_to_dashboard(self) -> bool:
@@ -356,7 +352,6 @@ class PaymenyTest:
                 self.actual_results["Vuln"] = 0
             else:
                 _logger.error("Unexpected error occurred when trying to navigate to vulnerabilities.", exc_info=True)
-        print(self.actual_results)
 
     def _navigate_to_RBAC(self) -> None:
         _logger.info("Navigating to RBAC")
@@ -381,7 +376,6 @@ class PaymenyTest:
                 self.actual_results["RBAC"] = 0
             else:
                 _logger.error("Unexpected error occurred when trying to navigate to RBAC.", exc_info=True)
-        print(self.actual_results)
         
     def _navigate_to_page(self, menu_item_xpath: str, page_indicator_xpath: str, page_name: str, json_status: str) -> bool:
         _logger.info(f"Navigating to {page_name}")
@@ -399,8 +393,9 @@ class PaymenyTest:
             self.actual_results[json_status] = 0
         else:
             _logger.error(f"Unexpected error occurred when trying to navigate to {page_name}.", exc_info=True)
-        print(self.actual_results)
         
+    def _navigate_to_network_policy(self) -> None:
+        return self._navigate_to_page('//*[@id="network-policy-left-menu-item"]', '/html/body/armo-root/div/div/div/armo-network-policy-page/div[4]/armo-workloads-table/div/table/thead/tr/th[1]', "Network policy", "NP")
 
     def _navigate_to_risk_acceptance(self) -> None:
         return self._navigate_to_page('//*[@id="rick-acceptance-left-menu-item"]', '//*[@id="mat-tab-link-0"]', "Risk acceptance", "risk_accept")
@@ -472,17 +467,19 @@ class PaymenyTest:
         self._wait_for_empty_table()
         _logger.info("Performed cleanup")
 
-    def compare_results(self):
+    def _compare_results(self):
         if not hasattr(self, 'access_data') or not hasattr(self, 'account_type'):
             _logger.error('Access data or account type not set.')
-            return
+            exit(1)
 
         expected_results = self.access_data.get(self.account_type)
 
         if expected_results is None:
             _logger.error(f'No access data available for account type: {self.account_type}')
-            return
+            exit(1)
 
+        all_tests_passed = True
+        _logger.info("_______Comparing actual results with expected results___________")
         # Compare actual results with expected results
         for page, expected_access in expected_results.items():
             actual_access = self.actual_results.get(page)
@@ -490,52 +487,60 @@ class PaymenyTest:
                 _logger.info(f"{page}: PASS (Expected: {expected_access}, Actual: {actual_access})")
             else:
                 _logger.error(f"{page}: FAIL (Expected: {expected_access}, Actual: {actual_access})")
-                exit(1)
+                all_tests_passed = False
+                
+        if not all_tests_passed:
+            exit(1)
 
 
 
     def run(self) -> None:
+        try:
         
-        parser = argparse.ArgumentParser(description='Run payment tests.')
-        parser.add_argument('--env-name', required=True, help='Environment name')
-        parser.add_argument('--account-id', required=True, help='Account ID')
-        parser.add_argument('--email', required=True, help='Login email')
-        parser.add_argument('--password', required=True, help='Login password')
-        args = parser.parse_args()
+            parser = argparse.ArgumentParser(description='Run payment tests.')
+            parser.add_argument('--env-name', required=True, help='Environment name')
+            parser.add_argument('--account-id', required=True, help='Account ID')
+            parser.add_argument('--email', required=True, help='Login email')
+            parser.add_argument('--password', required=True, help='Login password')
+            args = parser.parse_args()
 
-        env_name = args.env_name
-        account_id = args.account_id
-        email = args.email
-        password = args.password
+            env_name = args.env_name
+            account_id = args.account_id
+            email = args.email
+            password = args.password
 
-        account_data = self.load_json(ACCOUNT_DATA_JSON_PATH)
+            account_data = self.load_json(ACCOUNT_DATA_JSON_PATH)
 
-        self.account_type = self.get_account_type(env_name ,account_id, account_data)
-        if self.account_type is not None:
-            print(f"Account type for ID {account_id}: {self.account_type} \n  Environment: {env_name}")
-        else:
-            print(f"Account ID {account_id} not found on environment: {env_name} .")
-        self._login(email, password)
-        self._chose_user()
-        self.click_on_account_by_id(account_id)
-        self._click_get_started()
-        helm_command = self._copy_helm_command()
-        self._execute_helm_command(helm_command)
-        self._verify_installation()
-        self._view_cluster_button()
-        self._view_connected_cluster()
-        self._create_attack_path()
-        self._navigate_to_compliance()
-        self._navigate_to_dashboard()
-        self._navigate_to_vulnerabilities()
-        self._navigate_to_RBAC()
-        self._navigate_to_risk_acceptance()
-        self._navigate_to_repo_scanning()  
-        self._navigate_to_registry_scanning()
-        self._navigate_to_attack_path()
-        self._perform_cleanup()
-        self.compare_results()
-        self._interaction_manager.quit()
+            self.account_type = self.get_account_type(env_name ,account_id, account_data)
+            if self.account_type is not None:
+                print(f"Account type for ID {account_id}: {self.account_type} \n  Environment: {env_name}")
+            else:
+                print(f"Account ID {account_id} not found on environment: {env_name} .")
+
+            self._create_attack_path()
+            self._login(email, password)
+            self._chose_user()
+            self.click_on_account_by_id(account_id)
+            self._click_get_started()
+            helm_command = self._copy_helm_command()
+            self._execute_helm_command(helm_command)
+            self._verify_installation()
+            self._view_cluster_button()
+            self._view_connected_cluster()
+            self._navigate_to_compliance()
+            self._navigate_to_dashboard()
+            self._navigate_to_vulnerabilities()
+            self._navigate_to_RBAC()
+            self._navigate_to_network_policy()
+            self._navigate_to_risk_acceptance()
+            self._navigate_to_repo_scanning()  
+            self._navigate_to_registry_scanning()
+            self._navigate_to_attack_path()
+
+        finally:
+            self._compare_results()
+            self._perform_cleanup()
+            self._interaction_manager.quit()
 
 if __name__ == "__main__":
     PaymenyTest().run()
