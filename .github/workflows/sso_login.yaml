@@ -35,15 +35,15 @@ jobs:
           run: |
             python sso_login.py --email ${{ env.email_SSO }} --password ${{ env.login_pass_SSO }}
 
-        # - name: better-up-time
-        #   # if: failure()
-        #   if: failure() && steps.sso-login-test.outcome == 'failure'
-        #   run: |
-        #     curl --request POST \
-        #       --url https://betteruptime.com/api/v2/incidents \
-        #       --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
-        #       --header 'Content-Type: application/json' \
-        #       --data '{"summary": "Production Incident","sms": "true", "email": "true", "call": "false", "requester_email": "borisv@armosec.io", "description": "SSO login test failed ! "}'
+        - name: better-up-time
+          # if: failure()
+          if: failure() && steps.sso-login-test.outcome == 'failure'
+          run: |
+            curl --request POST \
+              --url https://betteruptime.com/api/v2/incidents \
+              --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
+              --header 'Content-Type: application/json' \
+              --data '{"summary": "Production Incident","sms": "true", "email": "true", "call": "false", "requester_email": "borisv@armosec.io", "description": "SSO login test failed ! "}'
 
         - name: upload screenshots
           uses: actions/upload-artifact@v3
