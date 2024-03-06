@@ -232,7 +232,7 @@ class PaymenyTest:
                 raise ex
         _logger.info("Verified connected cluster")
 
-    def create_attack_path(self, manifest_filename='./manifest.yaml')  -> None:
+    def _create_attack_path(self, manifest_filename='./manifest.yaml')  -> None:
         """
         Apply a Kubernetes manifest file to create an attack path.
 
@@ -515,7 +515,7 @@ class PaymenyTest:
         self._verify_installation()
         self._view_cluster_button()
         self._view_connected_cluster()
-        self.create_attack_path()
+        self._create_attack_path()
         self._navigate_to_compliance()
         self._navigate_to_dashboard()
         self._navigate_to_vulnerabilities()
