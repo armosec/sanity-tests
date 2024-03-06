@@ -1,4 +1,4 @@
-name: Run Python Script in Parallel
+name: Run payment tests
 
 on: 
   push:
@@ -75,11 +75,18 @@ jobs:
 
       - name: Run test for each account ID
         env:
-          email_sso: ${{ secrets.EMAIL_SSO }}
-          login_pass_sso: ${{ secrets.LOGIN_PASS_SSO }}
+          email_payment: ${{ secrets.EMAIL_PAYMENT }}
         run: |
+          PASSWORD='' 
+          if [ "${{ env.ENVIRONMENT }}" == "dev" ]; then
+            PASSWORD="${{ secrets.LOGIN_PASS_PAYMENT_DEV }}"
+          elif [ "${{ env.ENVIRONMENT }}" == "staging" ]; then
+            PASSWORD="${{ secrets.LOGIN_PASS_PAYMENT_STAGING }}"
+          else # Default to prod
+            PASSWORD="${{ secrets.LOGIN_PASS_PAYMENT_PROD }}"
+          fi
           echo "Running script for account ID: ${{ matrix.account }}"
-          python payment.py --account-id ${{ matrix.account }}
+          python payment.py --env-name "${{ env.ENVIRONMENT }}" --account-id ${{ matrix.account }} --password "$PASSWORD"
 
       - name: upload screenshots
         uses: actions/upload-artifact@v3

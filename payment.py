@@ -5,6 +5,7 @@ import time
 import datetime
 import logging
 import json
+import argparse
 from dataclasses import dataclass
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -75,13 +76,13 @@ class PaymenyTest:
         return None
 
 
-    def _login(self) -> None:
+    def _login(self, email, password) -> None:
         _logger.info("Logging in to Armo")
         self._interaction_manager.navigate(ARMO_PLATFORM_URL)
         mail_input = self._interaction_manager.wait_until_interactable(
             '//*[@id="frontegg-login-box-container-default"]/div[1]/input'
         )
-        mail_input.send_keys(os.environ['email_sso'])
+        mail_input.send_keys(email)
         mail_input.send_keys(Keys.ENTER)
         time.sleep(3)
         self._interaction_manager.driver.save_screenshot(
@@ -89,7 +90,7 @@ class PaymenyTest:
         password_input = self._interaction_manager.wait_until_interactable(
             '/html/body/frontegg-app/div[2]/div[2]/input'
         )
-        password_input.send_keys(os.environ['login_pass_sso'])
+        password_input.send_keys(password)
         self._interaction_manager.driver.save_screenshot(
                     f"./password_input_error_{self._get_current_timestamp()}.png")
         password_input.send_keys(Keys.ENTER)
@@ -493,20 +494,27 @@ class PaymenyTest:
 
 
     def run(self) -> None:
-        account_data = self.load_json(ACCOUNT_DATA_JSON_PATH)
-        if len(sys.argv) < 3:
-            print("needed: <env> <accountID>")
-            sys.exit(1)
+        
+        parser = argparse.ArgumentParser(description='Run payment tests.')
+        parser.add_argument('--env-name', required=True, help='Environment name')
+        parser.add_argument('--account-id', required=True, help='Account ID')
+        parser.add_argument('--email', required=True, help='Login email')
+        parser.add_argument('--password', required=True, help='Login password')
+        args = parser.parse_args()
 
-        env_name = sys.argv[1]
-        account_id = sys.argv[2]
+        env_name = args.env_name
+        account_id = args.account_id
+        email = args.email
+        password = args.password
+
+        account_data = self.load_json(ACCOUNT_DATA_JSON_PATH)
 
         self.account_type = self.get_account_type(env_name ,account_id, account_data)
         if self.account_type is not None:
-            print(f"Account type for ID {account_id}: {self.account_type}")
+            print(f"Account type for ID {account_id}: {self.account_type} \n  Environment: {env_name}")
         else:
-            print(f"Account ID {account_id} not found.")
-        self._login()
+            print(f"Account ID {account_id} not found on environment: {env_name} .")
+        self._login(email, password)
         self._chose_user()
         self.click_on_account_by_id(account_id)
         self._click_get_started()
