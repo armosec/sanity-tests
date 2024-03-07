@@ -48,6 +48,7 @@ jobs:
     needs: setup_matrix
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         account: ${{fromJson(needs.setup_matrix.outputs.matrix)}}
     steps:
@@ -85,7 +86,7 @@ jobs:
           else # Default to prod
             PASSWORD="${{ secrets.LOGIN_PASS_PAYMENT_PROD }}"
           fi
-          echo "Running script for account ID: ${{ matrix.account }}"
+          echo "Running payment test for account ID: ${{ matrix.account }}"
           python payment.py --env-name "${{ env.ENVIRONMENT }}" --account-id ${{ matrix.account }} --email "${{ secrets.EMAIL_PAYMENT }}" --password "$PASSWORD"
 
       - name: upload screenshots
