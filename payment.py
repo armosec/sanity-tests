@@ -145,24 +145,25 @@ class PaymenyTest:
                 '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/armo-button/button'
             )
             _logger.info("Clicked on get started button")
+            return True
         except TimeoutException:
             _logger.error("Get started button was not found or clickable. Checking for old cluster connection.")
             if self._check_for_existing_cluster():
                 _logger.info("Performing cleanup for old cluster.")
                 self._perform_cleanup()
-
                 _logger.info("Retrying to click on get started button after cleanup")
                 try:
                     self._interaction_manager.click(
                         '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/armo-button/button'
                     )
                     _logger.info("Clicked on get started button after cleanup")
+                    return True
                 except TimeoutException as e:
                     _logger.error("Get started button was not found or clickable after cleanup.",
                                   exc_info=True, stack_info=True, extra={'screenshot': True})
                     self._interaction_manager.driver.save_screenshot(
                         f"./get_started_button_error_{self._get_current_timestamp()}.png")
-                    raise e
+                    return False
 
 
 
