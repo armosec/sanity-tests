@@ -126,6 +126,9 @@ class PaymenyTest:
 
 
     def _click_get_started(self) -> None:
+        if self.verify_if_account_blocked():
+            _logger.info("Account is blocked. Skipping get started button.")
+            return
         try:
             _logger.info("Clicking on get started button")
             self._interaction_manager.click(
@@ -143,9 +146,9 @@ class PaymenyTest:
                 _logger.info("Get started button was not found or clickable. Account is blocked.")
 
     def _copy_helm_command(self) -> str:
-        if self.account_type == "blocked":
+        if self.verify_if_account_blocked():
             _logger.info("Account is blocked. Skipping helm command.")
-            return ""
+            return
         _logger.info("Copying helm command")
         helm_command_element = self._interaction_manager.wait_until_interactable(
             "//div[@class='command-area']//span[@class='ng-star-inserted']"
@@ -155,7 +158,7 @@ class PaymenyTest:
         return helm_command
 
     def _execute_helm_command(self, helm_command: str) -> None:
-        if self.account_type == "blocked":
+        if self.verify_if_account_blocked():
             _logger.info("Account is blocked. Skipping helm command execution.")
             return
         _logger.info("Executing helm command")
@@ -170,7 +173,7 @@ class PaymenyTest:
         _logger.info("Executed helm command successfully")
 
     def _verify_installation(self) -> None:
-        if self.account_type == "blocked":
+        if self.verify_if_account_blocked():
             _logger.info("Account is blocked. Skipping installation verification.")
             return
         _logger.info("Verifying installation")
@@ -187,7 +190,7 @@ class PaymenyTest:
         _logger.info("Verified installation")
 
     def _view_cluster_button(self) -> None:
-        if self.account_type == "blocked":
+        if self.verify_if_account_blocked():
             _logger.info("Account is blocked. Skipping view cluster button.")
             return
         _logger.info("Clicking on view cluster button")
@@ -206,8 +209,8 @@ class PaymenyTest:
         _logger.info("Clicked on view cluster button")
 
     def _view_connected_cluster(self) -> None:
-        if self.account_type == "blocked":
-            _logger.info("Account is blocked. Skipping view connected cluster.")
+        if self.verify_if_account_blocked():
+            _logger.info("Account is blocked. Skipping connected cluster verification.")
             return
         _logger.info("Verifying connected cluster")
         try:
@@ -250,12 +253,16 @@ class PaymenyTest:
             _logger.error("Error occurred:", e.stderr.decode())
 
     def _navigate_to_attack_path(self) -> None:
-        _logger.info("Navigating to attack path")   
+        _logger.info("Navigating to attack path")
+        if self.verify_if_account_blocked():
+            _logger.info("Account is blocked. Skipping attack path.")
+            return 
         try:
             self._interaction_manager.click('//*[@id="attack-path-left-menu-item"]')
         except:
             self.actual_results["A.C_main_page"] = 0
-            _logger.info("Can not access to the attack path page", exc_info=True)  
+            _logger.info("Can not access to the attack path page", exc_info=True)
+
         try:
             self._interaction_manager._timeout = 60
             _logger.info("Clicking on the fix button of the attack path.")
@@ -278,7 +285,15 @@ class PaymenyTest:
 
     def _navigate_to_compliance(self) -> None:
         _logger.info("Navigating to compliance")
-        self._interaction_manager.click('//*[@id="configuration-scanning-left-menu-item"]')
+        if self.verify_if_account_blocked():
+            _logger.info("Account is blocked. Skipping compliance.")
+            return 
+        try:
+            self._interaction_manager.click('//*[@id="configuration-scanning-left-menu-item"]')
+        except:
+            self.actual_results["compliance"] = 0
+            _logger.info("Can not access to the compliance page")
+ 
         try:
             _logger.info("select cluster")
             self._interaction_manager.click("//armo-cluster-scans-table//*[contains(@class, 'mat-tooltip-trigger')]") 
@@ -293,25 +308,20 @@ class PaymenyTest:
                 _logger.info("Must upgrade page is present.")
                 self.actual_results["compliance"] = 0
             else:
-                _logger.error("Unexpected error occurred when trying to navigate to complaince", exc_info=True)
+                _logger.error("Unexpected error occurred when trying to navigate to complaince")
 
 
     def _navigate_to_dashboard(self) -> bool:
         _logger.info("Navigating to dashboard")
+        if self.verify_if_account_blocked():
+            _logger.info("Account is blocked. Skipping dashboard.")
+            return
         try:
             self._interaction_manager.click('//*[@id="dashboard-left-menu-item"]')
             _logger.info("Clicked on dashboard")
         except:
-            if self._interaction_manager.element_exists('/html/body/armo-root/div/div/div/armo-must-upgrade-page/armo-button/button') and self.account_type == "blocked":
-                _logger.error("Account blocked. Must upgrade page is present.", exc_info=True)  
-                self.actual_results["dashboard"] = 0
-                return True
-            else:
-                _logger.error("Unexpected error occurred when trying to navigate to dashboard.",
-                              exc_info=True, stack_info=True, extra={'screenshot': True})
-                self._interaction_manager.driver.save_screenshot(
-                f"./navigate_to_dashboard_error_{self._get_current_timestamp()}.png") 
-                return False
+            self.actual_results["dashboard"] = 0
+            _logger.info("Can not access to the dashboard page")
                  
         try:
             # Wait for the element to exist
@@ -332,13 +342,16 @@ class PaymenyTest:
         
     def _navigate_to_vulnerabilities(self) -> None:
         _logger.info("Navigating to vulnerabilities")
+        if self.verify_if_account_blocked():
+            _logger.info("Account is blocked. Skipping vulnerabilities.")
+            return
         self._interaction_manager._timeout = 5
         try:
             self._interaction_manager.click('//*[@id="image-scanning-left-menu-item"]')
         except:
-            if self._interaction_manager.element_exists('/html/body/armo-root/div/div/div/armo-must-upgrade-page/armo-button/button') and self.account_type == "blocked":
-                _logger.error("Account blocked. Must upgrade page is present.", exc_info=True)  
-                self.actual_results["Vuln"] = 0       
+            self.actual_results["Vuln"] = 0
+            _logger.info("Can not access to the vulnerabilities page")
+
         try:
             # Attempt to click on the first workload
             self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-workloads-page/armo-vulnerabilities-shared-table/div/table/tbody/tr[1]/td[2]')
@@ -355,14 +368,15 @@ class PaymenyTest:
 
     def _navigate_to_RBAC(self) -> None:
         _logger.info("Navigating to RBAC")
+        if self.verify_if_account_blocked():
+            _logger.info("Account is blocked. Skipping RBAC.")
+            return 
         self._interaction_manager._timeout = 5
         try:
             self._interaction_manager.click('//*[@id="rbac-visualizer-left-menu-item"]')
         except:
-            if self._interaction_manager.element_exists('/html/body/armo-root/div/div/div/armo-must-upgrade-page/armo-button/button') and self.account_type == "blocked":
-                _logger.error("Account blocked. Must upgrade page is present.", exc_info=True)  
-                self.actual_results["RBAC"] = 0
-                return True
+            self.actual_results["RBAC"] = 0
+
         try:
             # Wait for the element to exist
             self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-visualizer-page/app-graph/div/div[1]/span/button')
@@ -374,11 +388,15 @@ class PaymenyTest:
             if self._interaction_manager.element_exists('/html/body/armo-root/div/div/div/armo-trial-expired-page/armo-button/button'):
                 _logger.info(" Upgrade page is present.")
                 self.actual_results["RBAC"] = 0
-            else:
+            else:  
                 _logger.error("Unexpected error occurred when trying to navigate to RBAC.", exc_info=True)
+
         
     def _navigate_to_page(self, menu_item_xpath: str, page_indicator_xpath: str, page_name: str, json_status: str) -> bool:
         _logger.info(f"Navigating to {page_name}")
+        if self.verify_if_account_blocked():
+            _logger.info(f"Account is blocked. Skipping {page_name}.")
+            return
         self._interaction_manager._timeout = 5
         self._interaction_manager.click(menu_item_xpath)
 
@@ -456,7 +474,7 @@ class PaymenyTest:
 
     def _perform_cleanup(self) -> None:
         _logger.info("Performing cleanup")
-        if self.account_type == "blocked":
+        if self.verify_if_account_blocked():
             _logger.info("Account is blocked. Skipping cleanup.")
             return
         self._uninstall_kubescape()
@@ -492,6 +510,22 @@ class PaymenyTest:
         if not all_tests_passed:
             exit(1)
 
+    def verify_if_account_blocked(self):
+        if self.account_type == "blocked":
+            _logger.info("Verifying if account is blocked.")
+            try:
+                # Attempt to find the element by XPath
+                self._interaction_manager._timeout = 5
+                self._interaction_manager.wait_until_interactable("/html/body/armo-root/div/div/div/armo-must-upgrade-page/armo-button/button")
+                _logger.info("Account Blocked - Must-upgrade page is present for this account.")
+                return True
+            except TimeoutException:
+                # Handle the case where the element is not found
+                _logger.error("Account NOT Blocked - Must-upgrade page is NOT present or not interactable.")
+                return False
+        else:
+            _logger.info(f"Account ID {self.account_type} does not require must-upgrade verification.")
+            return False
 
 
     def run(self) -> None:
