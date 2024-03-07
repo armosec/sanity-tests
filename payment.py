@@ -136,14 +136,11 @@ class PaymenyTest:
             )
             _logger.info("Clicked on get started button")
         except TimeoutException as e:
-            if self.account_type != "blocked":
-                _logger.error("Get started button was not found or clickable.",
-                              exc_info=True, stack_info=True, extra={'screenshot': True})
-                self._interaction_manager.driver.save_screenshot(
-                    f"./get_started_button_error_{self._get_current_timestamp()}.png")
-                raise e
-            else:
-                _logger.info("Get started button was not found or clickable. Account is blocked.")
+            _logger.error("Get started button was not found or clickable.",
+                          exc_info=True, stack_info=True, extra={'screenshot': True})
+            self._interaction_manager.driver.save_screenshot(
+                f"./get_started_button_error_{self._get_current_timestamp()}.png")
+            raise e
 
     def _copy_helm_command(self) -> str:
         if self.verify_if_account_blocked():
