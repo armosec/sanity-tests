@@ -353,7 +353,7 @@ class PaymenyTest:
                 _logger.info("Verification successful: There is 1 cluster.")
                 self.actual_results["dashboard"] = 1
             else:
-                _logger.info(f"Verification failed: Expected 1 cluster, found {cluster_count}.")
+                _logger.error(f"Verification failed: Expected 1 cluster, found {cluster_count}.")
                 self.actual_results["dashboard"] = 0
         except TimeoutException:
             _logger.error("The cluster count element does not exist on the page.",
