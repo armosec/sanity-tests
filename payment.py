@@ -138,14 +138,14 @@ class PaymenyTest:
     def _click_get_started(self) -> None:
         if self.verify_if_account_blocked():
             _logger.info("Account is blocked. Skipping get started button.")
-            return
+            return False  # Indicate that the process did not proceed as expected
         try:
             _logger.info("Clicking on get started button")
             self._interaction_manager.click(
                 '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/armo-button/button'
             )
             _logger.info("Clicked on get started button")
-            return True
+            return True  # Successful click
         except TimeoutException:
             _logger.error("Get started button was not found or clickable. Checking for old cluster connection.")
             if self._check_for_existing_cluster():
@@ -157,14 +157,13 @@ class PaymenyTest:
                         '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/armo-button/button'
                     )
                     _logger.info("Clicked on get started button after cleanup")
-                    return True
+                    return True  # Successful click after cleanup
                 except TimeoutException as e:
                     _logger.error("Get started button was not found or clickable after cleanup.",
                                   exc_info=True, stack_info=True, extra={'screenshot': True})
                     self._interaction_manager.driver.save_screenshot(
                         f"./get_started_button_error_{self._get_current_timestamp()}.png")
-                    return False
-
+                    return False  
 
 
     def _copy_helm_command(self) -> str:
@@ -386,7 +385,10 @@ class PaymenyTest:
                 _logger.info("Trial expired page is present.")
                 self.actual_results["Vuln"] = 0
             else:
-                _logger.error("Unexpected error occurred when trying to navigate to vulnerabilities.", exc_info=True)
+                _logger.error("Unexpected error occurred when trying to navigate to vulnerabilities.", 
+                              exc_info=True, stack_info=True, extra={'screenshot': True})
+                self._interaction_manager.driver.save_screenshot(
+                f"./vuln_error_{self._get_current_timestamp()}.png")
 
     def _navigate_to_RBAC(self) -> None:
         _logger.info("Navigating to RBAC")
