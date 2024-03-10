@@ -536,7 +536,7 @@ class PaymenyTest:
             _logger.info("Verifying if account is blocked.")
             try:
                 # Attempt to find the element by XPath
-                self._interaction_manager._timeout = 5
+                self._interaction_manager._timeout = 3
                 self._interaction_manager.wait_until_interactable("/html/body/armo-root/div/div/div/armo-must-upgrade-page/armo-button/button")
                 _logger.info("Account Blocked - Must-upgrade page is present for this account.")
                 return True
