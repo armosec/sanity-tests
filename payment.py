@@ -121,13 +121,14 @@ class PaymenyTest:
         # refresh the page 
         self._interaction_manager.driver.refresh()
         _logger.info("Page refreshed.")
+        time.sleep(1)
+        self._interaction_manager.click('//*[@id="configuration-scanning-left-menu-item"]')
         return found
 
     def _check_for_existing_cluster(self) -> bool:
-        # This is a placeholder implementation.
-        # You'll need to identify how to check for an existing cluster in your application.
         try:
-            self._interaction_manager.wait_until_interactable("/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]", timeout=5)
+            self._interaction_manager._timeout = 3
+            self._interaction_manager.wait_until_interactable("/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]")
             _logger.info("Old cluster connected.")
             return True
         except TimeoutException:
@@ -135,35 +136,31 @@ class PaymenyTest:
             return False
 
 
-    def _click_get_started(self) -> None:
+    def _click_get_started(self):
         if self.verify_if_account_blocked():
-            _logger.info("Account is blocked. Skipping get started button.")
-            return False  # Indicate that the process did not proceed as expected
+            _logger.info("Account is blocked. Skipping 'Get Started' button.")
+            return
         try:
-            _logger.info("Clicking on get started button")
-            self._interaction_manager.click(
-                '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/armo-button/button'
-            )
-            _logger.info("Clicked on get started button")
-            return True  # Successful click
-        except TimeoutException:
-            _logger.error("Get started button was not found or clickable. Checking for old cluster connection.")
+            _logger.info("Trying to click 'Get Started' button")
+            self._interaction_manager.click('//*[@id="configuration-scanning-left-menu-item"]')
+            self._interaction_manager.click('//*[@id="action-section"]/armo-button/button')
+            _logger.info("Successfully clicked 'Get Started' button")
+        except:
+            _logger.error("'Get Started' button not clickable. Checking for existing cluster.")
             if self._check_for_existing_cluster():
-                _logger.info("Performing cleanup for old cluster.")
+                _logger.info("Existing cluster detected. Performing cleanup.")  
                 self._perform_cleanup()
-                _logger.info("Retrying to click on get started button after cleanup")
+                # Attempt to click the "Get Started" button again
                 try:
-                    self._interaction_manager.click(
-                        '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/armo-button/button'
-                    )
-                    _logger.info("Clicked on get started button after cleanup")
-                    return True  # Successful click after cleanup
+                    self._interaction_manager.click('//*[@id="configuration-scanning-left-menu-item"]')
+                    self._interaction_manager.click('//*[@id="action-section"]/armo-button/button')
+                    _logger.info("Clicked 'Get Started' button after cleanup")
                 except TimeoutException as e:
-                    _logger.error("Get started button was not found or clickable after cleanup.",
-                                  exc_info=True, stack_info=True, extra={'screenshot': True})
+                    _logger.error("Still unable to click 'Get Started' after cleanup.", 
+                                   exc_info=True, stack_info=True, extra={'screenshot': True})
                     self._interaction_manager.driver.save_screenshot(
-                        f"./get_started_button_error_{self._get_current_timestamp()}.png")
-                    return False  
+                    f"./verify_button_error_{self._get_current_timestamp()}.png")
+                    raise e
 
 
     def _copy_helm_command(self) -> str:
