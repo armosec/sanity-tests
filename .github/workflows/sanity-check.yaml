@@ -112,7 +112,6 @@ jobs:
                   -t ${{ matrix.TEST }} \
                   -b production \
                   --logger DEBUG \
-                  --duration 3 \
                   --kwargs helm_branch=release \
                   deactivate
 
@@ -135,7 +134,6 @@ jobs:
                 -t ${{ matrix.TEST }} \
                 -b production \
                 --logger DEBUG \
-                --duration 3 \
                 --kwargs helm_branch=release \
                 deactivate
 
