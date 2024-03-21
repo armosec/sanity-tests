@@ -99,7 +99,7 @@ jobs:
           id: StepId1
           uses: nick-fields/retry@v2
           with:
-            timeout_seconds: 180
+            timeout_seconds: 270
             retry_wait_seconds: 60
             max_attempts: 2
             retry_on: any
