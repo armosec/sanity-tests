@@ -53,6 +53,6 @@ jobs:
     with:
       RETRY_JOB: true
       BINARY_TESTS: '[ 
-                        "scan_nsa"
+                        "scan_nsa_and_submit_to_backend"
                       ]'
     secrets: inherit
