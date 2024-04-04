@@ -564,7 +564,6 @@ def create_attack_path(manifest_filename='./manifest.yaml'):
 def navigate_to_attack_path(wait):
     try:
         # Wait until the element is clickable
-        # wait = WebDriverWait(driver, timeout)
         attack_path_element = wait.until(EC.element_to_be_clickable((By.ID, "attack-path-left-menu-item")))
         attack_path_element.click()
         print("Attack-path clicked.")
@@ -590,9 +589,7 @@ def attach_path(driver, wait):
     #     print("Scan all button not found.")
     #     driver.save_screenshot(f"./failed_to_find_the_scan_all_button_{ClusterManager.get_current_timestamp()}.png")
     
-    # time.sleep(10)
     print("waiting for attack path to be displayed - with timeout 5 min")
-
 
     # Check if the Attack path is displayed    
     try:
