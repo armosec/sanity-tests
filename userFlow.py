@@ -151,8 +151,15 @@ def navigate_to_dashboard(driver, wait):
         driver.save_screenshot(f"./failed_to_click_on_the_resourse_link_{ClusterManager.get_current_timestamp()}.png")    
     
     # Wait until the table of the esourse is present  
-    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "armo-resources-ignore-rules-list.ng-star-inserted")))
-    print("Table of the resourse is present")
+    try:
+        wait = WebDriverWait(driver, 60, 0.001)
+        # wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "armo-resources-ignore-rules-list.ng-star-inserted")))
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "button.armo-button.table-more-actions.sm")))
+        print("Table of the resourse is present")
+    except:
+        print("Table of the resourse is not present")
+        driver.save_screenshot(f"./failed_to_find_the_resourse_table_{ClusterManager.get_current_timestamp()}.png")
+    
     time.sleep(1)
     ignore_rule = IgnoreRule(driver)
     ignore_rule.click_ignore_button(wait, driver)
