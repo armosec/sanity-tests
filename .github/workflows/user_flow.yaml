@@ -52,7 +52,7 @@ jobs:
           if: always()
           with:
             name: screenshots
-            path: |    
+            path: | 
               ./*.png
 
         - name: Commit changes
