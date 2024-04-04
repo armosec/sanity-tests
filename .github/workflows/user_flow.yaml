@@ -45,7 +45,7 @@ jobs:
             email_user_flow: ${{ secrets.EMAIL_USER_FLOW }}
             login_pass_user_flow: ${{ secrets.LOGIN_PASS_USER_FLOW }}
           run: |
-            python UserFlow.py $URL
+            python userFlow.py $URL
 
         - name: upload screenshots
           uses: actions/upload-artifact@v3
