@@ -487,7 +487,6 @@ def risk_acceptance_page(driver, wait):
     vulnerabilities_tab_xpath = "/html/body/armo-root/div/div/div/armo-risk-acceptance-page/armo-risk-acceptance-container/nav/div/div/div/a[2]"
     risk_acceptance.switch_to_tab(vulnerabilities_tab_xpath)
     time.sleep(0.5)
-    # risk_acceptance.click_severity_element("td.cdk-column-vulnerabilities-0-severityScore")
     risk_acceptance.click_severity_element("td.mat-column-vulnerabilities-0-severityScore")
     time.sleep(1)
     risk_acceptance.click_edit_button('/html/body/div[5]/div/div/section/main/section/armo-button/button')
