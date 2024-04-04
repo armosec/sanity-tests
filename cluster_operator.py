@@ -19,7 +19,7 @@ def initialize_driver():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     _setup_driver = webdriver.Chrome(options=chrome_options)
-    # _setup_driver.set_window_size(1512, 982)
+    _setup_driver.set_window_size(1280,800)
     # _setup_driver.maximize_window()
     return _setup_driver
 
