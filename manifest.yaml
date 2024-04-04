@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alpine-configmap
+data:
+  example-config.txt: |
+    dmVyeSBpbXBvcnRhbnQgZmlsZQ==
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpine-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alpine
+  template:
+    metadata:
+      labels:
+        app: alpine
+    spec:
+      containers:
+        - name: alpine-container
+          image: alpine:3.18.2  # Use the Alpine Linux image
+          command: ["/bin/sh"]
+          args: ["-c", "nc -lnvp 8080"]
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: alpine-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alpine-service
+spec:
+  selector:
+    app: alpine 
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: NodePort
