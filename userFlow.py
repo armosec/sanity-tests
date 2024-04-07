@@ -388,11 +388,14 @@ def navigate_to_network_policy(driver, wait):
 
     # Click on the first checkbox - select the first workload
     try:
-        time.sleep(1.3)
+        time.sleep(1)
+        # checkbox = WebDriverWait(driver, 10).until(
+        #     EC.element_to_be_clickable((By.CSS_SELECTOR, "mat-checkbox[data-test-id='checkbox']")))
+        # # checkbox.click()
+        # driver.execute_script("arguments[0].click();", checkbox)
         checkbox = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "mat-checkbox[data-test-id='checkbox']")))
-        # checkbox.click()
-        driver.execute_script("arguments[0].click();", checkbox)
+            EC.element_to_be_clickable((By.XPATH, "//mat-checkbox[@data-test-id='checkbox']")))
+        checkbox.click()
         print("Checkbox clicked- woekload selected")
     except Exception as e:
         print(f"Failed to click on the workload CHECKBOX: {str(e)}")

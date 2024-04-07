@@ -139,8 +139,9 @@ class ConnectCluster:
             self.driver.save_screenshot(f"./get_started_button_error_{ClusterManager.get_current_timestamp()}.png")
 
     def connect_cluster_helm(self):
+        custom_wait = WebDriverWait(self.driver, timeout= 180, poll_frequency=0.001)
         css_selector = 'div.command-area > span.ng-star-inserted'
-        helm_command_element = self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector)))
+        helm_command_element = custom_wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector)))
         helm_command = helm_command_element.text
         try:
             result = subprocess.run(helm_command, shell=True, check=True, stderr=subprocess.PIPE)
