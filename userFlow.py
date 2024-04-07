@@ -388,13 +388,14 @@ def navigate_to_network_policy(driver, wait):
 
     # Click on the first checkbox - select the first workload
     try:
-        time.sleep(1)
+        time.sleep(1.3)
         checkbox = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, "mat-checkbox[data-test-id='checkbox']")))
-        checkbox.click()
+        # checkbox.click()
+        driver.execute_script("arguments[0].click();", checkbox)
         print("Checkbox clicked- woekload selected")
-    except: 
-        print("Failed to click on the workload CHECKBOX")
+    except Exception as e:
+        print(f"Failed to click on the workload CHECKBOX: {str(e)}")
         driver.save_screenshot(f"./failed_to_find_the_first_workload_{ClusterManager.get_current_timestamp()}.png")
 
     # Click the 'Generate' button
@@ -486,7 +487,7 @@ def risk_acceptance_page(driver, wait):
 
     vulnerabilities_tab_xpath = "/html/body/armo-root/div/div/div/armo-risk-acceptance-page/armo-risk-acceptance-container/nav/div/div/div/a[2]"
     risk_acceptance.switch_to_tab(vulnerabilities_tab_xpath)
-    time.sleep(0.5)
+    time.sleep(1)
     risk_acceptance.click_severity_element("td.mat-column-vulnerabilities-0-severityScore")
     time.sleep(1)
     risk_acceptance.click_edit_button('/html/body/div[5]/div/div/section/main/section/armo-button/button')
