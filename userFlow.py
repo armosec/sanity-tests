@@ -701,7 +701,7 @@ def main():
         ac_time = time.time() - ac_start_time
         np_stat_time = time.time()
         navigate_to_network_policy(driver, wait)
-        np_time =  time.time() - np_stat_time - 180 # 3 min waiting time
+        np_time =  time.time() - np_stat_time - 120 # 2 min waiting time
         
         
         log_data = {
