@@ -209,13 +209,13 @@ class Cleanup:
         print("Click on settings button.")
 
     def click_more_options_button(self):
-        time.sleep(0.3)
+        time.sleep(0.5)
         more_options_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.table-more-actions.sm')))
         more_options_button.click()
         print("Click on more options button.")
 
     def choose_delete_option(self):
-        time.sleep(0.3)
+        time.sleep(0.5)
         delete_button = self.driver.find_element(By.XPATH, "//button[text()='Delete']")
         delete_button.click()
         print("Click on delete button option.")

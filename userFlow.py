@@ -190,7 +190,8 @@ def navigate_to_vulnerabilities(driver, wait):
     print("Namespace filter clicked")
     # Click on the all namespaces (select all)
     select_all_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(@class, 'color-blue') and contains(text(), 'Select all')]")))
-    select_all_button.click()
+    # select_all_button.click()
+    driver.execute_script("arguments[0].click();", select_all_button)
     print("All namespaces selected")
 
     time.sleep(2)
@@ -315,8 +316,8 @@ def navigate_to_network_policy(driver, wait):
     driver.execute_script("arguments[0].click();", network_policy)
     print("go to Network policy page")
 
-    print("waiting for the network policy page to be displayed - 3 min")
-    time.sleep(180)
+    print("waiting for the network policy page to be displayed - 2 min")
+    time.sleep(120)
 
     # Click on the status filter
     try:
@@ -388,7 +389,7 @@ def navigate_to_network_policy(driver, wait):
 
     # Click on the first checkbox - select the first workload
     try:
-        time.sleep(1)
+        time.sleep(1.3)
         # checkbox = WebDriverWait(driver, 10).until(
         #     EC.element_to_be_clickable((By.CSS_SELECTOR, "mat-checkbox[data-test-id='checkbox']")))
         # # checkbox.click()
