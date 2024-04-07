@@ -315,8 +315,8 @@ def navigate_to_network_policy(driver, wait):
     driver.execute_script("arguments[0].click();", network_policy)
     print("go to Network policy page")
 
-    print("waiting for the network policy page to be displayed - 3 min")
-    time.sleep(180)
+    print("waiting for the network policy page to be displayed - 2 min")
+    time.sleep(120)
 
     # Click on the status filter
     try:
@@ -388,13 +388,17 @@ def navigate_to_network_policy(driver, wait):
 
     # Click on the first checkbox - select the first workload
     try:
-        time.sleep(1)
+        time.sleep(1.3)
+        # checkbox = WebDriverWait(driver, 10).until(
+        #     EC.element_to_be_clickable((By.CSS_SELECTOR, "mat-checkbox[data-test-id='checkbox']")))
+        # # checkbox.click()
+        # driver.execute_script("arguments[0].click();", checkbox)
         checkbox = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "mat-checkbox[data-test-id='checkbox']")))
+            EC.element_to_be_clickable((By.XPATH, "//mat-checkbox[@data-test-id='checkbox']")))
         checkbox.click()
         print("Checkbox clicked- woekload selected")
-    except: 
-        print("Failed to click on the workload CHECKBOX")
+    except Exception as e:
+        print(f"Failed to click on the workload CHECKBOX: {str(e)}")
         driver.save_screenshot(f"./failed_to_find_the_first_workload_{ClusterManager.get_current_timestamp()}.png")
 
     # Click the 'Generate' button
@@ -486,7 +490,7 @@ def risk_acceptance_page(driver, wait):
 
     vulnerabilities_tab_xpath = "/html/body/armo-root/div/div/div/armo-risk-acceptance-page/armo-risk-acceptance-container/nav/div/div/div/a[2]"
     risk_acceptance.switch_to_tab(vulnerabilities_tab_xpath)
-    time.sleep(0.5)
+    time.sleep(1)
     risk_acceptance.click_severity_element("td.mat-column-vulnerabilities-0-severityScore")
     time.sleep(1)
     risk_acceptance.click_edit_button('/html/body/div[5]/div/div/section/main/section/armo-button/button')
@@ -696,7 +700,7 @@ def main():
         ac_time = time.time() - ac_start_time
         np_stat_time = time.time()
         navigate_to_network_policy(driver, wait)
-        np_time =  time.time() - np_stat_time - 180 # 3 min waiting time
+        np_time =  time.time() - np_stat_time - 120 # 2 min waiting time
         
         
         log_data = {
@@ -719,8 +723,8 @@ def main():
             f"Attack Path Time: {log_data['AC_time']} sec")
 
 
-        with open("./logs/flow_user_logs.csv", "a") as f:
-            f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
+        # with open("./logs/flow_user_logs.csv", "a") as f:
+        #     f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
             
     finally:
         # Cleanup cluster from Armo platrom
