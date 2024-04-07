@@ -190,7 +190,8 @@ def navigate_to_vulnerabilities(driver, wait):
     print("Namespace filter clicked")
     # Click on the all namespaces (select all)
     select_all_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(@class, 'color-blue') and contains(text(), 'Select all')]")))
-    select_all_button.click()
+    # select_all_button.click()
+    driver.execute_script("arguments[0].click();", select_all_button)
     print("All namespaces selected")
 
     time.sleep(2)
