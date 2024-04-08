@@ -28,21 +28,28 @@ def main(SSO_MAIL, SSO_PASSWORD):
     password_field.send_keys(SSO_PASSWORD)
     password_field.send_keys(Keys.ENTER) # Press Enter to login
     time.sleep(1)
-    driver.save_screenshot("sso_login.png")
-    # WebDriverWait(driver, 10).until(EC.element_to_be_clickable(NEXTBUTTON)).click() # Click the next button
     
-    yes_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,NEXTBUTTON )))
-    yes_button.send_keys(Keys.ENTER)
+    try:
+        yes_button = driver.find_element((By.ID,NEXTBUTTON ))
+        driver.execute_script("arguments[0].scrollIntoView();", yes_button)
+        yes_button.click()
+        print("Clicked on Yes button.")
+    except TimeoutException:
+        print("Failed to click on Yes button.")
+        driver.save_screenshot("./faild_to_click_yes_button.png")
+        driver.quit()
+        exit(1)
 
     # Wait for the element to appear to verify the login
     try:
+        time.sleep(1)
         element = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "configuration-scanning-left-menu-item"))
         )
         print("SSO Login pass successful.")
     except TimeoutException:
         print("Login failed. Element does not exist within the given time frame.")
-        driver.save_screenshot("faild_to_login.png")
+        driver.save_screenshot("./faild_to_login.png")
         exit(1)
     
     driver.quit()
