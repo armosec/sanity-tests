@@ -30,7 +30,7 @@ def main(SSO_MAIL, SSO_PASSWORD):
     time.sleep(1)
     
     try:
-        yes_button = driver.find_element((NEXTBUTTON ))
+        yes_button = driver.find_element(*NEXTBUTTON)
         driver.execute_script("arguments[0].scrollIntoView();", yes_button)
         yes_button.click()
         print("Clicked on Yes button.")
