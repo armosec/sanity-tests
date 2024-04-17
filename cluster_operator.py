@@ -210,7 +210,7 @@ class Cleanup:
 
     def click_more_options_button(self):
         time.sleep(0.5)
-        more_options_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.table-more-actions.sm')))
+        more_options_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm')))
         more_options_button.click()
         print("Click on more options button.")
 
@@ -238,12 +238,21 @@ class IgnoreRule:
 
     def click_ignore_button(self, wait, driver):
         try:
-            wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'button.armo-button.table-more-actions.sm')))
-            driver.find_element(By.CSS_SELECTOR, 'button.armo-button.table-more-actions.sm')
-            driver.execute_script("arguments[0].click();", driver.find_element(By.CSS_SELECTOR, 'button.armo-button.table-more-actions.sm'))
+            wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm')))
+            driver.find_element(By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm')
+            driver.execute_script("arguments[0].click();", driver.find_element(By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm'))
+        except:
+            print("failed to click on 3 dots button")
+            driver.save_screenshot(f"./ignore_button_error_{ClusterManager.get_current_timestamp()}.png")
+            
+        try:
+            wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.armo-button.table-secondary.lg')))
+            driver.find_element(By.CSS_SELECTOR, '.armo-button.table-secondary.lg')
+            driver.execute_script("arguments[0].click();", driver.find_element(By.CSS_SELECTOR, '.armo-button.table-secondary.lg'))
         except:
             print("failed to find the Accepting the Risk button")
-            driver.save_screenshot(f"./ignore_button_error_{ClusterManager.get_current_timestamp()}.png")
+            driver.save_screenshot(f"./Accepting_Risk_button_error_{ClusterManager.get_current_timestamp()}.png")
+            
 
     # Check if there are at the fields not empty
     def get_ignore_rule_field(self ,driver, index):

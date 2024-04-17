@@ -154,7 +154,7 @@ def navigate_to_dashboard(driver, wait):
     try:
         wait = WebDriverWait(driver, 60, 0.001)
         # wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "armo-resources-ignore-rules-list.ng-star-inserted")))
-        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "button.armo-button.table-more-actions.sm")))
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "armo-button button.armo-button.primary.sm")))
         print("Table of the resourse is present")
     except:
         print("Table of the resourse is not present")
@@ -298,8 +298,6 @@ def navigate_to_vulnerabilities(driver, wait):
     time.sleep(1)
     ignore_rule = IgnoreRule(driver)
     ignore_rule.click_ignore_button(wait, driver)
-    edit_risk_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".armo-button.table-more-actions.lg")))
-    edit_risk_button.click()
     print("Clicked on the 'Accept Risk' button")
     time.sleep(1)
     container_name = ignore_rule.get_ignore_rule_field(driver, 3)
@@ -415,7 +413,7 @@ def navigate_to_network_policy(driver, wait):
     # Open the NP   
     try:
         time.sleep(2)
-        button =  wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "button.armo-button.table-more-actions.sm svg use[href*='chevron-right.svg#chevron-right']")))
+        button =  wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "button.armo-button.table-secondary.sm svg use[href='assets/icons/v2/arrows/chevron-right.svg#chevron-right']")))
         driver.execute_script("""
         var svg = arguments[0];
         var event = new MouseEvent('click', {
@@ -447,7 +445,7 @@ def navigate_to_network_policy(driver, wait):
             row_text = row.text
             # Check if row contains text indicating a Network Policy
             if "kind: NetworkPolicy" in row_text:
-                print(f"Network Policy found : {row_text}")
+                print(f"Network Policy found  row: {row_text}")
                 return  # Stop after finding the first NP
             else:
                 print("NP not displayed.")
@@ -482,17 +480,17 @@ def risk_acceptance_page(driver, wait):
     risk_acceptance.navigate_to_page()
     print("Navigated to Risk Acceptance page")
     time.sleep(1)
-    risk_acceptance.click_severity_element("td.mat-cell.cdk-column-posturePolicies-0-severityScore")
+    risk_acceptance.click_severity_element("td.mat-cell.mat-column-vulnerabilities-0-severityScore")
     time.sleep(1)
     risk_acceptance.click_edit_button('/html/body/div[5]/div/div/section/main/section/armo-button/button')
     time.sleep(2.5)
     risk_acceptance.delete_ignore_rule()
     time.sleep(3)
 
-    vulnerabilities_tab_xpath = "/html/body/armo-root/div/div/div/armo-risk-acceptance-page/armo-risk-acceptance-container/nav/div/div/div/a[2]"
-    risk_acceptance.switch_to_tab(vulnerabilities_tab_xpath)
+    compliance_tab_xpath = "/html/body/armo-root/div/div/div/armo-risk-acceptance-page/armo-risk-acceptance-container/nav/div/div/div/a[2]"
+    risk_acceptance.switch_to_tab(compliance_tab_xpath)
     time.sleep(1)
-    risk_acceptance.click_severity_element("td.mat-column-vulnerabilities-0-severityScore")
+    risk_acceptance.click_severity_element("td.mat-cell.cdk-column-posturePolicies-0-severityScore")
     time.sleep(1)
     risk_acceptance.click_edit_button('/html/body/div[5]/div/div/section/main/section/armo-button/button')
     time.sleep(2.5)
