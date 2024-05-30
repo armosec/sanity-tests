@@ -17,7 +17,7 @@ _setup_driver = None
 def initialize_driver():
     global setup_driver
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")
     _setup_driver = webdriver.Chrome(options=chrome_options)
     _setup_driver.set_window_size(1280,800)
     # _setup_driver.maximize_window()
@@ -122,6 +122,29 @@ class ClusterManager:
         except Exception as e:
             print(f"Failed to click on {filter_name} filter button:", str(e))
             driver.save_screenshot(f"./failed_to_click_on_{filter_name}_filter_button_{ClusterManager.get_current_timestamp()}.png")
+            
+    def click_on_vuln_view_button(self, button_xpath):
+        try:
+            button = self.wait.until(EC.element_to_be_clickable((By.XPATH, button_xpath)))
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", button)
+            time.sleep(1)  # Let any overlays disappear
+            self.driver.execute_script("arguments[0].click();", button)
+            print("Button clicked successfully.")
+        except Exception as e:
+            print(f"Failed to click the button: {str(e)}")
+            self.driver.save_screenshot(f"./failed_to_click_the_button_{ClusterManager.get_current_timestamp()}.png")
+
+    def click_menu_item_vuln_view(self, item_name):
+        try:
+            menu_item_xpath = f"//div[contains(@class, 'dropdown-menu')]//a[contains(text(), '{item_name}')]"
+            menu_item = self.wait.until(EC.element_to_be_clickable((By.XPATH, menu_item_xpath)))
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", menu_item)
+            time.sleep(1)  # Let any overlays disappear
+            self.driver.execute_script("arguments[0].click();", menu_item)
+            print(f"'{item_name}' menu item clicked successfully.")
+        except Exception as e:
+            print(f"Failed to click the menu item '{item_name}': {str(e)}")
+            self.driver.save_screenshot(f"./failed_to_click_the_menu_item_{item_name}_{ClusterManager.get_current_timestamp()}.png")
         
 
 class ConnectCluster:
@@ -364,4 +387,4 @@ class RiskAcceptancePage:
             print("switch to tab to Vulnerabilities.")
         except Exception as e:
             print(f"Error clicking on Vulnerabilities tab with XPath {tab_xpath}: {e}")
-            self.driver.save_screenshot(f"./failed_to_click_on_tVulnerabilities_tab_{ClusterManager.get_current_timestamp()}.png")
+            self.driver.save_screenshot(f"./failed_to_click_on_Vulnerabilities_tab_{ClusterManager.get_current_timestamp()}.png")

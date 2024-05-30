@@ -37,17 +37,6 @@ def navigate_to_dashboard(driver, wait):
     except:
         print("failed to click on the cluster")
         driver.save_screenshot(f"./failed_to_click_on_the_cluster_{ClusterManager.get_current_timestamp()}.png")
-
-    # try:
-    #     time.sleep(1)
-    #     wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="framework-control-table-status-0"]/div/mat-icon'))) # wait for the table to be present
-    #     add_filter_button = "//button[contains(.,'Add filter')]"
-    #     button =  WebDriverWait(driver, 10).until(EC.element_to_be_clickable(By.XPATH, add_filter_button))
-    #     button.click()
-    #     print("Add filter button clicked")
-    # except:
-    #     print("failed to click on Add filter button")
-    #     driver.save_screenshot(f"./failed_to_click_on_Add_filter_button_{ClusterManager.get_current_timestamp()}.png")
     
     time.sleep(1)
     # click on ID filter
@@ -181,6 +170,12 @@ def navigate_to_vulnerabilities(driver, wait):
     driver.execute_script("arguments[0].click();", vulnerabilities)
     print("Vulnerabilities clicked")
     
+    cluster_manager = ClusterManager(driver)
+    # Click the initial button to open the dropdown
+    cluster_manager.click_on_vuln_view_button("//button[contains(@class, 'armo-button secondary-neutral xs')]")
+    # Click the desired menu item
+    cluster_manager.click_menu_item_vuln_view("Workloads")
+    
     print("waiting for the vulnerabilities page to be displayed - 1 min")
     time.sleep(60)
     
@@ -286,12 +281,15 @@ def navigate_to_vulnerabilities(driver, wait):
 
     # Click on the severity filter
     try:
-        time.sleep(1)
-        high_filter = driver.find_element(By.ID, "image-scanning-table-severity-medium-undefined")
-        high_filter.click()
+        time.sleep(2)
+        # Wait until the element is clickable
+        medium_filter = WebDriverWait(driver, 10).until(
+        EC.presence_of_all_elements_located((By.XPATH, "//div[@class='severity-background']")))
+        medium_filter[2].click()
         print("Clicked on the medium severity fiter")
-    except:
+    except Exception as e:
         print("failed to click on the medium severity fiter")
+        print(str(e))
         driver.save_screenshot(f"./failed_to_click_on_medium_severity_filter_{ClusterManager.get_current_timestamp()}.png")
 
     # Creat Ignore rule
@@ -315,7 +313,7 @@ def navigate_to_network_policy(driver, wait):
     print("go to Network policy page")
 
     print("waiting for the network policy page to be displayed - 2 min")
-    time.sleep(120)
+    # time.sleep(120)
 
     # Click on the status filter
     try:
@@ -333,72 +331,22 @@ def navigate_to_network_policy(driver, wait):
         label_for_checkbox = driver.find_element(By.XPATH, "//div[contains(@class,'cdk-overlay-pane')]//span[contains(text(), 'Network policy is recommended')]/ancestor::label")
         label_for_checkbox.click()   
         print("clicked NP is recommende checkbox")
-    except:
-        print("failed to click on NP is recommende checkbox")
+    except Exception as e:
+        print(f"Failed to click on 'Network policy is recommended' checkbox: {e}")
         driver.save_screenshot(f"./failed_to_click_on_the_NP_checkbox_{ClusterManager.get_current_timestamp()}.png")
-    
-    # attempt_count = 0
-    # max_attempts = 3
-        
-    # status_filter_xpath = "//button[contains(., 'Status')]"
-    # cluster_filter_xpath = "//button[contains(., 'Cluster')]"
-    
-    # time.sleep(0.5)
-    # while attempt_count < max_attempts:
-    #     try:
-    #         ClusterManager.click_filter_button(driver, wait, status_filter_xpath)
-    #         label_for_checkbox = driver.find_element(By.XPATH, "//div[contains(@class,'cdk-overlay-pane')]//span[contains(text(), 'Network policy is recommended')]/ancestor::label")
-    #         label_for_checkbox.click()   
-    #         print("clicked NP is recommende checkbox")
-    #     except:
-    #         print("failed to click on NP is recommende checkbox")
-    #         ClusterManager.click_filter_button(driver, wait, cluster_filter_xpath)
-    #         attempt_count += 1  # Increment the attempt counter
-    #         if attempt_count < max_attempts:
-    #             print(f"Attempt {attempt_count}/{max_attempts}. Retrying in 30 seconds...")
-    #             time.sleep(60)
-    #         else:
-    #             print("Maximum attempts reached. Not retrying.")
-    #             driver.save_screenshot(f"./failed_to_click_on_the_NP_checkbox_{ClusterManager.get_current_timestamp()}.png")
-
-    
-    # attempt_count = 0
-    # max_attempts = 3
-
-    # while attempt_count < max_attempts:
-    #     try:
-    #         # Attempt to find and click the checkbox
-    #         label_for_checkbox = driver.find_element(By.XPATH, "//div[contains(@class,'cdk-overlay-pane')]//span[contains(text(), 'Network policy is recommended')]/ancestor::label")
-    #         label_for_checkbox.click()   
-    #         print("Clicked 'Network policy is recommended' checkbox")
-    #         break  # Exit the loop if click is successful
-    #     except Exception as e:
-    #         print("Failed to click on 'Network policy is recommended' checkbox")
-    #         attempt_count += 1  # Increment the attempt counter
-    #         if attempt_count < max_attempts:
-    #             print(f"Attempt {attempt_count}/{max_attempts}. Retrying in 30 seconds...")
-    #             time.sleep(60)
-    #         else:
-    #             print("Maximum attempts reached. Not retrying.")
-    #             driver.save_screenshot(f"./failed_to_click_on_the_NP_checkbox_{ClusterManager.get_current_timestamp()}.png")
         
     # click on the esc button
     ClusterManager.press_esc_key(driver)
-
-    # Click on the first checkbox - select the first workload
+    
     try:
-        time.sleep(1.3)
-        # checkbox = WebDriverWait(driver, 10).until(
-        #     EC.element_to_be_clickable((By.CSS_SELECTOR, "mat-checkbox[data-test-id='checkbox']")))
-        # # checkbox.click()
-        # driver.execute_script("arguments[0].click();", checkbox)
-        checkbox = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//mat-checkbox[@data-test-id='checkbox']")))
-        checkbox.click()
-        print("Checkbox clicked- woekload selected")
+        time.sleep(1)
+        label_for_checkbox = driver.find_element(By.XPATH, "//mat-checkbox[@data-test-id='checkbox']")
+        label_for_checkbox.click()
+        print("Clicked on the first workload checkbox.")
     except Exception as e:
         print(f"Failed to click on the workload CHECKBOX: {str(e)}")
         driver.save_screenshot(f"./failed_to_find_the_first_workload_{ClusterManager.get_current_timestamp()}.png")
+        
 
     # Click the 'Generate' button
     try:
@@ -476,13 +424,13 @@ def navigate_to_network_policy(driver, wait):
 
 def risk_acceptance_page(driver, wait):
     risk_acceptance = RiskAcceptancePage(driver, wait)
-
+    time.sleep(3)
     risk_acceptance.navigate_to_page()
     print("Navigated to Risk Acceptance page")
     time.sleep(1)
     risk_acceptance.click_severity_element("td.mat-cell.mat-column-vulnerabilities-0-severityScore")
     time.sleep(1)
-    risk_acceptance.click_edit_button('/html/body/div[5]/div/div/section/main/section/armo-button/button')
+    risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
     time.sleep(2.5)
     risk_acceptance.delete_ignore_rule()
     time.sleep(3)
@@ -492,7 +440,7 @@ def risk_acceptance_page(driver, wait):
     time.sleep(1)
     risk_acceptance.click_severity_element("td.mat-cell.cdk-column-posturePolicies-0-severityScore")
     time.sleep(1)
-    risk_acceptance.click_edit_button('/html/body/div[5]/div/div/section/main/section/armo-button/button')
+    risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
     time.sleep(2.5)
     risk_acceptance.delete_ignore_rule()
     time.sleep(3)
@@ -548,8 +496,6 @@ def verify_and_click_description(index, wait, driver):
 
     except Exception as e:
         print(f"An error occurred: {e}")
-
-
 
 
 def create_attack_path(manifest_filename='./manifest.yaml'):
