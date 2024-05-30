@@ -17,7 +17,7 @@ _setup_driver = None
 def initialize_driver():
     global setup_driver
     chrome_options = Options()
-    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")
     _setup_driver = webdriver.Chrome(options=chrome_options)
     _setup_driver.set_window_size(1280,800)
     # _setup_driver.maximize_window()
@@ -227,6 +227,7 @@ class Cleanup:
             print(f"Command executed successfully: {stdout.decode()}")
 
     def click_settings_button(self):
+        time.sleep(1)
         settings_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/armo-side-nav-menu/nav/div[2]/armo-nav-items-list/ul[3]/li')))
         self.driver.execute_script("arguments[0].click();", settings_button)     
         print("Click on settings button.")
