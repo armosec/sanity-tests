@@ -154,7 +154,7 @@ class ConnectCluster:
 
     def click_get_started(self):
         try:
-            get_started_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, '//button[contains(.,"Get started with Kubernetes security")]')))
+            get_started_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="action-section"]/armo-button/button')))
             self.driver.execute_script("arguments[0].click();", get_started_button)
             print("Click on get started button.")
         except TimeoutException as e:

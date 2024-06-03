@@ -58,9 +58,7 @@ class OnboardingTest:
     def _click_get_started(self) -> None:
         try:
             _logger.info("Clicking on get started button")
-            self._interaction_manager.click(
-                '/html/body/armo-root/div/div/div/armo-home-page/armo-home-empty-state/armo-empty-state-page/main/section[1]/div/armo-button/button'
-            )
+            self._interaction_manager.click('//*[@id="action-section"]/armo-button/button')
             _logger.info("Clicked on get started button")
         except TimeoutException as e:
             _logger.error("Get started button was not found or clickable.",

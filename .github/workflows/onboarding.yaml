@@ -57,7 +57,7 @@ jobs:
               --data '{"summary": "Production Incident Onboarding failed","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "On-boarding failed ! "}'
 
         - name: upload screenshots
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           if: always()
           with:
             name: screenshots

@@ -60,8 +60,8 @@ class LatencyTest:
         password_input.send_keys(Keys.ENTER)
         _logger.info("Logged in to Armo")
 
-    def _navigate_to_dashboard(self) -> None:
-        _logger.info("Navigating to dashboard")
+    def _navigate_to_compliance(self) -> None:
+        _logger.info("Navigating to compliance")
         # Click on the compliance tab.
         self._interaction_manager.click('//*[@id="configuration-scanning-left-menu-item"]')
         # Click on the cluster (the first one).
@@ -75,13 +75,13 @@ class LatencyTest:
         # Switch to the last window.
         self._interaction_manager.switch_to_window(-1)
 
-        _logger.info("Navigated to dashboard")
+        _logger.info("Navigated to compliance")
 
     def run(self) -> None:
         start_time = time.time()
         self._login()
         login_time = time.time()
-        self._navigate_to_dashboard()
+        self._navigate_to_compliance()
         end_time = time.time()
         latency_without_login = "{:.2f}".format(end_time - login_time)
         latency = "{:.2f}".format(end_time - start_time)
