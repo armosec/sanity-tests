@@ -1,6 +1,6 @@
 Test Name,Runs,Failures,Successes,Success Rate (%),First Run Date,Last Run Date
 scan_local_repository_and_submit_to_backend,19,0,19,100.0,2024-05-26 23:11:22,2024-05-27 04:52:51
-network_policy_known_servers_cache,38,0,38,100.0,2024-05-26 23:11:24,2024-05-30 12:02:41
+network_policy_known_servers_cache,40,1,39,97.5,2024-05-26 23:11:24,2024-05-30 12:19:17
 scan_repository_from_url_and_submit_to_backend,20,0,20,100.0,2024-05-26 23:11:53,2024-05-27 04:53:08
 host_scanner,18,1,17,94.44,2024-05-26 23:12:09,2024-05-27 04:29:20
 host_scanner_with_hostsensorrule,21,1,20,95.24,2024-05-26 23:12:15,2024-05-27 04:53:45
@@ -19,7 +19,7 @@ user_email_settings,21,0,21,100.0,2024-05-26 23:14:48,2024-05-27 04:54:06
 smart_remediation_c0045,19,0,19,100.0,2024-05-26 23:14:55,2024-05-27 04:56:31
 ac_5_fix_control_with_relevancy,19,0,19,100.0,2024-05-26 23:14:58,2024-05-27 04:56:46
 ac_8_fix_control_with_relevancy,20,0,20,100.0,2024-05-26 23:14:59,2024-05-27 04:55:32
-basic_incident_presented,20,9,11,55.0,2024-05-26 23:15:05,2024-05-27 04:56:32
+basic_incident_presented,23,10,13,56.52,2024-05-26 23:15:05,2024-05-30 13:09:39
 sr_ac_scan_status,20,4,16,80.0,2024-05-26 23:15:32,2024-05-27 05:00:04
 synchronizer_race_condition,20,1,19,95.0,2024-05-26 23:15:44,2024-05-27 04:58:47
 ac_1_1_fix_control_no_relevancy,20,1,19,95.0,2024-05-26 23:15:45,2024-05-27 04:57:19
@@ -32,11 +32,11 @@ ac_alpine_fix_control_with_relevancy,20,0,20,100.0,2024-05-26 23:16:38,2024-05-2
 ac_alpine_fix_image_no_relevancy_with_cronjob,20,3,17,85.0,2024-05-26 23:16:39,2024-05-27 04:57:21
 synchronizer,21,1,20,95.24,2024-05-26 23:16:50,2024-05-27 04:58:30
 smart_remediation_c0034,20,0,20,100.0,2024-05-26 23:17:02,2024-05-27 04:58:44
-network_policy_pod_restarted,36,21,15,41.67,2024-05-26 23:17:05,2024-05-30 11:51:57
+network_policy_pod_restarted,39,23,16,41.03,2024-05-26 23:17:05,2024-05-30 12:19:31
 smart_remediation_c0057,20,0,20,100.0,2024-05-26 23:17:07,2024-05-27 04:59:05
 relevancy_fix_vuln,19,1,18,94.74,2024-05-26 23:17:08,2024-05-27 04:58:38
 smart_remediation_c0048,19,1,18,94.74,2024-05-26 23:17:10,2024-05-27 04:58:00
-network_policy_known_servers,35,0,35,100.0,2024-05-26 23:17:17,2024-05-30 11:50:43
+network_policy_known_servers,38,1,37,97.37,2024-05-26 23:17:17,2024-05-30 12:19:31
 ks_microservice_ns_creation,20,0,20,100.0,2024-05-26 23:17:27,2024-05-27 04:58:41
 smart_remediation_c0074,21,1,20,95.24,2024-05-26 23:17:30,2024-05-27 04:58:17
 ac_6_fix_control_with_relevancy,18,0,18,100.0,2024-05-26 23:17:39,2024-05-27 04:56:34
@@ -45,8 +45,8 @@ synchronizer_reconciliation,20,1,19,95.0,2024-05-26 23:17:48,2024-05-27 04:58:50
 scan_with_exception_to_backend,20,0,20,100.0,2024-05-26 23:17:50,2024-05-27 04:59:07
 ks_microservice_nsa_and_mitre_framework_demand,19,2,17,89.47,2024-05-26 23:17:55,2024-05-27 05:01:18
 smart_remediation_c0016,21,0,21,100.0,2024-05-26 23:17:56,2024-05-27 04:58:04
-network_policy_multiple_replicas,35,3,32,91.43,2024-05-26 23:18:14,2024-05-30 11:38:53
-network_policy_data_appended,37,4,33,89.19,2024-05-26 23:18:23,2024-05-30 12:06:06
+network_policy_multiple_replicas,39,5,34,87.18,2024-05-26 23:18:14,2024-05-30 12:19:31
+network_policy_data_appended,40,6,34,85.0,2024-05-26 23:18:23,2024-05-30 12:19:31
 ac_3_fix_control_with_relevancy,20,1,19,95.0,2024-05-26 23:18:25,2024-05-27 04:56:32
 sr_r_0035_attack_chain,21,2,19,90.48,2024-05-26 23:18:46,2024-05-27 05:00:15
 relevantCVEs,21,0,21,100.0,2024-05-26 23:19:21,2024-05-27 05:00:17
@@ -55,7 +55,7 @@ registry_scanning_triggering_with_cron_job,21,4,17,80.95,2024-05-26 23:19:27,202
 vuln_scan_proxy,17,0,17,100.0,2024-05-26 23:19:39,2024-05-27 05:00:40
 vuln_scan_test_public_registry_connectivity_excluded_by_backend,21,1,20,95.24,2024-05-26 23:20:02,2024-05-27 04:59:48
 synchronizer_proxy,21,3,18,85.71,2024-05-26 23:20:02,2024-05-27 05:10:19
-network_policy,35,8,27,77.14,2024-05-26 23:20:44,2024-05-30 11:54:05
+network_policy,38,10,28,73.68,2024-05-26 23:20:44,2024-05-30 12:19:17
 ks_microservice_triggering_with_cron_job,19,7,12,63.16,2024-05-26 23:20:58,2024-05-27 05:03:18
 vuln_v2_views_kev,19,0,19,100.0,2024-05-26 23:21:15,2024-05-27 05:02:12
 vuln_v2_views,16,1,15,93.75,2024-05-26 23:21:22,2024-05-27 05:01:37
@@ -68,3 +68,4 @@ ks_microservice_delete_cronjob,21,4,17,80.95,2024-05-26 23:23:38,2024-05-27 05:0
 sr_r_0007_control_networkpolicy,21,1,20,95.24,2024-05-26 23:24:57,2024-05-27 04:57:14
 slack_alerts,20,9,11,55.0,2024-05-26 23:28:27,2024-05-27 05:10:05
 vuln_scan_trigger_scan_public_registry_excluded,18,1,17,94.44,2024-05-26 23:29:36,2024-05-27 05:00:56
+scan_mitre,2,0,2,100.0,2024-05-30 12:30:52,2024-05-30 12:43:21
