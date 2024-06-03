@@ -166,6 +166,10 @@ class ConnectCluster:
         css_selector = 'div.command-area > span.ng-star-inserted'
         helm_command_element = custom_wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, css_selector)))
         helm_command = helm_command_element.text
+        
+        # Add command to the helm, to update the node agent every minute (for NP testing)
+        helm_command += " --set nodeAgent.config.updatePeriod=1m"
+        
         try:
             result = subprocess.run(helm_command, shell=True, check=True, stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as e:

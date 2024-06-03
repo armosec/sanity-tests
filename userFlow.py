@@ -601,7 +601,7 @@ def main():
     # Assigning your variables
     email_user_flow = os.environ.get('email_user_flow')
     login_pass_user_flow = os.environ.get('login_pass_user_flow')
-    prod_url = "https://cloud.armosec.io/dashboard"
+    prod_url = "https://cloud.armosec.io"
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
 
     # Setup the driver

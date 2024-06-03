@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from interaction_manager import InteractionManager, InteractionManagerConfig
 import logging
 
-ARMO_PLATFORM_URL = "https://cloud.armosec.io/dashboard"
+ARMO_PLATFORM_URL = "https://cloud.armosec.io"
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
