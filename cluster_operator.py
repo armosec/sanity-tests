@@ -384,12 +384,29 @@ class RiskAcceptancePage:
         except Exception as e:
             print(f"Failed to delete ignore rule: {e}")
             self.driver.save_screenshot(f"./failed_to_delete_ignore_rule_{ClusterManager.get_current_timestamp()}.png")
-
-    def switch_to_tab(self, tab_xpath):
+            
+    def switch_tab(self, tab_name):
         try:
-            tab = self.wait.until(EC.element_to_be_clickable((By.XPATH, tab_xpath)))
-            tab.click()
-            print("switch to tab to Vulnerabilities.")
+            # Define the href for each tab based on the tab name
+            tab_hrefs = {
+                "Security Risks": "/risk-acceptance?tab=security-risks",
+                "Vulnerabilities": "/risk-acceptance?tab=vulnerabilities",
+                "Compliance": "/risk-acceptance?tab=compliance"
+            }
+            
+            # Get the href for the specified tab name
+            tab_href = tab_hrefs.get(tab_name)
+            if not tab_href:
+                print(f"Tab '{tab_name}' not found.")
+                return
+
+            # Locate the tab element using the href
+            tab_xpath = f"//a[@href='{tab_href}']"
+            tab_element = self.wait.until(EC.element_to_be_clickable((By.XPATH, tab_xpath)))
+            
+            # Click on the tab
+            tab_element.click()
+            print(f"Switched to '{tab_name}' tab successfully.")
         except Exception as e:
-            print(f"Error clicking on Vulnerabilities tab with XPath {tab_xpath}: {e}")
-            self.driver.save_screenshot(f"./failed_to_click_on_Vulnerabilities_tab_{ClusterManager.get_current_timestamp()}.png")
+            print(f"Failed to switch to '{tab_name}' tab: {str(e)}")
+            self.driver.save_screenshot(f"./failed_to_switch_to_{tab_name.replace(' ', '_')}_tab_{ClusterManager.get_current_timestamp()}.png")

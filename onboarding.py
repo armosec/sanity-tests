@@ -8,7 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 from interaction_manager import InteractionManager, InteractionManagerConfig
 
-ARMO_PLATFORM_URL = "https://cloud.armosec.io"
+ARMO_PLATFORM_URL = "https://cloud.armosec.io/compliance"
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)

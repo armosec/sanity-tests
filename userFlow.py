@@ -312,7 +312,7 @@ def navigate_to_network_policy(driver, wait):
     driver.execute_script("arguments[0].click();", network_policy)
     print("go to Network policy page")
 
-    print("waiting for the network policy page to be displayed - 2 min")
+    # print("waiting for the network policy page to be displayed - 2 min")
     # time.sleep(120)
 
     # Click on the status filter
@@ -428,6 +428,7 @@ def risk_acceptance_page(driver, wait):
     risk_acceptance.navigate_to_page()
     print("Navigated to Risk Acceptance page")
     time.sleep(1)
+    risk_acceptance.switch_tab("Vulnerabilities")
     risk_acceptance.click_severity_element("td.mat-cell.mat-column-vulnerabilities-0-severityScore")
     time.sleep(1)
     risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
@@ -435,8 +436,7 @@ def risk_acceptance_page(driver, wait):
     risk_acceptance.delete_ignore_rule()
     time.sleep(3)
 
-    compliance_tab_xpath = "/html/body/armo-root/div/div/div/armo-risk-acceptance-page/armo-risk-acceptance-container/nav/div/div/div/a[2]"
-    risk_acceptance.switch_to_tab(compliance_tab_xpath)
+    risk_acceptance.switch_tab("Compliance")
     time.sleep(1)
     risk_acceptance.click_severity_element("td.mat-cell.cdk-column-posturePolicies-0-severityScore")
     time.sleep(1)
@@ -601,7 +601,7 @@ def main():
     # Assigning your variables
     email_user_flow = os.environ.get('email_user_flow')
     login_pass_user_flow = os.environ.get('login_pass_user_flow')
-    prod_url = "https://cloud.armosec.io"
+    prod_url = "https://cloud.armosec.io/compliance"
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
 
     # Setup the driver
@@ -645,7 +645,8 @@ def main():
         ac_time = time.time() - ac_start_time
         np_stat_time = time.time()
         navigate_to_network_policy(driver, wait)
-        np_time =  time.time() - np_stat_time - 120 # 2 min waiting time
+        # np_time =  time.time() - np_stat_time - 120 # 2 min waiting time
+        np_time =  time.time() - np_stat_time
         
         
         log_data = {
