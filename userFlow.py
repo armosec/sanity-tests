@@ -312,8 +312,8 @@ def navigate_to_network_policy(driver, wait):
     driver.execute_script("arguments[0].click();", network_policy)
     print("go to Network policy page")
 
-    # print("waiting for the network policy page to be displayed - 2 min")
-    # time.sleep(120)
+    print("waiting for the network policy page to be displayed - 2 min")
+    time.sleep(120)
 
     # Click on the status filter
     try:
@@ -543,8 +543,6 @@ def attach_path(driver, wait):
     # except :
     #     print("Scan all button not found.")
     #     driver.save_screenshot(f"./failed_to_find_the_scan_all_button_{ClusterManager.get_current_timestamp()}.png")
-    
-    print("waiting for attack path to be displayed - with timeout 5 min")
 
     # Check if the Attack path is displayed    
     try:

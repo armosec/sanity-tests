@@ -169,6 +169,7 @@ class ConnectCluster:
         
         # Add command to the helm, to update the node agent every minute (for NP testing)
         helm_command += " --set nodeAgent.config.updatePeriod=1m"
+        print(f"Helm command: {helm_command}")
         
         try:
             result = subprocess.run(helm_command, shell=True, check=True, stderr=subprocess.PIPE)
