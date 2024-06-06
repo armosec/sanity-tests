@@ -238,7 +238,7 @@ class Cleanup:
         print("Click on settings button.")
 
     def click_more_options_button(self):
-        time.sleep(0.5)
+        time.sleep(1)
         more_options_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm')))
         more_options_button.click()
         print("Click on more options button.")

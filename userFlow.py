@@ -307,6 +307,19 @@ def navigate_to_vulnerabilities(driver, wait):
     return container_name
 
 def navigate_to_network_policy(driver, wait):
+    
+    print("Deleting all deployments in the 'default' namespace...")
+    command = "kubectl delete deployments --all -n default"
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        print(f"Error executing command: {stderr.decode()}")
+    else:
+        print(f"Command executed successfully: {stdout.decode()}")
+        
+    print("waiting for the network policy page to be displayed - 2 min")
+    time.sleep(120)
+     
     # Click on the network policy page
     network_policy = driver.find_element(By.ID, 'network-policy-left-menu-item')
     driver.execute_script("arguments[0].click();", network_policy)
