@@ -325,8 +325,8 @@ def navigate_to_network_policy(driver, wait):
     driver.execute_script("arguments[0].click();", network_policy)
     print("go to Network policy page")
 
-    print("waiting for the network policy page to be displayed - 2 min")
-    time.sleep(120)
+    print("waiting for the network policy page to be displayed - 3 min")
+    time.sleep(180)
 
     # Click on the status filter
     try:
