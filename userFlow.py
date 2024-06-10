@@ -641,7 +641,7 @@ def main():
         # Navigating to dashboard
         comp_start_time = time.time()
         resource_name = navigate_to_dashboard(driver,wait)
-        compalince_time = time.time() - comp_start_time
+        complince_time = time.time() - comp_start_time
 
         # Navigating to vulnerabilities 
         vul_start_time = time.time()
@@ -652,7 +652,7 @@ def main():
         attach_path(driver, wait) 
         ac_time = time.time() - ac_start_time
         np_stat_time = time.time()
-        navigate_to_network_policy(driver, wait)
+        # navigate_to_network_policy(driver, wait)
         # np_time =  time.time() - np_stat_time - 120 # 2 min waiting time
         np_time =  time.time() - np_stat_time
         
@@ -662,9 +662,9 @@ def main():
             'login_time': f"{login_time:.2f}",
             'onboarding_time': f"{onboarding_time:.2f}",
             'onboarding_time_excluding_login': f"{(onboarding_time - login_time):.2f}",
-            'compliance_time': f"{compalince_time:.2f}",
+            'compliance_time': f"{complince_time:.2f}",
             'vulnerabilities_time': f"{vulnerabilities_time:.2f}",
-            'NP_time': f"{np_time:.2f}",
+            # 'NP_time': f"{np_time:.2f}",
             'AC_time': f"{ac_time:.2f}"
         }   
         print(f"Timestamp: {log_data['timestamp']}\n"
@@ -673,7 +673,7 @@ def main():
             f"Onboarding Time (Excluding Login): {log_data['onboarding_time_excluding_login']} sec\n"
             f"Compliance Time: {log_data['compliance_time']} sec\n"
             f"Vulnerabilities Time: {log_data['vulnerabilities_time']} sec\n"
-            f"Network Policy Time: {log_data['NP_time']} sec\n"
+            # f"Network Policy Time: {log_data['NP_time']} sec\n"
             f"Attack Path Time: {log_data['AC_time']} sec")
 
 
