@@ -654,6 +654,7 @@ def main():
         np_stat_time = time.time()
         # navigate_to_network_policy(driver, wait)
         # np_time =  time.time() - np_stat_time - 120 # 2 min waiting time
+        np_time = 0 # NP test desabled
         np_time =  time.time() - np_stat_time
         
         
@@ -664,7 +665,7 @@ def main():
             'onboarding_time_excluding_login': f"{(onboarding_time - login_time):.2f}",
             'compliance_time': f"{complince_time:.2f}",
             'vulnerabilities_time': f"{vulnerabilities_time:.2f}",
-            # 'NP_time': f"{np_time:.2f}",
+            'NP_time': f"{np_time:.2f}",
             'AC_time': f"{ac_time:.2f}"
         }   
         print(f"Timestamp: {log_data['timestamp']}\n"
@@ -673,7 +674,7 @@ def main():
             f"Onboarding Time (Excluding Login): {log_data['onboarding_time_excluding_login']} sec\n"
             f"Compliance Time: {log_data['compliance_time']} sec\n"
             f"Vulnerabilities Time: {log_data['vulnerabilities_time']} sec\n"
-            # f"Network Policy Time: {log_data['NP_time']} sec\n"
+            f"Network Policy Time: {log_data['NP_time']} sec\n"
             f"Attack Path Time: {log_data['AC_time']} sec")
 
 
