@@ -281,7 +281,7 @@ def navigate_to_vulnerabilities(driver, wait):
 
     # Click on the severity filter
     try:
-        time.sleep(2)
+        time.sleep(3)
         # Wait until the element is clickable
         medium_filter = WebDriverWait(driver, 10).until(
         EC.presence_of_all_elements_located((By.XPATH, "//div[@class='severity-background']")))
