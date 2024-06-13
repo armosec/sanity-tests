@@ -17,7 +17,7 @@ _setup_driver = None
 def initialize_driver():
     global setup_driver
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")
     _setup_driver = webdriver.Chrome(options=chrome_options)
     _setup_driver.set_window_size(1280,800)
     # _setup_driver.maximize_window()
@@ -145,7 +145,18 @@ class ClusterManager:
         except Exception as e:
             print(f"Failed to click the menu item '{item_name}': {str(e)}")
             self.driver.save_screenshot(f"./failed_to_click_the_menu_item_{item_name}_{ClusterManager.get_current_timestamp()}.png")
-        
+            
+    def run_shell_command(command):
+        try:
+            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+            if process.returncode != 0:
+                print(f"Error executing command: {stderr.decode()}")
+            else:
+                print(f"Command executed successfully: {stdout.decode()}")
+        except Exception as e:
+            print(f"An error occurred while running the command: {str(e)}")
+
 
 class ConnectCluster:
     def __init__(self,driver):

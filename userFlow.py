@@ -308,17 +308,13 @@ def navigate_to_vulnerabilities(driver, wait):
 
 def navigate_to_network_policy(driver, wait):
     
-    print("Deleting all deployments in the 'default' namespace...")
-    command = "kubectl delete deployments --all -n default"
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    if process.returncode != 0:
-        print(f"Error executing command: {stderr.decode()}")
-    else:
-        print(f"Command executed successfully: {stdout.decode()}")
+    print("Reset pods in the 'default' namespace...")        
+    ClusterManager.run_shell_command("kubectl delete pods -n default --all")
         
     print("waiting for the network policy page to be displayed - 3 min")
     time.sleep(180)
+    print("View generated network policies:")
+    ClusterManager.run_shell_command("kubectl get generatednetworkpolicies -A")
      
     # Click on the network policy page
     network_policy = driver.find_element(By.ID, 'network-policy-left-menu-item')
@@ -561,6 +557,7 @@ def attach_path(driver, wait):
         wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, f"[data-test-id='{data_test_id}']")))
         print("Attack path is displayed.")
 
+
         # Obtain descriptions
         descriptions = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[data-test-id='description']")))
 
@@ -652,9 +649,9 @@ def main():
         attach_path(driver, wait) 
         ac_time = time.time() - ac_start_time
         np_stat_time = time.time()
-        # navigate_to_network_policy(driver, wait)
-        # np_time =  time.time() - np_stat_time - 120 # 2 min waiting time
-        np_time = 0 # NP test desabled
+        navigate_to_network_policy(driver, wait)
+        np_time =  time.time() - np_stat_time - 120 # 2 min waiting time
+        # np_time = 0 # NP test desabled
         np_time =  time.time() - np_stat_time
         
         
