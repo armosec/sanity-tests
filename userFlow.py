@@ -283,15 +283,14 @@ def navigate_to_vulnerabilities(driver, wait):
     try:
         time.sleep(3)
         # Wait until the element is clickable
-        critical_filter = WebDriverWait(driver, 10).until(
+        high_filter = WebDriverWait(driver, 10).until(
         EC.presence_of_all_elements_located((By.XPATH, "//div[@class='severity-background']")))
-        # critical_filter[2].click()
-        critical_filter.click()
-        print("Clicked on the critical severity fiter")
+        high_filter[1].click()
+        print("Clicked on the high severity fiter")
     except Exception as e:
-        print("failed to click on the critical severity fiter")
+        print("failed to click on the high severity fiter")
         print(str(e))
-        driver.save_screenshot(f"./failed_to_click_on_critical_severity_filter_{ClusterManager.get_current_timestamp()}.png")
+        driver.save_screenshot(f"./failed_to_click_on_high_severity_filter_{ClusterManager.get_current_timestamp()}.png")
 
     # Creat Ignore rule
     time.sleep(1)
