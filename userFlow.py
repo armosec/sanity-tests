@@ -278,19 +278,20 @@ def navigate_to_vulnerabilities(driver, wait):
 
     # click on the esc button
     ClusterManager.press_esc_key(driver)
-    driver.refresh() # refresh the page to get the vulnerabilities - test
+    # driver.refresh() # refresh the page to get the vulnerabilities - test
     # Click on the severity filter
     try:
         time.sleep(3)
         # Wait until the element is clickable
-        medium_filter = WebDriverWait(driver, 10).until(
+        critical_filter = WebDriverWait(driver, 10).until(
         EC.presence_of_all_elements_located((By.XPATH, "//div[@class='severity-background']")))
-        medium_filter[2].click()
-        print("Clicked on the medium severity fiter")
+        # critical_filter[2].click()
+        critical_filter.click()
+        print("Clicked on the critical severity fiter")
     except Exception as e:
-        print("failed to click on the medium severity fiter")
+        print("failed to click on the critical severity fiter")
         print(str(e))
-        driver.save_screenshot(f"./failed_to_click_on_medium_severity_filter_{ClusterManager.get_current_timestamp()}.png")
+        driver.save_screenshot(f"./failed_to_click_on_critical_severity_filter_{ClusterManager.get_current_timestamp()}.png")
 
     # Creat Ignore rule
     time.sleep(1)
