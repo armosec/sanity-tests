@@ -278,7 +278,7 @@ def navigate_to_vulnerabilities(driver, wait):
 
     # click on the esc button
     ClusterManager.press_esc_key(driver)
-
+    driver.refresh() # refresh the page to get the vulnerabilities - test
     # Click on the severity filter
     try:
         time.sleep(3)
