@@ -123,29 +123,34 @@ class ClusterManager:
             print(f"Failed to click on {filter_name} filter button:", str(e))
             driver.save_screenshot(f"./failed_to_click_on_{filter_name}_filter_button_{ClusterManager.get_current_timestamp()}.png")
             
-    def click_on_vuln_view_button(self, button_xpath):
+    def click_menu_item_vuln_view(self, button_name):
         try:
-            button = self.wait.until(EC.element_to_be_clickable((By.XPATH, button_xpath)))
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", button)
-            time.sleep(1)  # Let any overlays disappear
-            self.driver.execute_script("arguments[0].click();", button)
-            print("Button clicked successfully.")
-        except Exception as e:
-            print(f"Failed to click the button: {str(e)}")
-            self.driver.save_screenshot(f"./failed_to_click_the_button_{ClusterManager.get_current_timestamp()}.png")
-
-    def click_menu_item_vuln_view(self, item_name):
-        try:
-            menu_item_xpath = f"//div[contains(@class, 'dropdown-menu')]//a[contains(text(), '{item_name}')]"
-            menu_item = self.wait.until(EC.element_to_be_clickable((By.XPATH, menu_item_xpath)))
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", menu_item)
-            time.sleep(1)  # Let any overlays disappear
-            self.driver.execute_script("arguments[0].click();", menu_item)
-            print(f"'{item_name}' menu item clicked successfully.")
-        except Exception as e:
-            print(f"Failed to click the menu item '{item_name}': {str(e)}")
-            self.driver.save_screenshot(f"./failed_to_click_the_menu_item_{item_name}_{ClusterManager.get_current_timestamp()}.png")
+            # Locate the button element using the text within the div
+            button_xpath = f"//div[@class='button-toggle-label ng-star-inserted' and text()='{button_name}']/parent::a"
+            button_element = self.wait.until(EC.element_to_be_clickable((By.XPATH, button_xpath)))
             
+            # Click the button
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", button_element)
+            self.driver.execute_script("arguments[0].click();", button_element)
+            print(f"Clicked on '{button_name}' button successfully.")
+        except Exception as e:
+            print(f"Failed to click on '{button_name}' button: {str(e)}")
+            self.driver.save_screenshot(f"./failed_to_click_{button_name.replace(' ', '_')}_button_{ClusterManager.get_current_timestamp()}.png")
+            
+    def click_button_by_text(self, button_text):
+        try:
+            # Locate the button element using its text content
+            button_xpath = f"//button[contains(@class, 'armo-button') and .//span[text()='{button_text}']]"
+            button_element = self.wait.until(EC.element_to_be_clickable((By.XPATH, button_xpath)))
+            
+            # Click the button
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", button_element)
+            self.driver.execute_script("arguments[0].click();", button_element)
+            print(f"Clicked on button with text '{button_text}' successfully.")
+        except Exception as e:
+            print(f"Failed to click on button with text '{button_text}': {str(e)}")
+            self.driver.save_screenshot(f"./failed_to_click_button_{button_text.replace(' ', '_')}_{ClusterManager.get_current_timestamp()}.png")
+
     def run_shell_command(command):
         try:
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

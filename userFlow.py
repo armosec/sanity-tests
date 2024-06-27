@@ -170,18 +170,16 @@ def navigate_to_vulnerabilities(driver, wait):
     driver.execute_script("arguments[0].click();", vulnerabilities)
     print("Vulnerabilities clicked")
     
-    cluster_manager = ClusterManager(driver)
-    # Click the initial button to open the dropdown
-    cluster_manager.click_on_vuln_view_button("//button[contains(@class, 'armo-button secondary-neutral xs')]")
-    # Click the desired menu item
-    cluster_manager.click_menu_item_vuln_view("Workloads")
-    
+    cluster_manager = ClusterManager(driver)    
     print("waiting for the vulnerabilities page to be displayed - 1 min")
     time.sleep(60)
+    # Click on the Workloads tab
+    cluster_manager.click_menu_item_vuln_view("Workloads")
     
     # Click on the namespace filter
-    name_space = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-workloads-page/div[2]/armo-table-filters/armo-created-filters-list/div/armo-multi-select-filter[2]/armo-common-trigger-button/armo-button/button')))
-    name_space.click()
+    # name_space = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-workloads-page/div[2]/armo-table-filters/armo-created-filters-list/div/armo-multi-select-filter[2]/armo-common-trigger-button/armo-button/button')))
+    # name_space.click()
+    cluster_manager.click_button_by_text("Namespace")
     print("Namespace filter clicked")
     # Click on the all namespaces (select all)
     select_all_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(@class, 'color-blue') and contains(text(), 'Select all')]")))
@@ -255,8 +253,9 @@ def navigate_to_vulnerabilities(driver, wait):
     # Click name space filter
     time.sleep(1)
     try:
-        name_space = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-workloads-page/div[2]/armo-table-filters/armo-created-filters-list/div/armo-multi-select-filter[2]/armo-common-trigger-button/armo-button/button')))
-        name_space.click()
+        # name_space = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-workloads-page/div[2]/armo-table-filters/armo-created-filters-list/div/armo-multi-select-filter[2]/armo-common-trigger-button/armo-button/button')))
+        # name_space.click()
+        cluster_manager.click_button_by_text("Namespace")
         print("Namespace filter clicked")
     except:
         print("failed to click on namespace filter")
