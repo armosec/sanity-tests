@@ -177,17 +177,16 @@ def navigate_to_vulnerabilities(driver, wait):
     cluster_manager.click_menu_item_vuln_view("Workloads")
     
     # Click on the namespace filter
-    # name_space = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-workloads-page/div[2]/armo-table-filters/armo-created-filters-list/div/armo-multi-select-filter[2]/armo-common-trigger-button/armo-button/button')))
-    # name_space.click()
+    name_space = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-workloads-page/div[2]/armo-table-filters/armo-created-filters-list/div/armo-multi-select-filter[2]/armo-common-trigger-button/armo-button/button')))
     cluster_manager.click_button_by_text("Namespace")
     print("Namespace filter clicked")
+    
     # Click on the all namespaces (select all)
     select_all_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(@class, 'color-blue') and contains(text(), 'Select all')]")))
-    # select_all_button.click()
     driver.execute_script("arguments[0].click();", select_all_button)
     print("All namespaces selected")
-
-    time.sleep(2)
+    
+    time.sleep(1)
     # Verify that all namespaces are selected
     checkboxes_container_xpath = '//ul[@class="m-0 px-0 pt-1 font-size-14"]'
 
@@ -644,7 +643,7 @@ def main():
         container_name = navigate_to_vulnerabilities(driver, wait)
         vulnerabilities_time = time.time() - vul_start_time
         risk_acceptance_page(driver, wait)
-        ac_start_time = time.time()
+        ac_start_time = time.time() 
         attach_path(driver, wait) 
         ac_time = time.time() - ac_start_time
         np_stat_time = time.time()
