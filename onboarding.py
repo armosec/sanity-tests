@@ -199,25 +199,25 @@ class OnboardingTest:
         _logger.info("Performed cleanup")
 
     def run(self) -> None:
-        # start_time = time.time()
+        start_time = time.time()
         self._login()
-        # login_time = time.time()
-        # self._click_get_started()
-        # helm_command = self._copy_helm_command()
-        # self._execute_helm_command(helm_command)
-        # self._verify_installation()
-        # self._view_cluster_button()
-        # self._view_connected_cluster()
-        # end_time = time.time()
+        login_time = time.time()
+        self._click_get_started()
+        helm_command = self._copy_helm_command()
+        self._execute_helm_command(helm_command)
+        self._verify_installation()
+        self._view_cluster_button()
+        self._view_connected_cluster()
+        end_time = time.time()
         self._perform_cleanup()
         self._interaction_manager.quit()
 
-        # onboarding_time = "{:.2f}".format(end_time - start_time)
-        # lonboarding_time_without_login = "{:.2f}".format(end_time - login_time)
-        # onboarding_details = OnboardingDetails(
-        #     onboarding_time, lonboarding_time_without_login)
-        # onboarding_details.to_file("./logs/onboarding_logs.csv")
-        # _logger.info(f"Onboarding details: {onboarding_details}")
+        onboarding_time = "{:.2f}".format(end_time - start_time)
+        lonboarding_time_without_login = "{:.2f}".format(end_time - login_time)
+        onboarding_details = OnboardingDetails(
+            onboarding_time, lonboarding_time_without_login)
+        onboarding_details.to_file("./logs/onboarding_logs.csv")
+        _logger.info(f"Onboarding details: {onboarding_details}")
 
 if __name__ == "__main__":
     OnboardingTest().run()
