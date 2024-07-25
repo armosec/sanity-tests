@@ -11,7 +11,7 @@ class TestConfig:
     interaction_manager: InteractionManager
     email: str
     password: str
-    ebvironment: str
+    environment: str
 
 class BaseTest(ABC):
     def __init__(self, config: TestConfig) -> None:
@@ -19,6 +19,7 @@ class BaseTest(ABC):
         self._interaction_manager = config.interaction_manager
         self._email = config.email
         self._password = config.password
+        self._environment = config.environment
     
     @abstractmethod
     def run(self):
