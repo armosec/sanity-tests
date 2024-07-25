@@ -1,3 +1,4 @@
+# tests/vulnerabilities.py
 import time
 from .base_test import BaseTest
 from selenium.webdriver.common.by import By
@@ -6,10 +7,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from .cluster_operator import ClusterManager, IgnoreRule, ConnectCluster
 
-
 class Vulnerabilities(BaseTest):
     def run(self):
-        self.login()
+        login_url = self.get_login_url()
+        self.login(login_url)
         cluster_manager = ConnectCluster(self._driver)
         try:
             cluster_manager.click_get_started()
@@ -19,8 +20,7 @@ class Vulnerabilities(BaseTest):
             cluster_manager.view_connected_cluster()
             self.navigate_to_vulnerabilities()
         finally:
-            self.perform_cleanup()
-            print("Test completed")
+            print("cleanup completed successfully")
 
     def navigate_to_vulnerabilities(self):
         driver = self._driver
@@ -122,16 +122,16 @@ class Vulnerabilities(BaseTest):
 
         ClusterManager.press_esc_key(driver)
         time.sleep(0.5)
+        driver.save_screenshot(f"./namespace_selected_{ClusterManager.get_current_timestamp()}.png")
 
         try:
             severity_filter_elements = driver.find_elements(By.XPATH, "//div[@class='severity-background']")
-            # severity_filter_elements[1].click()
-            driver.execute_script("arguments[0].click();", severity_filter_elements[2])
-            print("Clicked on the high severity filter")
+            severity_filter_elements[2].click()
+            print("Clicked on the medium severity filter")
         except Exception as e:
-            print("failed to click on the high severity filter")
+            print("failed to click on the medium severity filter")
             print(str(e))
-            driver.save_screenshot(f"./failed_to_click_on_high_severity_filter_{ClusterManager.get_current_timestamp()}.png")
+            driver.save_screenshot(f"./failed_to_click_on_medium_severity_filter_{ClusterManager.get_current_timestamp()}.png")
 
         time.sleep(1)
         ignore_rule = IgnoreRule(driver)

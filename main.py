@@ -1,4 +1,5 @@
 # main.py
+
 import os
 import sys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -10,13 +11,13 @@ from tests.base_test import TestConfig
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class TestsRunner:
-    def __init__(self, tests_with_credentials_and_env):
-        self.tests_with_credentials_and_env = tests_with_credentials_and_env
+    def __init__(self, tests_with_credentials):
+        self.tests_with_credentials = tests_with_credentials
 
     def run(self):
         with ThreadPoolExecutor() as executor:
             futures = [executor.submit(self.run_test, test_class, email, password, environment) 
-                       for test_class, email, password, environment in self.tests_with_credentials_and_env]
+                       for test_class, email, password, environment in self.tests_with_credentials]
             for future in as_completed(futures):
                 try:
                     future.result()
@@ -40,12 +41,11 @@ class TestsRunner:
             driver.quit()
 
 def main():
-    if len(sys.argv) < 5 or (len(sys.argv) - 2) % 3 != 0:
-        print("Usage: python main.py [ENVIRONMENT] [test_name1 email1 password1 ... test_nameN emailN passwordN]")
+    if len(sys.argv) < 4 or (len(sys.argv) - 1) % 4 != 0:
+        print("Usage: python main.py [environment test_name email password ...]")
         sys.exit(1)
 
-    environment = sys.argv[1]
-    test_names_and_credentials = sys.argv[2:]
+    test_data = sys.argv[1:]
 
     test_mapping = {
         'vulnerabilities': Vulnerabilities,
@@ -53,20 +53,21 @@ def main():
         # Add additional mappings here
     }
 
-    tests_with_credentials_and_env = []
-    for i in range(0, len(test_names_and_credentials), 3):
-        test_name = test_names_and_credentials[i]
-        email = test_names_and_credentials[i+1]
-        password = test_names_and_credentials[i+2]
+    tests_with_credentials = []
+    for i in range(0, len(test_data), 4):
+        environment = test_data[i]
+        test_name = test_data[i+1]
+        email = test_data[i+2]
+        password = test_data[i+3]
 
         test_class = test_mapping.get(test_name.lower())
         if not test_class:
             print(f"Unknown test: {test_name}")
             sys.exit(1)
 
-        tests_with_credentials_and_env.append((test_class, email, password, environment))
+        tests_with_credentials.append((test_class, email, password, environment))
 
-    test_runner = TestsRunner(tests_with_credentials_and_env)
+    test_runner = TestsRunner(tests_with_credentials)
     test_runner.run()
 
 if __name__ == "__main__":

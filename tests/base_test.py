@@ -11,6 +11,7 @@ class TestConfig:
     interaction_manager: InteractionManager
     email: str
     password: str
+    ebvironment: str
 
 class BaseTest(ABC):
     def __init__(self, config: TestConfig) -> None:
