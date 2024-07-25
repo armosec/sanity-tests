@@ -1,4 +1,4 @@
-name: UserFlow test
+name: UserFlow sanity
 
 on:
   workflow_dispatch:

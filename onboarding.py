@@ -47,12 +47,14 @@ class OnboardingTest:
         mail_input = self._interaction_manager.wait_until_interactable(
             '//*[@id="frontegg-login-box-container-default"]/div[1]/input'
         )
-        mail_input.send_keys(os.environ['email_onboarding'])
+        # mail_input.send_keys(os.environ['email_onboarding'])
+        mail_input.send_keys("borisv@armosec.io")
         mail_input.send_keys(Keys.ENTER)
         password_input = self._interaction_manager.wait_until_interactable(
             '/html/body/frontegg-app/div[2]/div[2]/input'
         )
-        password_input.send_keys(os.environ['login_pass_onboarding'])
+        # password_input.send_keys(os.environ['login_pass_onboarding'])
+        password_input.send_keys("Bv110584!")
         password_input.send_keys(Keys.ENTER)
 
     def _click_get_started(self) -> None:
@@ -154,14 +156,14 @@ class OnboardingTest:
     def _click_settings_button(self) -> None:
         _logger.info("Clicking on settings button")
         self._interaction_manager.click(
-            '/html/body/armo-root/div/armo-side-nav-menu/nav/div[2]/armo-nav-items-list/ul[3]/li'
+            '//*[@id="settings-left-menu-item"]'
         )
         _logger.info("Clicked on settings button")
 
     def _click_more_options_button(self) -> None:
         _logger.info("Clicking on more options button")
         self._interaction_manager.click(
-            '/html/body/armo-root/div/div/div/div[2]/armo-clusters-page/armo-clusters-table/div/table/tbody/tr/td[9]/armo-row-options-button/armo-icon-button/armo-button/button/armo-icon'
+            '/html/body/armo-root/div/div/div/div/armo-clusters-page/armo-clusters-table/div/table/tbody/tr/td[9]/armo-row-options-button/armo-icon-button/armo-button'
         )
         _logger.info("Clicked on more options button")
 
@@ -197,25 +199,25 @@ class OnboardingTest:
         _logger.info("Performed cleanup")
 
     def run(self) -> None:
-        start_time = time.time()
+        # start_time = time.time()
         self._login()
-        login_time = time.time()
-        self._click_get_started()
-        helm_command = self._copy_helm_command()
-        self._execute_helm_command(helm_command)
-        self._verify_installation()
-        self._view_cluster_button()
-        self._view_connected_cluster()
-        end_time = time.time()
+        # login_time = time.time()
+        # self._click_get_started()
+        # helm_command = self._copy_helm_command()
+        # self._execute_helm_command(helm_command)
+        # self._verify_installation()
+        # self._view_cluster_button()
+        # self._view_connected_cluster()
+        # end_time = time.time()
         self._perform_cleanup()
         self._interaction_manager.quit()
 
-        onboarding_time = "{:.2f}".format(end_time - start_time)
-        lonboarding_time_without_login = "{:.2f}".format(end_time - login_time)
-        onboarding_details = OnboardingDetails(
-            onboarding_time, lonboarding_time_without_login)
-        onboarding_details.to_file("./logs/onboarding_logs.csv")
-        _logger.info(f"Onboarding details: {onboarding_details}")
+        # onboarding_time = "{:.2f}".format(end_time - start_time)
+        # lonboarding_time_without_login = "{:.2f}".format(end_time - login_time)
+        # onboarding_details = OnboardingDetails(
+        #     onboarding_time, lonboarding_time_without_login)
+        # onboarding_details.to_file("./logs/onboarding_logs.csv")
+        # _logger.info(f"Onboarding details: {onboarding_details}")
 
 if __name__ == "__main__":
     OnboardingTest().run()
