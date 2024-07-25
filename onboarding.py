@@ -163,7 +163,7 @@ class OnboardingTest:
     def _click_more_options_button(self) -> None:
         _logger.info("Clicking on more options button")
         self._interaction_manager.click(
-            '/html/body/armo-root/div/div/div/div/armo-clusters-page/armo-clusters-table/div/table/tbody/tr/td[9]/armo-row-options-button/armo-icon-button/armo-button'
+            '/html/body/armo-root/div/div/div/div/armo-clusters-page/armo-clusters-table/div/table/tbody/tr/td[9]/armo-row-options-button/armo-icon-button/armo-button/button'
         )
         _logger.info("Clicked on more options button")
 

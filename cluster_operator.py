@@ -249,7 +249,7 @@ class Cleanup:
 
     def click_settings_button(self):
         time.sleep(1)
-        settings_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/armo-root/div/armo-side-nav-menu/nav/div[2]/armo-nav-items-list/ul[3]/li')))
+        settings_button = self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="settings-left-menu-item"]')))
         self.driver.execute_script("arguments[0].click();", settings_button)     
         print("Click on settings button.")
 
