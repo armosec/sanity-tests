@@ -49,8 +49,8 @@ jobs:
     if: needs.setup.outputs.test_type == 'all' || needs.setup.outputs.test_type == 'vulnerabilities'
     runs-on: ubuntu-latest
     env:
-      TEST_EMAIL: ${{ secrets.TEST_EMAIL_VULNERABILITIES }}
-      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD_VULNERABILITIES }}
+      TEST_EMAIL: ${{ secrets.EMAIL_VULNERABILITIES }}
+      TEST_PASSWORD: ${{ secrets.LOGIN_PASSWORD_VULNERABILITIES }}
       ENVIRONMENT: ${{ needs.setup.outputs.environment }}
     steps:
     - name: Checkout repository
@@ -77,8 +77,8 @@ jobs:
     if: needs.setup.outputs.test_type == 'all' || needs.setup.outputs.test_type == 'compliance'
     runs-on: ubuntu-latest
     env:
-      TEST_EMAIL: ${{ secrets.TEST_EMAIL_COMPLIANCE }}
-      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD_COMPLIANCE }}
+      TEST_EMAIL: ${{ secrets.EMAIL_COMPLIANCE }}
+      TEST_PASSWORD: ${{ secrets.LOGIN_PASSWORD_COMPLIANCE }}
       ENVIRONMENT: ${{ needs.setup.outputs.environment }}
     steps:
     - name: Checkout repository

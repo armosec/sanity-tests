@@ -4,12 +4,18 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-from .cluster_operator import ClusterManager, IgnoreRule
+from .cluster_operator import ClusterManager, IgnoreRule, ConnectCluster
 
 class Compliance(BaseTest):
     def run(self):
         self.login()
+        cluster_manager = ConnectCluster(self._driver)
         try:
+            cluster_manager.click_get_started()
+            cluster_manager.connect_cluster_helm()
+            cluster_manager.verify_installation()
+            cluster_manager.view_cluster_button()
+            cluster_manager.view_connected_cluster()
             self.navigate_to_compliance()
         finally:
             self.perform_cleanup()

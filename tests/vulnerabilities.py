@@ -12,14 +12,14 @@ class Vulnerabilities(BaseTest):
         self.login()
         cluster_manager = ConnectCluster(self._driver)
         try:
-            # cluster_manager.click_get_started()
-            # cluster_manager.connect_cluster_helm()
-            # cluster_manager.verify_installation()
-            # cluster_manager.view_cluster_button()
-            # cluster_manager.view_connected_cluster()
+            cluster_manager.click_get_started()
+            cluster_manager.connect_cluster_helm()
+            cluster_manager.verify_installation()
+            cluster_manager.view_cluster_button()
+            cluster_manager.view_connected_cluster()
             self.navigate_to_vulnerabilities()
         finally:
-            # self.perform_cleanup()
+            self.perform_cleanup()
             print("Test completed")
 
     def navigate_to_vulnerabilities(self):
