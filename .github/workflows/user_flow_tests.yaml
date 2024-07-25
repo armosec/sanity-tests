@@ -33,17 +33,6 @@ jobs:
       run: |
         echo "ENVIRONMENT=${{ inputs.ENVIRONMENT }}"
         echo "TEST_TYPE=${{ inputs.TEST_TYPE }}"
-        
-    - name: Generate uuid
-      id: uuid
-      run: |
-        echo "RANDOM_UUID=systets-$(uuidgen)" >> $GITHUB_OUTPUT
-
-    - name: Create k8s Kind Cluster
-      id: kind-cluster-instal
-      uses: helm/kind-action@v1.3.0
-      with:
-        cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
 
     - name: Set environment output
       id: set-environment
@@ -66,6 +55,17 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+
+    - name: Generate uuid
+      id: uuid
+      run: |
+        echo "RANDOM_UUID=systets-$(uuidgen)" >> $GITHUB_OUTPUT
+
+    - name: Create k8s Kind Cluster
+      id: kind-cluster-instal
+      uses: helm/kind-action@v1.3.0
+      with:
+        cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -94,6 +94,17 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+
+    - name: Generate uuid
+      id: uuid
+      run: |
+        echo "RANDOM_UUID=systets-$(uuidgen)" >> $GITHUB_OUTPUT
+
+    - name: Create k8s Kind Cluster
+      id: kind-cluster-instal
+      uses: helm/kind-action@v1.3.0
+      with:
+        cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
