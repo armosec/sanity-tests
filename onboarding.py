@@ -47,14 +47,12 @@ class OnboardingTest:
         mail_input = self._interaction_manager.wait_until_interactable(
             '//*[@id="frontegg-login-box-container-default"]/div[1]/input'
         )
-        # mail_input.send_keys(os.environ['email_onboarding'])
-        mail_input.send_keys("borisv@armosec.io")
+        mail_input.send_keys(os.environ['email_onboarding'])
         mail_input.send_keys(Keys.ENTER)
         password_input = self._interaction_manager.wait_until_interactable(
             '/html/body/frontegg-app/div[2]/div[2]/input'
         )
-        # password_input.send_keys(os.environ['login_pass_onboarding'])
-        password_input.send_keys("Bv110584!")
+        password_input.send_keys(os.environ['login_pass_onboarding'])
         password_input.send_keys(Keys.ENTER)
 
     def _click_get_started(self) -> None:

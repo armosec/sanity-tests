@@ -20,7 +20,8 @@ class Compliance(BaseTest):
             cluster_manager.view_connected_cluster()
             self.navigate_to_compliance()
         finally:
-            print("cleanup completed successfully")
+            self.perform_cleanup()
+            print("Compliance test completed")
 
     def navigate_to_compliance(self):
         driver = self._driver
@@ -33,6 +34,8 @@ class Compliance(BaseTest):
             print("failed to click on compliance")
             driver.save_screenshot(f"./failed_to_click_on_compliance_{ClusterManager.get_current_timestamp()}.png")
         
+        # Click on the cluster (the first one) 
+        time.sleep(1)
         try:
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')))
             cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
@@ -42,6 +45,8 @@ class Compliance(BaseTest):
             print("failed to click on the cluster")
             driver.save_screenshot(f"./failed_to_click_on_the_cluster_{ClusterManager.get_current_timestamp()}.png")
         
+        time.sleep(1)
+        # click on ID filter
         try:
             id_button = "//button[.//span[contains(text(), 'Control ID')]]"
             id_element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, id_button)))
@@ -93,6 +98,7 @@ class Compliance(BaseTest):
             print("failed to click on fix button")
             driver.save_screenshot(f"./failed_to_click_on_fix_button_{ClusterManager.get_current_timestamp()}.png")
         
+        # Wait until the side by side remediation page is visible
         WebDriverWait(driver, 10).until(lambda d: len(d.window_handles) == 2)
         driver.switch_to.window(driver.window_handles[1])
         try:
@@ -100,13 +106,19 @@ class Compliance(BaseTest):
             WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-side-by-side-remediation-page/div/armo-comparison-wrapper/div/div/div[1]/div/p')))
             parent_selector = "div.row-container.yaml-code-row"
             parent_element = driver.find_element(By.CSS_SELECTOR, parent_selector)
+
+            # Find all armo-yaml-code elements within the parent element
             armo_yaml_code_elements = parent_element.find_elements(By.CSS_SELECTOR, "armo-yaml-code")
         except:
             print("side by side remediation page is not visible")
             driver.save_screenshot(f"./SBS_page_not_loaded_{ClusterManager.get_current_timestamp()}.png")
 
+        # Check if there are exactly 2 child elements
         if len(armo_yaml_code_elements) == 2:
+            # Count the number of rows in each armo-yaml-code element
             rows_count = [len(elm.find_elements(By.TAG_NAME, "tr")) for elm in armo_yaml_code_elements]
+
+            # Compare the row counts of the two elements
             if rows_count[0] == rows_count[1]:
                 print(f"Both armo-yaml-code elements have the same number of rows: {rows_count[0]} rows.")
             else:
@@ -117,13 +129,15 @@ class Compliance(BaseTest):
         time.sleep(2)
         driver.switch_to.window(driver.window_handles[0])
 
+        # Click on the resourse link (failed and accepted)
         try:
             resourse_link= WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="framework-control-table-failed-0"]/div/armo-router-link/a/armo-button/button')))
             resourse_link.click()                                          
         except: 
             print("failed to click on resourse link")
             driver.save_screenshot(f"./failed_to_click_on_the_resourse_link_{ClusterManager.get_current_timestamp()}.png")    
-
+        
+        # Wait until the table of the esourse is present  
         try:
             WebDriverWait(driver, 60, 0.001).until(EC.presence_of_element_located((By.CSS_SELECTOR, "armo-button button.armo-button.primary.sm")))
             print("Table of the resourse is present")
