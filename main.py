@@ -2,6 +2,7 @@
 
 import os
 import sys
+import logging
 from selenium.webdriver.support.ui import WebDriverWait
 from tests.selenium_config import initialize_driver
 from tests.interaction_manager import InteractionManager
@@ -9,6 +10,9 @@ from tests.vulnerabilities import Vulnerabilities
 from tests.compliance import Compliance
 from tests.base_test import TestConfig
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+logging.basicConfig(level=logging.INFO)
+_logger = logging.getLogger(__name__)
 
 class TestsRunner:
     def __init__(self, tests_with_credentials):

@@ -83,6 +83,14 @@ jobs:
       run: |
         python main.py ${{ env.ENVIRONMENT }} vulnerabilities $TEST_EMAIL $TEST_PASSWORD
 
+    - name: upload screenshots
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: screenshots
+        path: | 
+          ./*.png
+
   test_compliance:
     needs: setup
     if: needs.setup.outputs.test_type == 'all' || needs.setup.outputs.test_type == 'compliance'
@@ -121,3 +129,11 @@ jobs:
     - name: Run Compliance Test
       run: |
         python main.py ${{ env.ENVIRONMENT }} compliance $TEST_EMAIL $TEST_PASSWORD
+
+    - name: upload screenshots
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: screenshots
+        path: | 
+          ./*.png
