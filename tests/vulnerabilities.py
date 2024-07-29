@@ -12,9 +12,10 @@ logger = logging.getLogger(__name__)
 
 class Vulnerabilities(BaseTest):
     def run(self):
+        cluster_manager = ConnectCluster(self._driver)
+        cluster_manager.create_attack_path()
         login_url = self.get_login_url()
         self.login(login_url)
-        cluster_manager = ConnectCluster(self._driver)
         try:
             cluster_manager.click_get_started()
             cluster_manager.connect_cluster_helm()

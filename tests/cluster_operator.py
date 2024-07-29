@@ -1,6 +1,7 @@
-import time, datetime
-import subprocess
+import os
 import logging
+import subprocess
+import time, datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 class ClusterManager:
     def __init__(self, driver):
         self._driver = driver
-        self.wait = WebDriverWait(self._driver, timeout=90, poll_frequency=0.001)
+        self.wait = WebDriverWait(self._driver, timeout=60, poll_frequency=0.001)
         self._interaction_manager = InteractionManager(driver)
 
     def login(self, email_onboarding, login_pass_onboarding, url):
@@ -97,6 +98,12 @@ class ClusterManager:
                 logger.info(f"Command executed successfully: {stdout.decode()}")
         except Exception as e:
             logger.error(f"An error occurred while running the command: {str(e)}")
+            
+    def create_attack_path(self, manifest_filename='../manifest.yaml'):
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+        manifest_path = os.path.join(current_directory, manifest_filename)
+        command = f"kubectl apply -f {manifest_path}"
+        self.run_shell_command(command)
 
 
 class ConnectCluster:
