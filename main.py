@@ -26,7 +26,7 @@ class TestsRunner:
                 try:
                     future.result()
                 except Exception as exc:
-                    print(f"Test generated an exception: {exc}")
+                    _logger.error(f"Test generated an exception: {exc}")
 
     def run_test(self, test_class, email, password, environment):
         driver = initialize_driver()

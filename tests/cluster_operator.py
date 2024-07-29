@@ -180,7 +180,7 @@ class Cleanup:
 
     def click_settings_button(self):
         time.sleep(1)
-        self._interaction_manager.click('/html/body/armo-root/div/armo-side-nav-menu/nav/div[2]/armo-nav-items-list/ul[3]/li', By.XPATH)
+        self._interaction_manager.click('settings-left-menu-item', By.ID)
         logger.info("Click on settings button.")
 
     def click_more_options_button(self):

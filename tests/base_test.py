@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from selenium import webdriver
 from .interaction_manager import InteractionManager
 from selenium.webdriver.common.keys import Keys
-from .cluster_operator import Cleanup
+from .cluster_operator import Cleanup , ClusterManager
 from dataclasses import dataclass
 
 @dataclass
@@ -55,5 +55,5 @@ class BaseTest(ABC):
 
         except:
             print("Failed to perform cleanup")
-            self.driver.save_screenshot(f"./failed_to_perform_cleanup_{self.ClusterManager.get_current_timestamp()}.png")
+            self._driver.save_screenshot(f"./failed_to_perform_cleanup_{ClusterManager.get_current_timestamp()}.png")
             exit(1)
