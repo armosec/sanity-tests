@@ -1,9 +1,10 @@
-from abc import ABC, abstractmethod
 from selenium import webdriver
-from .interaction_manager import InteractionManager
-from selenium.webdriver.common.keys import Keys
-from .cluster_operator import Cleanup , ClusterManager
 from dataclasses import dataclass
+from abc import ABC, abstractmethod
+from selenium.webdriver.common.keys import Keys
+from .interaction_manager import InteractionManager
+from .cluster_operator import Cleanup, ClusterManager
+from selenium.webdriver.support.ui import WebDriverWait
 
 @dataclass
 class TestConfig:
@@ -12,7 +13,7 @@ class TestConfig:
     email: str
     password: str
     environment: str
-
+    
 class BaseTest(ABC):
     def __init__(self, config: TestConfig) -> None:
         self._driver = config.driver
@@ -20,6 +21,7 @@ class BaseTest(ABC):
         self._email = config.email
         self._password = config.password
         self._environment = config.environment
+        self._wait = WebDriverWait(self._driver, 60, 0.001)
     
     @abstractmethod
     def run(self):

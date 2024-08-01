@@ -6,22 +6,27 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-from .cluster_operator import ClusterManager, IgnoreRule, ConnectCluster
+from .cluster_operator import ClusterManager, IgnoreRule, ConnectCluster , RiskAcceptancePage
 
 logger = logging.getLogger(__name__)
 
 class Compliance(BaseTest):
+    def __init__(self, config):
+        super().__init__(config)
+        self.connect_cluster = ConnectCluster(self._driver, self._wait)
+        self.cluster_manager = ClusterManager(self._driver, self._wait)
+    
     def run(self):
         login_url = self.get_login_url()
         self.login(login_url)
-        cluster_manager = ConnectCluster(self._driver)
         try:
-            cluster_manager.click_get_started()
-            cluster_manager.connect_cluster_helm()
-            cluster_manager.verify_installation()
-            cluster_manager.view_cluster_button()
-            cluster_manager.view_connected_cluster()
+            self.connect_cluster.click_get_started()
+            self.connect_cluster.connect_cluster_helm()
+            self.connect_cluster.verify_installation()
+            self.connect_cluster.view_cluster_button()
+            self.connect_cluster.view_connected_cluster()
             self.navigate_to_compliance()
+            self.risk_acceptance_page()
         finally:
             self.perform_cleanup()
             print("Compliance test completed")
@@ -159,3 +164,17 @@ class Compliance(BaseTest):
         time.sleep(3)
         ignore_rule.igor_rule_icon_check()
         return resource_name
+    
+    def risk_acceptance_page(self):
+        risk_acceptance = RiskAcceptancePage(self._driver)
+        time.sleep(3)
+        risk_acceptance.navigate_to_page()
+        print("Navigated to Risk Acceptance page")
+        risk_acceptance.switch_tab("Compliance")
+        time.sleep(1)
+        risk_acceptance.click_severity_element("td.mat-cell.cdk-column-posturePolicies-0-severityScore")
+        time.sleep(1)
+        risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
+        time.sleep(2.5)
+        risk_acceptance.delete_ignore_rule()
+        time.sleep(3)

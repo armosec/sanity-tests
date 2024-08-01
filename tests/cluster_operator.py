@@ -15,9 +15,10 @@ from .interaction_manager import InteractionManager
 logger = logging.getLogger(__name__)
 
 class ClusterManager:
-    def __init__(self, driver):
+    def __init__(self, driver, wait):
         self._driver = driver
-        self.wait = WebDriverWait(self._driver, timeout=60, poll_frequency=0.001)
+        # self.wait = WebDriverWait(self._driver, timeout=60, poll_frequency=0.001)
+        self._wait = wait
         self._interaction_manager = InteractionManager(driver)
 
     def login(self, email_onboarding, login_pass_onboarding, url):
@@ -107,9 +108,9 @@ class ClusterManager:
 
 
 class ConnectCluster:
-    def __init__(self, driver):
+    def __init__(self, driver, wait):
         self._driver = driver
-        self.wait = WebDriverWait(self._driver, timeout=90, poll_frequency=0.001)
+        self._wait = wait
         self._interaction_manager = InteractionManager(driver)
 
     def click_get_started(self):
@@ -169,9 +170,9 @@ class ConnectCluster:
                 raise Exception("Element not found after maximum retry attempts.")
 
 class Cleanup:
-    def __init__(self, driver):
+    def __init__(self, driver, wait):
         self._driver = driver
-        self.wait = WebDriverWait(self._driver, timeout=90, poll_frequency=0.001)
+        self._wait = wait
         self._interaction_manager = InteractionManager(driver)
 
     def uninstall_kubescape(self): 
@@ -213,7 +214,7 @@ class Cleanup:
 class IgnoreRule:
     def __init__(self, driver):
         self._driver = driver
-        self.wait = WebDriverWait(self._driver, timeout=90, poll_frequency=0.001)
+        self.wait = WebDriverWait(self._driver, timeout=60, poll_frequency=0.001)
         self._interaction_manager = InteractionManager(driver)
 
     def click_ignore_button(self):
@@ -269,18 +270,18 @@ class IgnoreRule:
 
 
 class RiskAcceptancePage:
-    def __init__(self, driver, wait):
+    def __init__(self, driver):
         self._driver = driver
-        self.wait = wait
+        self.wait = WebDriverWait(self._driver, timeout=60, poll_frequency=0.001)
         self._interaction_manager = InteractionManager(driver)
 
     def navigate_to_page(self):
         try:
             self._interaction_manager.click("rick-acceptance-left-menu-item", By.ID)
-            logger.info("Clicked on Risk Acceptance.")
+            logger.info("Clicked on Risk Acceptance page.")
         except Exception as e:
-            logger.error(f"Error clicking on Risk Acceptance menu item: {e}")
-            self._driver.save_screenshot(f"./failed_to_click_on_risk_acceptance_{ClusterManager.get_current_timestamp()}.png")
+            logger.error(f"Error clicking on Risk Acceptance page: {e}")
+            self._driver.save_screenshot(f"./failed_to_click_on_risk_acceptance_page_{ClusterManager.get_current_timestamp()}.png")
 
     def click_severity_element(self, css_selector):
         try:

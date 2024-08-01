@@ -5,14 +5,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-from .cluster_operator import ClusterManager, IgnoreRule, ConnectCluster
+from .cluster_operator import ClusterManager, IgnoreRule, ConnectCluster, RiskAcceptancePage
 
 logger = logging.getLogger(__name__)
 
 class Vulnerabilities(BaseTest):
     def run(self):
-        connect_cluster = ConnectCluster(self._driver)
-        cluster_manager = ClusterManager(self._driver)
+        connect_cluster = ConnectCluster(self._driver, self._wait)
+        cluster_manager = ClusterManager(self._driver, self._wait)
         cluster_manager.create_attack_path()  
         login_url = self.get_login_url()
         self.login(login_url)
@@ -23,6 +23,7 @@ class Vulnerabilities(BaseTest):
             connect_cluster.view_cluster_button()
             connect_cluster.view_connected_cluster()
             self.navigate_to_vulnerabilities()
+            self.risk_acceptance_page()
         finally:
             self.perform_cleanup()  
             logger.info("Cleanup completed successfully")
@@ -38,7 +39,7 @@ class Vulnerabilities(BaseTest):
             logger.error("Failed to click on vulnerabilities")
             driver.save_screenshot(f"./failed_to_click_on_vulnerabilities_{ClusterManager.get_current_timestamp()}.png")
         
-        cluster_manager = ClusterManager(driver)
+        cluster_manager = ClusterManager(driver, self._wait)
         try:
             cluster_manager.click_on_vuln_view_button("Workloads")
         except Exception as e:
@@ -148,3 +149,17 @@ class Vulnerabilities(BaseTest):
         time.sleep(3)
         ignore_rule.igor_rule_icon_check()
         return container_name
+    
+    def risk_acceptance_page(self):
+        risk_acceptance = RiskAcceptancePage(self._driver)
+        time.sleep(3)
+        risk_acceptance.navigate_to_page()
+        print("Navigated to risk acceptance page")
+        time.sleep(1)
+        risk_acceptance.switch_tab("Vulnerabilities")
+        risk_acceptance.click_severity_element("td.mat-cell.mat-column-vulnerabilities-0-severityScore")
+        time.sleep(1)
+        risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
+        time.sleep(2.5)
+        risk_acceptance.delete_ignore_rule()
+        time.sleep(3)
