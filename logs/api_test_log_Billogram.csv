@@ -1,0 +1,2 @@
+timestamp,login_time,cve_view_no_filter,cve_view_with_risk_spotlight,workload_view_table_no_filter,workload_view_table_with_risk_spotlight,images_view_table_no_filter,images_view_table_with_risk_spotlight,sbom_view_table_no_filter,sbom_view_table_with_risk_spotlight
+2024-08-04 22:19:59,0.60,11.86,29.46,0.38,60.13,0.92,31.50,60.14,0.17
