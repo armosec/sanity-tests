@@ -1,0 +1,207 @@
+name: Run API Tests
+
+on:
+  schedule:
+    - cron: "17 * * * *"  # Runs at the 17th minute of every hour
+  push:
+    branches:
+    - main
+
+jobs:
+  run-api-test-AKME:
+    name: Run API Test AKME
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Run API test with AKME
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_AKME }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name AKME
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for AKME"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_AKME.csv
+
+  run-api-test-ARMO:
+    name: Run API Test ARMO
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Run API test with ARMO
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_ARMO }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name ARMO
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for ARMO"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_ARMO.csv
+
+  run-api-test-Billogram:
+    name: Run API Test Billogram
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Run API test with Billogram
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_Billogram }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name Billogram
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for Billogram"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_Billogram.csv
+
+  run-api-test-AXUAL:
+    name: Run API Test AXUAL
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Run API test with AXUAL
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_AXUAL }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name AXUAL
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for AXUAL"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_AXUAL.csv
+
+  run-api-test-Kyos:
+    name: Run API Test Kyos
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Run API test with Kyos
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_Kyos }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name Kyos
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for Kyos"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_Kyos.csv  
+
+  run-api-test-Schuberg-Philis:
+    name: Run API Test Schuberg-Philis
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Run API test with Schuberg-Philis
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_Schuberg_Philis }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name Schuberg_Philis
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for Schuberg_Philis"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_Schuberg_Philis.csv 
