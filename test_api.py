@@ -202,7 +202,6 @@ if __name__ == "__main__":
     parser.add_argument('--customer_guid', required=True, help='Your customer GUID')
     parser.add_argument('--log_name', required=True, help='Descriptive name for the log file')
 
-    
     args = parser.parse_args()
 
     base_url = "https://api.armosec.io"
