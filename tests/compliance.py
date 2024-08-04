@@ -11,12 +11,14 @@ from .cluster_operator import ClusterManager, IgnoreRule, ConnectCluster , RiskA
 logger = logging.getLogger(__name__)
 
 class Compliance(BaseTest):
-    def __init__(self, config):
-        super().__init__(config)
-        self.connect_cluster = ConnectCluster(self._driver, self._wait)
-        self.cluster_manager = ClusterManager(self._driver, self._wait)
+    # def __init__(self, config):
+    #     super().__init__(config)
+    #     self.connect_cluster = ConnectCluster(self._driver, self._wait)
+    #     self.cluster_manager = ClusterManager(self._driver, self._wait)
     
     def run(self):
+        self.connect_cluster = ConnectCluster(self._driver, self._wait)
+        self.cluster_manager = ClusterManager(self._driver, self._wait)
         login_url = self.get_login_url()
         self.login(login_url)
         try:
