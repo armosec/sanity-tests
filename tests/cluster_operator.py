@@ -254,7 +254,7 @@ class IgnoreRule:
 
     def delete_ignore_rule(self):
         try:
-            self._interaction_manager.click('.delete-button.mat-focus-indicator.mat-tooltip-trigger', By.CSS_SELECTOR)
+            self._interaction_manager.click('button.armo-button.error-secondary.xl', By.CSS_SELECTOR)
             logger.info("Click on delete ignore rule button.")
         except:
             logger.error("Not found Delete ignore rule button.")

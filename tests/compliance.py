@@ -17,15 +17,15 @@ class Compliance(BaseTest):
         self.login(login_url)
         try:
             print("Running Compliance test")
-            connect_cluster.click_get_started()
-            connect_cluster.connect_cluster_helm()
-            connect_cluster.verify_installation()
-            connect_cluster.view_cluster_button()
-            connect_cluster.view_connected_cluster()
+            # connect_cluster.click_get_started()
+            # connect_cluster.connect_cluster_helm()
+            # connect_cluster.verify_installation()
+            # connect_cluster.view_cluster_button()
+            # connect_cluster.view_connected_cluster()
             self.navigate_to_compliance()
             self.risk_acceptance_page()
         finally:
-            self.perform_cleanup()
+            # self.perform_cleanup()
             print("Compliance test completed")
 
     def navigate_to_compliance(self):

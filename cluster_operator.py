@@ -332,7 +332,7 @@ class IgnoreRule:
 
     def delete_ignore_rule(self, wait, driver):
         try:
-            delete_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.delete-button.mat-focus-indicator.mat-tooltip-trigger')))
+            delete_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.error-secondary.xl')))
             delete_button.click()
             print("Click on delete ignore rule button.")
         except:
