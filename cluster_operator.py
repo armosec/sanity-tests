@@ -315,7 +315,7 @@ class IgnoreRule:
     
     def save_ignore_rule(self, wait, driver):
         try:
-            save_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".save-button")))
+            save_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.armo-button.primary.xl")))
             save_button.click()
             print("Click on save ignore rule.")
         except:

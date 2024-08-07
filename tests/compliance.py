@@ -10,23 +10,18 @@ from .cluster_operator import ClusterManager, IgnoreRule, ConnectCluster , RiskA
 
 logger = logging.getLogger(__name__)
 
-class Compliance(BaseTest):
-    # def __init__(self, config):
-    #     super().__init__(config)
-    #     self.connect_cluster = ConnectCluster(self._driver, self._wait)
-    #     self.cluster_manager = ClusterManager(self._driver, self._wait)
-    
+class Compliance(BaseTest):    
     def run(self):
-        self.connect_cluster = ConnectCluster(self._driver, self._wait)
-        self.cluster_manager = ClusterManager(self._driver, self._wait)
+        connect_cluster = ConnectCluster(self._driver, self._wait)
         login_url = self.get_login_url()
         self.login(login_url)
         try:
-            self.connect_cluster.click_get_started()
-            self.connect_cluster.connect_cluster_helm()
-            self.connect_cluster.verify_installation()
-            self.connect_cluster.view_cluster_button()
-            self.connect_cluster.view_connected_cluster()
+            print("Running Compliance test")
+            connect_cluster.click_get_started()
+            connect_cluster.connect_cluster_helm()
+            connect_cluster.verify_installation()
+            connect_cluster.view_cluster_button()
+            connect_cluster.view_connected_cluster()
             self.navigate_to_compliance()
             self.risk_acceptance_page()
         finally:

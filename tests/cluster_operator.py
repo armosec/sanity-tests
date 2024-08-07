@@ -239,7 +239,7 @@ class IgnoreRule:
     
     def save_ignore_rule(self):
         try:
-            self._interaction_manager.click(".save-button", By.CSS_SELECTOR)
+            self._interaction_manager.click("button.armo-button.primary.xl", By.CSS_SELECTOR)
             logger.info("Click on save ignore rule.")
         except:
             logger.error("failed to click on save button")

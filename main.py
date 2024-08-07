@@ -8,6 +8,7 @@ from tests.selenium_config import initialize_driver
 from tests.interaction_manager import InteractionManager
 from tests.vulnerabilities import Vulnerabilities
 from tests.compliance import Compliance
+from tests.attach_path import AttachPath
 from tests.base_test import TestConfig
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -54,6 +55,7 @@ def main():
     test_mapping = {
         'vulnerabilities': Vulnerabilities,
         'compliance': Compliance,
+        'attach_path': AttachPath,
         # Add additional mappings here
     }
 
