@@ -67,9 +67,9 @@ class LatencyTest:
         # Click on the cluster (the first one).
         self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
         # Click on the failed resource button.
-        self._interaction_manager.click('//*[@id="framework-control-table-failed-1"]/div/armo-router-link/a/armo-button/button', click_delay=1)
+        self._interaction_manager.click('//*[@id="framework-control-table-failed-0"]/div/armo-router-link/a/armo-button/button', click_delay=1)
         # Click on the fix button in the rules list.
-        self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-with-namespace/table/tbody/tr/td[3]/armo-resource-ignore-rules-cell/div/div[2]/armo-fix-button/armo-button/button')
+        self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-basic/table/tbody/tr/td[2]/armo-resource-ignore-rules-cell/div/div[2]/armo-fix-button/armo-button')
 
         
         # Switch to the last window.

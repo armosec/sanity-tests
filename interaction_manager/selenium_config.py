@@ -17,7 +17,7 @@ class InteractionManagerConfig:
     @classmethod
     def from_env(cls) -> InteractionManagerConfig:
         config = InteractionManagerConfig(
-            headless=literal_eval(environ.get('IM_HEADLESS').title()) if environ.get('IM_HEADLESS') else True,
+            headless=literal_eval(environ.get('IM_HEADLESS').title()) if environ.get('IM_HEADLESS') else False,
             timeout=int(environ['IM_TIMEOUT']) if environ.get('IM_TIMEOUT') else 15
         )
 
