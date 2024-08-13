@@ -57,24 +57,38 @@ class InteractionManager:
         )
         return element
 
-    def click(self, xpath: str, by=By.XPATH, click_delay: Optional[float] = None) -> WebElement:
-        _logger.info(f'Clicking "{xpath}"')
+    def click(self, xpath: str, by=By.XPATH, click_delay: Optional[float] = None, index: int = 0) -> WebElement:
+        _logger.info(f'Clicking "{xpath}" with index {index}')
+        
+        # Find all elements that match the locator
+        elements = WebDriverWait(self._driver, self._timeout).until(
+            EC.presence_of_all_elements_located((by, xpath))
+        )
+        
+        if len(elements) <= index:
+            _logger.error(f'Index {index} is out of range for elements found with "{xpath}"')
+            raise IndexError(f'Element with index {index} not found')
+    
+        element = elements[index]
+    
         if click_delay:
             sleep(click_delay)
-        element = self.wait_until_interactable(xpath, by)
+        
         try:
             if click_delay:
                 sleep(click_delay)
             element.click()
         except ElementClickInterceptedException as e:
             _logger.error(
-                f'Failed to click "{xpath}" due to ElementClickInterceptedException. Trying to click using JavaScript.',
+                f'Failed to click "{xpath}" at index {index} due to ElementClickInterceptedException. Trying to click using JavaScript.',
                 exc_info=True,
                 stack_info=True,
                 extra={"screenshot": False},
             )
             self._driver.execute_script("arguments[0].click();", element)
+    
         return element
+
 
     def focus_and_send_text(self, xpath: str, text: str, by=By.XPATH) -> WebElement:
         _logger.info(f'Sending text "{text}" to "{xpath}"')

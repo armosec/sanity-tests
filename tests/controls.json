@@ -1,0 +1,125 @@
+{
+  "svg": {
+    "xmlns": "http://www.w3.org/2000/svg",
+    "class": "grab ng-star-inserted",
+    "defs": {
+      "marker": {
+        "id": "arrow",
+        "markerWidth": "5",
+        "markerHeight": "6",
+        "refX": "2",
+        "refY": "3",
+        "orient": "auto-start-reverse",
+        "polygon": {
+          "points": "5,3 0,0 0,6"
+        }
+      }
+    },
+    "g": {
+      "transform": "translate(392.4836922498891,167.9742140517705) scale(0.9821395952633915)",
+      "path": [
+        {
+          "fill": "none",
+          "stroke-width": "2px",
+          "marker-end": "url(#arrow)",
+          "class": "line ng-star-inserted",
+          "id": "(60,85); (210,85);",
+          "d": "M 100 85 L 170 85"
+        }
+      ],
+      "foreignObject": [
+        {
+          "x": "35",
+          "y": "60",
+          "width": "50",
+          "height": "50",
+          "class": "ng-star-inserted",
+          "armo-attack-chain-graph-node": {
+            "data-test-id": "node-Initial Access",
+            "armo-node-name": {
+              "style": "--width: 90px; --height: 28px; --fontSize: 9px; --lineHeight: 12px; --marginBottom: 4px;",
+              "text": "Initial Access"
+            },
+            "images-container": {
+              "clickable": "true",
+              "backgrounds-container": {
+                "img": [
+                  {
+                    "class": "gray ng-star-inserted",
+                    "width": "50",
+                    "src": "assets/attack-chains/heptagon-gray-with-border.svg"
+                  },
+                  {
+                    "class": "blue ng-star-inserted",
+                    "width": "50",
+                    "src": "assets/attack-chains/heptagon-blue-with-border.svg"
+                  }
+                ]
+              },
+              "kinds-container": {
+                "img": [
+                  {
+                    "class": "blue ng-star-inserted",
+                    "width": "36",
+                    "src": "assets/attack-chains/kinds/service-blue.svg"
+                  },
+                  {
+                    "class": "white ng-star-inserted",
+                    "width": "36",
+                    "src": "assets/attack-chains/kinds/service-white.svg"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "x": "185",
+          "y": "60",
+          "width": "50",
+          "height": "50",
+          "class": "ng-star-inserted",
+          "armo-attack-chain-graph-node": {
+            "data-test-id": "node-Denial of service",
+            "armo-node-name": {
+              "style": "--width: 90px; --height: 28px; --fontSize: 9px; --lineHeight: 12px; --marginBottom: 4px;",
+              "text": "Denial of service"
+            },
+            "images-container": {
+              "selected": "true",
+              "clickable": "true",
+              "backgrounds-container": {
+                "img": [
+                  {
+                    "class": "gray ng-star-inserted",
+                    "width": "50",
+                    "src": "assets/attack-chains/heptagon-gray-with-border.svg"
+                  },
+                  {
+                    "class": "blue ng-star-inserted",
+                    "width": "50",
+                    "src": "assets/attack-chains/heptagon-blue-with-border.svg"
+                  }
+                ]
+              },
+              "kinds-container": {
+                "img": [
+                  {
+                    "class": "blue ng-star-inserted",
+                    "width": "36",
+                    "src": "assets/attack-chains/kinds/deployment-blue.svg"
+                  },
+                  {
+                    "class": "white ng-star-inserted",
+                    "width": "36",
+                    "src": "assets/attack-chains/kinds/deployment-white.svg"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

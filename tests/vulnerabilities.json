@@ -1,124 +1,452 @@
 {
     "svg": {
-        "xmlns": "http://www.w3.org/2000/svg",
-        "class": "grab ng-star-inserted",
-        "defs": {
-            "marker": {
-                "id": "arrow",
-                "markerWidth": "5",
-                "markerHeight": "6",
-                "refX": "2",
-                "refY": "3",
-                "orient": "auto-start-reverse",
-                "polygon": {
-                    "points": "5,3 0,0 0,6"
-                }
-            }
-        },
-        "g": [
+      "xmlns": "http://www.w3.org/2000/svg",
+      "class": "grab ng-star-inserted",
+      "defs": {
+        "marker": {
+          "id": "arrow",
+          "markerWidth": "5",
+          "markerHeight": "6",
+          "refX": "2",
+          "refY": "3",
+          "orient": "auto-start-reverse",
+          "polygon": {
+            "points": "5,3 0,0 0,6"
+          }
+        }
+      },
+      "g": [
+        {
+          "transform": "translate(339,32.5) scale(1)",
+          "path": [
             {
-                "transform": "translate(249,32.5) scale(1)",
-                "g": [
-                    {
-                        "path": [
-                            {
-                                "fill": "none",
-                                "stroke-width": "2px",
-                                "marker-end": "url(#arrow)",
-                                "class": "line ng-star-inserted",
-                                "id": "(60,215); (210,215);",
-                                "d": "M 100 215 L 170 215"
-                            },
-                            {
-                                "fill": "none",
-                                "stroke-width": "2px",
-                                "marker-end": "url(#arrow)",
-                                "class": "line ng-star-inserted",
-                                "id": "(210,215); (360,85);",
-                                "d": "M 250 215 L 265 215 Q 285 215 285 195 L 285 105 Q 285 85 305 85 L 320 85"
-                            },
-                            {
-                                "fill": "none",
-                                "stroke-width": "2px",
-                                "marker-end": "url(#arrow)",
-                                "class": "line ng-star-inserted",
-                                "id": "(210,215); (360,150);",
-                                "d": "M 250 215 L 265 215 Q 285 215 285 195 L 285 170 Q 285 150 305 150 L 440 150"
-                            },
-                            {
-                                "fill": "none",
-                                "stroke-width": "2px",
-                                "marker-end": "url(#arrow)",
-                                "class": "line ng-star-inserted",
-                                "id": "(210,215); (360,215);",
-                                "d": "M 250 215 L 320 215"
-                            },
-                            {
-                                "fill": "none",
-                                "stroke-width": "2px",
-                                "marker-end": "url(#arrow)",
-                                "class": "line ng-star-inserted",
-                                "id": "(210,215); (360,280);",
-                                "d": "M 250 215 L 265 215 Q 285 215 285 235 L 285 260 Q 285 280 305 280 L 440 280"
-                            },
-                            {
-                                "fill": "none",
-                                "stroke-width": "2px",
-                                "marker-end": "url(#arrow)",
-                                "class": "line ng-star-inserted",
-                                "id": "(210,215); (360,345);",
-                                "d": "M 250 215 L 265 215 Q 285 215 285 235 L 285 325 Q 285 345 305 345 L 320 345"
-                            }
-                        ]
-                    }
-                ]
+              "fill": "none",
+              "stroke-width": "2px",
+              "marker-end": "url(#arrow)",
+              "class": "line ng-star-inserted",
+              "id": "(60,215); (210,215);",
+              "d": "M 100 215 L 170 215"
             },
             {
-                "foreignObject": [
-                    {
-                        "x": "35",
-                        "y": "190",
-                        "width": "50",
-                        "height": "50",
-                        "class": "ng-star-inserted",
-                        "armo-attack-chain-graph-node": {
-                            "data-test-id": "node-Initial Access",
-                            "class": "ng-star-inserted",
-                            "armo-node-name": {
-                                "style": "--width: 90px; --height: 28px; --fontSize: 9px; --lineHeight: 12px; --marginBottom: 4px;",
-                                "content": "Initial Access"
-                            },
-                            "images-container": {
-                                "class": "clickable ng-star-inserted",
-                                "backgrounds-container": [
-                                    {
-                                        "class": "gray ng-star-inserted",
-                                        "width": "50",
-                                        "src": "assets/attack-chains/heptagon-gray-with-border.svg"
-                                    },
-                                    {
-                                        "class": "blue ng-star-inserted",
-                                        "width": "50",
-                                        "src": "assets/attack-chains/heptagon-blue-with-border.svg"
-                                    }
-                                ],
-                                "kinds-container": [
-                                    {
-                                        "class": "blue ng-star-inserted",
-                                        "width": "36",
-                                        "src": "assets/attack-chains/kinds/service-blue.svg"
-                                    },
-                                    {
-                                        "class": "white ng-star-inserted",
-                                        "width": "36",
-                                        "src": "assets/attack-chains/kinds/service-white.svg"
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                ]
+              "fill": "none",
+              "stroke-width": "2px",
+              "marker-end": "url(#arrow)",
+              "class": "line ng-star-inserted",
+              "id": "(210,215); (360,85);",
+              "d": "M 250 215 L 265 215 Q 285 215 285 195 L 285 105 Q 285 85 305 85 L 320 85"
+            },
+            {
+              "fill": "none",
+              "stroke-width": "2px",
+              "marker-end": "url(#arrow)",
+              "class": "line ng-star-inserted",
+              "id": "(210,215); (360,150);",
+              "d": "M 250 215 L 265 215 Q 285 215 285 195 L 285 170 Q 285 150 305 150 L 440 150"
+            },
+            {
+              "fill": "none",
+              "stroke-width": "2px",
+              "marker-end": "url(#arrow)",
+              "class": "line ng-star-inserted",
+              "id": "(210,215); (360,215);",
+              "d": "M 250 215 L 320 215"
+            },
+            {
+              "fill": "none",
+              "stroke-width": "2px",
+              "marker-end": "url(#arrow)",
+              "class": "line ng-star-inserted",
+              "id": "(210,215); (360,280);",
+              "d": "M 250 215 L 265 215 Q 285 215 285 235 L 285 260 Q 285 280 305 280 L 440 280"
+            },
+            {
+              "fill": "none",
+              "stroke-width": "2px",
+              "marker-end": "url(#arrow)",
+              "class": "line ng-star-inserted",
+              "id": "(210,215); (360,345);",
+              "d": "M 250 215 L 265 215 Q 285 215 285 235 L 285 325 Q 285 345 305 345 L 320 345"
             }
-        ]
+          ],
+          "g": [
+            {
+              "foreignObject": [
+                {
+                  "x": "35",
+                  "y": "190",
+                  "width": "50",
+                  "height": "50",
+                  "class": "ng-star-inserted",
+                  "armo-attack-chain-graph-node": {
+                    "data-test-id": "node-Initial Access",
+                    "armo-node-name": {
+                      "style": {
+                        "--width": "90px",
+                        "--height": "28px",
+                        "--fontSize": "9px",
+                        "--lineHeight": "12px",
+                        "--marginBottom": "4px"
+                      },
+                      "text": "Initial Access"
+                    },
+                    "div": [
+                      {
+                        "class": "images-container clickable ng-star-inserted",
+                        "backgrounds-container": {
+                          "img": [
+                            {
+                              "class": "gray ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-gray-with-border.svg"
+                            },
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-blue-with-border.svg"
+                            }
+                          ]
+                        },
+                        "kinds-container": {
+                          "img": [
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/service-blue.svg"
+                            },
+                            {
+                              "class": "white ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/service-white.svg"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "x": "185",
+                  "y": "190",
+                  "width": "50",
+                  "height": "50",
+                  "class": "ng-star-inserted",
+                  "armo-attack-chain-graph-node": {
+                    "data-test-id": "node-Execution (Vulnerable Image)",
+                    "armo-node-name": {
+                      "style": {
+                        "--width": "90px",
+                        "--height": "28px",
+                        "--fontSize": "9px",
+                        "--lineHeight": "12px",
+                        "--marginBottom": "4px"
+                      },
+                      "text": "Execution (Vulnerable Image)"
+                    },
+                    "div": [
+                      {
+                        "class": "images-container selected clickable ng-star-inserted",
+                        "backgrounds-container": {
+                          "img": [
+                            {
+                              "class": "gray ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-gray-with-border.svg"
+                            },
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-blue-with-border.svg"
+                            }
+                          ]
+                        },
+                        "kinds-container": {
+                          "img": [
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/deployment-blue.svg"
+                            },
+                            {
+                              "class": "white ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/deployment-white.svg"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "x": "335",
+                  "y": "60",
+                  "width": "50",
+                  "height": "50",
+                  "class": "ng-star-inserted",
+                  "armo-attack-chain-graph-node": {
+                    "data-test-id": "node-Data Collection",
+                    "armo-node-name": {
+                      "style": {
+                        "--width": "90px",
+                        "--height": "28px",
+                        "--fontSize": "9px",
+                        "--lineHeight": "12px",
+                        "--marginBottom": "4px"
+                      },
+                      "text": "Data Collection"
+                    },
+                    "div": [
+                      {
+                        "class": "images-container clickable ng-star-inserted",
+                        "backgrounds-container": {
+                          "img": [
+                            {
+                              "class": "gray ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-gray-with-border.svg"
+                            },
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-blue-with-border.svg"
+                            }
+                          ]
+                        },
+                        "kinds-container": {
+                          "img": [
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/config-map-blue.svg"
+                            },
+                            {
+                              "class": "white ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/config-map-white.svg"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "x": "455",
+                  "y": "125",
+                  "width": "50",
+                  "height": "50",
+                  "class": "ng-star-inserted",
+                  "armo-attack-chain-graph-node": {
+                    "data-test-id": "node-Credential access",
+                    "armo-node-name": {
+                      "style": {
+                        "--width": "90px",
+                        "--height": "28px",
+                        "--fontSize": "9px",
+                        "--lineHeight": "12px",
+                        "--marginBottom": "4px"
+                      },
+                      "text": "Credential access"
+                    },
+                    "div": [
+                      {
+                        "class": "images-container clickable ng-star-inserted",
+                        "backgrounds-container": {
+                          "img": [
+                            {
+                              "class": "gray ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-gray-with-border.svg"
+                            },
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-blue-with-border.svg"
+                            }
+                          ]
+                        },
+                        "kinds-container": {
+                          "img": [
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/service-account-blue.svg"
+                            },
+                            {
+                              "class": "white ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/service-account-white.svg"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "x": "335",
+                  "y": "190",
+                  "width": "50",
+                  "height": "50",
+                  "class": "ng-star-inserted",
+                  "armo-attack-chain-graph-node": {
+                    "data-test-id": "node-Privilege Escalation (Node)",
+                    "armo-node-name": {
+                      "style": {
+                        "--width": "90px",
+                        "--height": "28px",
+                        "--fontSize": "9px",
+                        "--lineHeight": "12px",
+                        "--marginBottom": "4px"
+                      },
+                      "text": "Privilege Escalation (Node)"
+                    },
+                    "div": [
+                      {
+                        "class": "images-container clickable ng-star-inserted",
+                        "backgrounds-container": {
+                          "img": [
+                            {
+                              "class": "gray ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-gray-with-border.svg"
+                            },
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-blue-with-border.svg"
+                            }
+                          ]
+                        },
+                        "kinds-container": {
+                          "img": [
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/deployment-blue.svg"
+                            },
+                            {
+                              "class": "white ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/deployment-white.svg"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "x": "455",
+                  "y": "255",
+                  "width": "50",
+                  "height": "50",
+                  "class": "ng-star-inserted",
+                  "armo-attack-chain-graph-node": {
+                    "data-test-id": "node-Persistence",
+                    "armo-node-name": {
+                      "style": {
+                        "--width": "90px",
+                        "--height": "28px",
+                        "--fontSize": "9px",
+                        "--lineHeight": "12px",
+                        "--marginBottom": "4px"
+                      },
+                      "text": "Persistence"
+                    },
+                    "div": [
+                      {
+                        "class": "images-container clickable ng-star-inserted",
+                        "backgrounds-container": {
+                          "img": [
+                            {
+                              "class": "gray ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-gray-with-border.svg"
+                            },
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-blue-with-border.svg"
+                            }
+                          ]
+                        },
+                        "kinds-container": {
+                          "img": [
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/deployment-blue.svg"
+                            },
+                            {
+                              "class": "white ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/deployment-white.svg"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "x": "335",
+                  "y": "320",
+                  "width": "50",
+                  "height": "50",
+                  "class": "ng-star-inserted",
+                  "armo-attack-chain-graph-node": {
+                    "data-test-id": "node-Lateral Movement (Network)",
+                    "armo-node-name": {
+                      "style": {
+                        "--width": "90px",
+                        "--height": "28px",
+                        "--fontSize": "9px",
+                        "--lineHeight": "12px",
+                        "--marginBottom": "4px"
+                      },
+                      "text": "Lateral Movement (Network)"
+                    },
+                    "div": [
+                      {
+                        "class": "images-container clickable ng-star-inserted",
+                        "backgrounds-container": {
+                          "img": [
+                            {
+                              "class": "gray ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-gray-with-border.svg"
+                            },
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "50",
+                              "src": "assets/attack-chains/heptagon-blue-with-border.svg"
+                            }
+                          ]
+                        },
+                        "kinds-container": {
+                          "img": [
+                            {
+                              "class": "blue ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/deployment-blue.svg"
+                            },
+                            {
+                              "class": "white ng-star-inserted",
+                              "width": "36",
+                              "src": "assets/attack-chains/kinds/deployment-white.svg"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
-}
+  }
+  
