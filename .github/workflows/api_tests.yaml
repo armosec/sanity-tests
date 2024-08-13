@@ -108,7 +108,7 @@ jobs:
         EMAIL: ${{ secrets.ST_EMAIL }}
         CUSTOMER: ${{ secrets.ST_CUSTOMER }}
         PASSWORD: ${{ secrets.ST_PASSWORD }}
-        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_Billogram }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_BILLOGRAM }}
       run: |
         python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name Billogram
 
@@ -184,7 +184,7 @@ jobs:
         EMAIL: ${{ secrets.ST_EMAIL }}
         CUSTOMER: ${{ secrets.ST_CUSTOMER }}
         PASSWORD: ${{ secrets.ST_PASSWORD }}
-        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_Kyos }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_KYOS }}
       run: |
         python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name Kyos
 
@@ -222,7 +222,7 @@ jobs:
         EMAIL: ${{ secrets.ST_EMAIL }}
         CUSTOMER: ${{ secrets.ST_CUSTOMER }}
         PASSWORD: ${{ secrets.ST_PASSWORD }}
-        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_Schuberg_Philis }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_SCHUBERG_PHILIS }}
       run: |
         python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name Schuberg_Philis
 
@@ -235,3 +235,41 @@ jobs:
         commit: --signoff
         pull: '--ff-only'
         add: ./logs/api_test_log_Schuberg_Philis.csv 
+
+  run-api-test-Mimecast:
+    name: Run API Test Mimecast
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_api.txt
+
+    - name: Run API test with Mimecast
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_MIMECAST }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name Mimecast
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for Mimecast"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_Mimecast.csv 
