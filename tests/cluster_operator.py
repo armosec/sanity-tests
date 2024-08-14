@@ -62,6 +62,7 @@ class ClusterManager:
             return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
+    @staticmethod
     def press_esc_key(driver):
         try:
             actions = ActionChains(driver)

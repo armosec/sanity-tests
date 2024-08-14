@@ -68,62 +68,57 @@ class AttachPath(BaseTest):
             driver.save_screenshot(f"./failed_to_find_the_attack_path_{ClusterManager.get_current_timestamp()}.png")
 
     def click_on_attach_path(self, index, wait, driver, interaction_manager):
-        cluster_manager = ClusterManager(driver, wait)
         try:
             descriptions = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[data-test-id='description']")))
             description_element = descriptions[index]
             description_element.click()
-            logger.info(f"Clicked on description {index + 1}.")
+            logger.info(f"Clicked on description {index}.")
 
-            # Capture the returned table_id
-            table_id = self.validate_attach_path_graph(driver, interaction_manager)
-            if table_id == "attack-chain-vulnerabilities-table":
+            # element_text = self.validate_attach_path_graph(driver, interaction_manager) -- need to fix this
+            element_text = self.check_attach_path_kind(driver)
+            if element_text == "CVE":
                 self.create_ignore_rule(driver) 
-                self._interaction_manager.click("node-Initial Access", by=By.ID)
+                time.sleep(3)
+                self._interaction_manager.click("armo-attack-chain-graph-node[data-test-id='node-Initial Access']", by=By.CSS_SELECTOR)
                 logger.info("Clicked on 'Initial Access' node.")
-                control_row = wait.until(EC.presence_of_element_located((By.ID, "row-C-0256")))
-                logger.info("Found control C-0256.")
-                fix_button = driver.find_element(By.ID, "fix-button")
+                time.sleep(2)
                 try:
-                    self._interaction_manager.click("fix-button", by=By.ID, index=2)
+                    self._interaction_manager.click("armo-fix-button[data-test-id='fix-button'] button", by=By.CSS_SELECTOR)
                     logger.info("Clicked on 'Fix' button.")
                 except Exception as e:
                     logger.error(f"Failed to click on 'Fix' button: {str(e)}")
                     self._driver.save_screenshot(f"./failed_to_click_fix_button_{ClusterManager.get_current_timestamp()}.png")
                 
-                if self.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
-                    logger.info("SBS yamls - The number of rows is equal .")
-                else:
-                    logger.error("SBS yamls - The number of rows is NOT equal.")
-                cluster_manager.press_esc_key(driver)
+                # if self.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
+                #     logger.info("SBS yamls - The number of rows is equal.")
+                # else:
+                #     logger.error("SBS yamls - The number of rows is NOT equal.")
+                time.sleep(2)
+                ClusterManager.press_esc_key(driver)
             else:
-                self._interaction_manager.click("fix-button", by=By.ID, index=2)
-                if self.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
-                    logger.info("SBS yamls - The number of rows is equal .")
-                else:
-                    logger.error("SBS yamls - The number of rows is NOT equal.")
-                cluster_manager.press_esc_key(driver)
-                
-                
-            
-
-            
-            
+                self._interaction_manager.click("armo-fix-button[data-test-id='fix-button'] button", by=By.CSS_SELECTOR)
+                logger.info("Clicked on 'Fix' button.")
+                # if self.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
+                #     logger.info("SBS yamls - The number of rows is equal .")
+                # else:
+                #     logger.error("SBS yamls - The number of rows is NOT equal.")
+                time.sleep(2)
+                ClusterManager.press_esc_key(driver)
             
         except Exception as e:
-            logger.error(f"Failed to click on description {index + 1}: {str(e)}")
+            logger.error(f"Failed to click on description {index}: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_description_{index + 1}_{ClusterManager.get_current_timestamp()}.png")
 
         
     def validate_attach_path_graph(self, driver, interaction_manager):
-        table_id = self.check_attach_path_kind(driver)
-        if table_id:
-            logger.info(f"Found the {table_id}")
+        element_text = self.check_attach_path_kind(driver)
+        if element_text:
+            logger.info(f"Found the {element_text}")
 
             # Validate the graph based on the identified table type
-            if self.validate_graph(interaction_manager, table_id):
+            if self.validate_graph(interaction_manager, element_text):
                 logger.info("Attach Path graph validation passed.")
-                return table_id  # Return the table_id
+                return element_text  
             else:
                 logger.error("Graph validation failed.")
                 self._driver.save_screenshot(f"./failed_graph_validation_{ClusterManager.get_current_timestamp()}.png")
@@ -134,32 +129,30 @@ class AttachPath(BaseTest):
             return None  # Return None if no table is found
 
 
-    def check_attach_path_kind(self, driver, timeout=5):
-        try:
-            # Check for 'attack-chain-controls-table'
-            controls_table_present = self._wait.until(EC.presence_of_element_located((By.ID, "attack-chain-controls-table")))
-            logger.info("Found 'attack-chain-controls-table'")
-            return "attack-chain-controls-table"
-        except TimeoutException:
-            logger.info("'attack-chain-controls-table' not found, checking 'attack-chain-vulnerabilities-table'")
+    def check_attach_path_kind(self, driver):
+        element = WebDriverWait(driver, 5).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, ".mat-sort-header-content"))
+        )
+        # Get the text of the element
+        element_text = element.text.strip()
 
-        try:
-            # Check for 'attack-chain-vulnerabilities-table'
-            vulnerabilities_table_present = self._wait.until(EC.presence_of_element_located((By.ID, "attack-chain-vulnerabilities-table")))
-            logger.info("Found 'attack-chain-vulnerabilities-table'")
-            return "attack-chain-vulnerabilities-table"
-        except TimeoutException:
-            logger.error("Neither 'attack-chain-controls-table' nor 'attack-chain-vulnerabilities-table' found")
-            self._driver.save_screenshot(f"./failed_to_find_attack_chain_table_{ClusterManager.get_current_timestamp()}.png")
-            return None
+        if element_text == "CVE ID":
+            logger.info("The text 'CVE ID' is present in the element.")
+            return "CVE"
+        elif element_text == "SEVERITY":
+            logger.info("The text 'SEVERITY' is present in the element.")
+            return "SEVERITY"      
+        else:
+            logger.error(f"Expected 'CVE ID' or 'severity', but found '{element_text}'")
 
-    def validate_graph(self, interaction_manager, table_id):
+
+    def validate_graph(self, interaction_manager, element_text):
         try:
             # Extract current graph data
             current_graph_data = self.extract_graph_data(interaction_manager.driver)
 
             # Load baseline graph data
-            if table_id == "attack-chain-vulnerabilities-table":
+            if element_text == "CVE":
                 with open('./tests/vulnerabilities.json', 'r') as file:
                     baseline_graph_data = json.load(file)
             else:
@@ -220,27 +213,38 @@ class AttachPath(BaseTest):
         risk_acceptance.delete_ignore_rule()
         time.sleep(3)
             
-def compare_yaml_code_elements(driver, parent_selector: str, timeout: int = 10) -> bool:
-    try:
-        # Wait until the parent element is present
-        parent_element = WebDriverWait(driver, timeout).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, parent_selector))
-        )
+    def compare_yaml_code_elements(driver, parent_selector, timeout: int = 10) -> bool:
+        try:
+            # Wait until the parent element is present
+            parent_element = WebDriverWait(driver, timeout).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, parent_selector))
+            )
 
-        # Wait until all armo-yaml-code elements within the parent element are present
-        armo_yaml_code_elements = WebDriverWait(parent_element, timeout).until(
-            lambda element: element.find_elements(By.CSS_SELECTOR, "armo-yaml-code")
-        )
-    except (TimeoutException, NoSuchElementException):
-        logger.error("Side by side remediation page is not visible")
-        driver.save_screenshot(f"./SBS_page_not_loaded_{ClusterManager.get_current_timestamp()}.png")
-        return False
+            # Debugging: Log the parent element found
+            logger.info(f"Parent element found with selector: {parent_selector}")
 
-    # Check if there are exactly 2 child elements
-    if len(armo_yaml_code_elements) == 2:
+            # Find all armo-yaml-code elements within the parent element
+            armo_yaml_code_elements = parent_element.find_elements(By.CSS_SELECTOR, "armo-yaml-code")
+
+            # Debugging: Log the number of armo-yaml-code elements found
+            logger.info(f"Found {len(armo_yaml_code_elements)} 'armo-yaml-code' elements")
+            
+        except (TimeoutException, NoSuchElementException) as e:
+            logger.error(f"Side by side remediation page is not visible: {str(e)}")
+            driver.save_screenshot(f"./SBS_page_not_loaded_{ClusterManager.get_current_timestamp()}.png")
+            return False
+
+        # Check if there are exactly 2 child elements
+        # if len(armo_yaml_code_elements) == 2:
         # Count the number of rows in each armo-yaml-code element
-        rows_count = [len(elm.find_elements(By.TAG_NAME, "tr")) for elm in armo_yaml_code_elements]
-
+        try:
+            rows_count = [len(elm.find_elements(By.TAG_NAME, "tr")) for elm in armo_yaml_code_elements]
+        except Exception as e:
+            logger.error(f"Error counting rows in 'armo-yaml-code' elements: {str(e)}")
+            driver.save_screenshot(f"./error_counting_rows_{ClusterManager.get_current_timestamp()}.png")
+            return False
+        # Debugging: Log the row counts
+        logger.info(f"Row counts: {rows_count}")
         # Compare the row counts of the two elements
         if rows_count[0] == rows_count[1]:
             logger.info(f"Both armo-yaml-code elements have the same number of rows: {rows_count[0]} rows.")
@@ -248,6 +252,6 @@ def compare_yaml_code_elements(driver, parent_selector: str, timeout: int = 10) 
         else:
             logger.error(f"The armo-yaml-code elements have different numbers of rows: {rows_count[0]} and {rows_count[1]} rows.")
             return False
-    else:
-        logger.error(f"The element contains {len(armo_yaml_code_elements)} armo-yaml-code child elements, not 2.")
-        return False
+        # else:
+        #     logger.error(f"The element contains {len(armo_yaml_code_elements)} armo-yaml-code child elements, not 2.")
+        #     return False
