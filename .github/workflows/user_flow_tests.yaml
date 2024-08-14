@@ -18,6 +18,7 @@ on:
         - all
         - compliance
         - vulnerabilities
+        - attach-path
         type: choice
         default: all
         required: true
