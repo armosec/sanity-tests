@@ -141,7 +141,7 @@ jobs:
 
   test_attach_path:
     needs: setup
-    if: needs.setup.outputs.test_type == 'all' || needs.setup.outputs.test_type == 'attach_path'
+    if: needs.setup.outputs.test_type == 'all' || needs.setup.outputs.test_type == 'attach-path'
     runs-on: ubuntu-latest
     env:
       TEST_EMAIL: ${{ secrets.EMAIL_ATTACH_PATH }}
