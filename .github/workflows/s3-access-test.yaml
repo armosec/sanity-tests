@@ -1,0 +1,34 @@
+name: S3 Access Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # Allowing the GitHub Action runner to assume an AWS role via OpenID Connect (OIDC).
+
+jobs:
+  s3-access-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: armosec/shared-workflows
+          submodules: 'true'
+          token: ${{ secrets.ARMOSEC_GITHUB_ACCESS_TOKEN }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.SANITY_TESTS_BUCKET_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Create a dummy file
+        run: echo "This is a dummy test file." > test-file.txt
+
+      - name: Upload dummy file to S3
+        run: aws s3 cp test-file.txt s3://sanity-logs-bucket/test-file.txt
+
+      - name: List contents of S3 bucket
+        run: aws s3 ls s3://system-test-metrics-bucket/
