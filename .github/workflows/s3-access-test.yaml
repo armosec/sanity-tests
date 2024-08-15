@@ -21,14 +21,14 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.SANITY_TESTS_BUCKET_ROLE_ARN }}
+          role-to-assume: ${{ secrets.SYSTEM_TESTS_METRICS_BUCKET_ROLE_ARN }}
           aws-region: eu-west-2
 
       - name: Create a dummy file
         run: echo "This is a dummy test file." > test-file.txt
 
       - name: Upload dummy file to S3
-        run: aws s3 cp test-file.txt s3://sanity-logs-bucket/test-file.txt
+        run: aws s3 cp test-file.txt s3://system-test-metrics-bucket/test-file.txt
 
       - name: List contents of S3 bucket
         run: aws s3 ls s3://system-test-metrics-bucket/
