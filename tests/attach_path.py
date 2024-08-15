@@ -6,22 +6,29 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from .cluster_operator import ClusterManager, IgnoreRule, RiskAcceptancePage
+from .cluster_operator import ClusterManager, IgnoreRule, RiskAcceptancePage , ConnectCluster
 from .interaction_manager import InteractionManager
 
 logger = logging.getLogger(__name__)
 
 class AttachPath(BaseTest):
     def run(self):
-        cluster_manager = ClusterManager(self._driver, self._wait)
-        cluster_manager.create_attack_path()
+        connect_cluster = ConnectCluster(self._driver, self._wait)
+        connect_maneger = ClusterManager(self._driver, self._wait)
+        connect_maneger.create_attack_path()
         login_url = self.get_login_url()
         self.login(login_url)
         try:
             logger.info("Running Attach Path test")
+            connect_cluster.click_get_started()
+            connect_cluster.connect_cluster_helm()
+            connect_cluster.verify_installation()
+            connect_cluster.view_cluster_button()
+            connect_cluster.view_connected_cluster()
             self.navigate_to_attach_path()
             self.risk_acceptance_page()
         finally:
+            self.perform_cleanup()
             logger.info("Attach path test completed")
 
     def navigate_to_attach_path(self):
@@ -44,7 +51,7 @@ class AttachPath(BaseTest):
             # Obtain descriptions
             descriptions = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[data-test-id='description']")))
 
-            if len(descriptions) < 2:
+            if len(descriptions) < 2: # Check if there are at least 2 descriptions 
                 logger.error(f"Expected 2 elements with 'data-test-id=description', found {len(descriptions)}")
                 driver.save_screenshot(f"./failed_to_find_AC_{ClusterManager.get_current_timestamp()}.png")
             else:
@@ -89,19 +96,19 @@ class AttachPath(BaseTest):
                     logger.error(f"Failed to click on 'Fix' button: {str(e)}")
                     self._driver.save_screenshot(f"./failed_to_click_fix_button_{ClusterManager.get_current_timestamp()}.png")
                 
-                # if self.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
-                #     logger.info("SBS yamls - The number of rows is equal.")
-                # else:
-                #     logger.error("SBS yamls - The number of rows is NOT equal.")
+                if self.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
+                    logger.info("SBS yamls - The number of rows is equal.")
+                else:
+                    logger.error("SBS yamls - The number of rows is NOT equal.")
                 time.sleep(2)
                 ClusterManager.press_esc_key(driver)
             else:
                 self._interaction_manager.click("armo-fix-button[data-test-id='fix-button'] button", by=By.CSS_SELECTOR)
                 logger.info("Clicked on 'Fix' button.")
-                # if self.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
-                #     logger.info("SBS yamls - The number of rows is equal .")
-                # else:
-                #     logger.error("SBS yamls - The number of rows is NOT equal.")
+                if self.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
+                    logger.info("SBS yamls - The number of rows is equal .")
+                else:
+                    logger.error("SBS yamls - The number of rows is NOT equal.")
                 time.sleep(2)
                 ClusterManager.press_esc_key(driver)
             
@@ -172,7 +179,7 @@ class AttachPath(BaseTest):
             )
         except TimeoutException:
             logger.error("SVG element not found on the page.")
-            driver.save_screenshot(f"./svg_element_not_found_{ClusterManager.get_current_timestamp()}.png")
+            self._driver.save_screenshot(f"./svg_element_not_found_{ClusterManager.get_current_timestamp()}.png")
             return None
 
         paths = svg_element.find_elements(By.CSS_SELECTOR, "path")
@@ -213,7 +220,7 @@ class AttachPath(BaseTest):
         risk_acceptance.delete_ignore_rule()
         time.sleep(3)
             
-    def compare_yaml_code_elements(driver, parent_selector, timeout: int = 10) -> bool:
+    def compare_yaml_code_elements(self, driver, parent_selector, timeout: int = 10) -> bool:
         try:
             # Wait until the parent element is present
             parent_element = WebDriverWait(driver, timeout).until(
@@ -235,23 +242,23 @@ class AttachPath(BaseTest):
             return False
 
         # Check if there are exactly 2 child elements
-        # if len(armo_yaml_code_elements) == 2:
-        # Count the number of rows in each armo-yaml-code element
-        try:
-            rows_count = [len(elm.find_elements(By.TAG_NAME, "tr")) for elm in armo_yaml_code_elements]
-        except Exception as e:
-            logger.error(f"Error counting rows in 'armo-yaml-code' elements: {str(e)}")
-            driver.save_screenshot(f"./error_counting_rows_{ClusterManager.get_current_timestamp()}.png")
-            return False
-        # Debugging: Log the row counts
-        logger.info(f"Row counts: {rows_count}")
-        # Compare the row counts of the two elements
-        if rows_count[0] == rows_count[1]:
-            logger.info(f"Both armo-yaml-code elements have the same number of rows: {rows_count[0]} rows.")
-            return True
+        if len(armo_yaml_code_elements) == 2:
+            # Count the number of rows in each armo-yaml-code element
+            try:
+                rows_count = [len(elm.find_elements(By.TAG_NAME, "tr")) for elm in armo_yaml_code_elements]
+            except Exception as e:
+                logger.error(f"Error counting rows in 'armo-yaml-code' elements: {str(e)}")
+                driver.save_screenshot(f"./error_counting_rows_{ClusterManager.get_current_timestamp()}.png")
+                return False
+            # Debugging: Log the row counts
+            logger.info(f"Row counts: {rows_count}")
+            # Compare the row counts of the two elements
+            if rows_count[0] == rows_count[1]:
+                logger.info(f"Both armo-yaml-code elements have the same number of rows: {rows_count[0]} rows.")
+                return True
+            else:
+                logger.error(f"The armo-yaml-code elements have different numbers of rows: {rows_count[0]} and {rows_count[1]} rows.")
+                return False
         else:
-            logger.error(f"The armo-yaml-code elements have different numbers of rows: {rows_count[0]} and {rows_count[1]} rows.")
+            logger.error(f"The element contains {len(armo_yaml_code_elements)} armo-yaml-code child elements, not 2.")
             return False
-        # else:
-        #     logger.error(f"The element contains {len(armo_yaml_code_elements)} armo-yaml-code child elements, not 2.")
-        #     return False

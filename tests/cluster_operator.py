@@ -13,6 +13,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 from .interaction_manager import InteractionManager
 
 logger = logging.getLogger(__name__)
+# FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+# logging.basicConfig(format=FORMAT)
+# logger.setLevel(logging.DEBUG)
 
 class ClusterManager:
     def __init__(self, driver, wait):
@@ -148,7 +151,7 @@ class ConnectCluster:
     def view_cluster_button(self):
         try:
             self._interaction_manager.click('armo-connection-wizard-connection-step-footer .armo-button', By.CSS_SELECTOR)
-            self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'armo-connection-wizard-connection-step-footer .armo-button')))
+            self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'armo-connection-wizard-connection-step-footer .armo-button')))
             time.sleep(2)
             self._interaction_manager.click('armo-connection-wizard-connection-step-footer .armo-button', By.CSS_SELECTOR)
         except TimeoutException as e:

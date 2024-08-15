@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 class Compliance(BaseTest):    
     def run(self):
+        cluster_manager = ClusterManager(self._driver, self._wait)
         connect_cluster = ConnectCluster(self._driver, self._wait)
         login_url = self.get_login_url()
         self.login(login_url)
@@ -177,30 +178,30 @@ class Compliance(BaseTest):
         risk_acceptance.delete_ignore_rule()
         time.sleep(3)
         
-    def compare_yaml_code_elements(driver, parent_selector: str) -> bool:
-        try:
-            # Locate the parent element
-            parent_element = driver.find_element(By.CSS_SELECTOR, parent_selector)
+    # def compare_yaml_code_elements(driver, parent_selector: str) -> bool:
+    #     try:
+    #         # Locate the parent element
+    #         parent_element = driver.find_element(By.CSS_SELECTOR, parent_selector)
 
-            # Find all armo-yaml-code elements within the parent element
-            armo_yaml_code_elements = parent_element.find_elements(By.CSS_SELECTOR, "armo-yaml-code")
-        except NoSuchElementException:
-            logger.error("Side by side remediation page is not visible")
-            driver.save_screenshot(f"./SBS_page_not_loaded_{ClusterManager.get_current_timestamp()}.png")
-            return False
+    #         # Find all armo-yaml-code elements within the parent element
+    #         armo_yaml_code_elements = parent_element.find_elements(By.CSS_SELECTOR, "armo-yaml-code")
+    #     except NoSuchElementException:
+    #         logger.error("Side by side remediation page is not visible")
+    #         driver.save_screenshot(f"./SBS_page_not_loaded_{ClusterManager.get_current_timestamp()}.png")
+    #         return False
 
-        # Check if there are exactly 2 child elements
-        if len(armo_yaml_code_elements) == 2:
-            # Count the number of rows in each armo-yaml-code element
-            rows_count = [len(elm.find_elements(By.TAG_NAME, "tr")) for elm in armo_yaml_code_elements]
+    #     # Check if there are exactly 2 child elements
+    #     if len(armo_yaml_code_elements) == 2:
+    #         # Count the number of rows in each armo-yaml-code element
+    #         rows_count = [len(elm.find_elements(By.TAG_NAME, "tr")) for elm in armo_yaml_code_elements]
 
-            # Compare the row counts of the two elements
-            if rows_count[0] == rows_count[1]:
-                logger.info(f"Both armo-yaml-code elements have the same number of rows: {rows_count[0]} rows.")
-                return True
-            else:
-                logger.error(f"The armo-yaml-code elements have different numbers of rows: {rows_count[0]} and {rows_count[1]} rows.")
-                return False
-        else:
-            logger.error(f"The element contains {len(armo_yaml_code_elements)} armo-yaml-code child elements, not 2.")
-            return False
+    #         # Compare the row counts of the two elements
+    #         if rows_count[0] == rows_count[1]:
+    #             logger.info(f"Both armo-yaml-code elements have the same number of rows: {rows_count[0]} rows.")
+    #             return True
+    #         else:
+    #             logger.error(f"The armo-yaml-code elements have different numbers of rows: {rows_count[0]} and {rows_count[1]} rows.")
+    #             return False
+    #     else:
+    #         logger.error(f"The element contains {len(armo_yaml_code_elements)} armo-yaml-code child elements, not 2.")
+    #         return False

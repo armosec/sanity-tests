@@ -55,7 +55,7 @@ def main():
     test_mapping = {
         'vulnerabilities': Vulnerabilities,
         'compliance': Compliance,
-        'attach_path': AttachPath,
+        'attach-path': AttachPath,
         # Add additional mappings here
     }
 
