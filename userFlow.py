@@ -621,7 +621,7 @@ def main():
         create_attack_path(manifest_filename='manifest.yaml')
         
         # Connecting the cluster
-        connect_cluster = ConnectCluster(driver, wait)
+        connect_cluster = ConnectCluster(driver)
         connect_cluster.click_get_started()
         connect_cluster.connect_cluster_helm()
         connect_cluster.verify_installation()
