@@ -44,7 +44,7 @@ class BaseTest(ABC):
         
 
     def perform_cleanup(self):
-        cleanup = Cleanup(self._driver)
+        cleanup = Cleanup(self._driver, self._wait)
         try:
             print("Performing cleanup")
             cleanup.uninstall_kubescape()
