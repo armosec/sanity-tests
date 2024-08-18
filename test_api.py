@@ -4,6 +4,7 @@ import datetime
 import csv
 import os
 import argparse
+from datetime import datetime, timedelta, timezone
 
 class ApiTester:
     def __init__(self, base_url, login_endpoint, email, customer, password, customer_guid):
@@ -18,8 +19,8 @@ class ApiTester:
                 
     def get_current_timestamp(self, format_type="default"):
         if format_type == "special":
-            return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        return datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     
     def save_to_csv(self, log_data, file_name):
         file_exists = os.path.isfile(file_name)
@@ -192,6 +193,33 @@ class ApiTester:
             ]
         }
         return self.test_api("/api/v1/vulnerability_v2/component/list", payload, "sbom_view_table_with_risk_spotlight", self.customer_guid)
+    
+    def attackchains(self):
+        payload = {
+            "pageSize": 50,
+            "pageNum": 1,
+            "orderBy": "timestamp:desc,viewedMainScreen:desc",
+            "innerFilters": [{}]
+        }
+        return self.test_api("/api/v1/attackchains", payload, "attackchains", self.customer_guid)
+    
+    def vulnerability_overtime(self):
+        # Calculate the current date and the date 30 days ago with timezone awareness
+        until_date = datetime.now(timezone.utc)
+        since_date = until_date - timedelta(days=30)
+        
+        # Format the dates to include milliseconds
+        until_str = until_date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+        since_str = since_date.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+        
+        payload = {
+            "since": since_str,
+            "until": until_str,
+            "innerFilters": [{}]
+        }
+        response_time = self.test_api("/api/v1/vulnerability_v2/vulnerability/overtime", payload, "vulnerability_overtime", self.customer_guid)
+        return response_time
+        
 
 
 if __name__ == "__main__":
@@ -226,6 +254,9 @@ if __name__ == "__main__":
         images_view_table_with_risk_spotlight_time = api_tester.images_view_table_with_risk_spotlight()
         sbom_view_table_no_filter_time = api_tester.sbom_view_table_no_filter()
         sbom_view_table_with_risk_spotlight_time = api_tester.sbom_view_table_with_risk_spotlight()
+        attackchains_time = api_tester.attackchains()
+        vulnerability_overtime_time = api_tester.vulnerability_overtime()
+        
 
         log_data = {
             'timestamp': api_tester.get_current_timestamp("special"),
@@ -237,7 +268,9 @@ if __name__ == "__main__":
             'images_view_table_no_filter': f"{float(images_view_table_no_filter_time):.2f}",
             'images_view_table_with_risk_spotlight': f"{float(images_view_table_with_risk_spotlight_time):.2f}",
             'sbom_view_table_no_filter': f"{float(sbom_view_table_no_filter_time):.2f}",
-            'sbom_view_table_with_risk_spotlight': f"{float(sbom_view_table_with_risk_spotlight_time):.2f}"
+            'sbom_view_table_with_risk_spotlight': f"{float(sbom_view_table_with_risk_spotlight_time):.2f}",
+            'attackchains': f"{float(attackchains_time):.2f}",
+            'vulnerability_overtime': f"{float(vulnerability_overtime_time):.2f}"
         }
 
         api_tester.save_to_csv(log_data, log_file)
