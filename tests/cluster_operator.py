@@ -81,6 +81,28 @@ class ClusterManager:
         except Exception as e:
             logger.error(f"Failed to click on {filter_name} filter button:", str(e))
             self._driver.save_screenshot(f"./failed_to_click_on_{filter_name}_filter_button_{self.get_current_timestamp()}.png")
+            
+    def close_filter_by_type(self, filter_type: str):
+        """
+        Closes the filter of the specified type.
+
+        :param filter_type: The type of filter to close, e.g., "Severity", "Risk category".
+        """
+        try:
+            # Find the button containing the filter type text
+            filter_button_xpath = f"//button[contains(@class, 'has-selected-values') and .//span[contains(text(), '{filter_type}')]]"
+            filter_button = self._interaction_manager.wait_until_exists(filter_button_xpath, by=By.XPATH)
+            
+            # Within this button, find the close icon
+            close_icon = filter_button.find_element(By.CSS_SELECTOR, "armo-icon[class*='close'] svg")
+            
+            # Click the close icon to close the filter
+            close_icon.click()
+            logger.info(f'Closed the "{filter_type}" filter.')
+
+        except Exception as e:
+            logger.error(f'Failed to close the "{filter_type}" filter: {str(e)}')
+            self._driver.save_screenshot(f"./failed_to_close_{filter_type}_filter_{self.get_current_timestamp()}.png")
 
     def click_on_vuln_view_button(self, button_name: str):
         try:
@@ -92,6 +114,21 @@ class ClusterManager:
         except Exception as e:
             logger.error(f"Failed to click on '{button_name}' button: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_{button_name.replace(' ', '_')}_button_{self.get_current_timestamp()}.png")
+            
+    def click_button_by_text(self, button_text: str):
+        try:
+            # Find all buttons with the specific class
+            buttons = self._driver.find_elements(By.CSS_SELECTOR, "button[class='armo-button tertiary sm']")
+            
+            for button in buttons:
+                if button.text.strip() == button_text:
+                    button.click()
+                    logger.info(f"Clicked on button with text: '{button_text}'")
+                    return
+            logger.error(f"Button with text: '{button_text}' not found")
+        except Exception as e:
+            logger.error(f"Failed to click on button with text '{button_text}': {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_click_button_{button_text.replace(' ', '_')}_{ClusterManager.get_current_timestamp()}.png")
 
     def run_shell_command(self, command):
         try:

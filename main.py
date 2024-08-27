@@ -9,6 +9,7 @@ from tests.interaction_manager import InteractionManager
 from tests.vulnerabilities import Vulnerabilities
 from tests.compliance import Compliance
 from tests.attach_path import AttachPath
+from tests.security_risk import SecurityRisk
 from tests.base_test import TestConfig
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -56,6 +57,7 @@ def main():
         'vulnerabilities': Vulnerabilities,
         'compliance': Compliance,
         'attach-path': AttachPath,
+        'security-risk': SecurityRisk,
         # Add additional mappings here
     }
 

@@ -125,6 +125,13 @@ class InteractionManager:
         _logger.info(f'Selecting "{visible_text}" in "{xpath}"')
         element = self.wait_until_interactable(xpath, by)
         Select(element).select_by_visible_text(visible_text)
+        
+    def get_text(self, locator: str, by=By.XPATH) -> str:
+        _logger.info(f'Getting text from element located by "{by}" with locator "{locator}"')
+        element = self.wait_until_interactable(locator, by)
+        text = element.text
+        _logger.info(f'Text found: "{text}"')
+        return text
 
     def switch_to_window(self, windows_index: int) -> None:
         _logger.info(f'Switching to window index {windows_index}')
