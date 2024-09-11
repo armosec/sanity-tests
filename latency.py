@@ -51,12 +51,14 @@ class LatencyTest:
         mail_input = self._interaction_manager.wait_until_interactable(
             '//*[@id="frontegg-login-box-container-default"]/div[1]/input'
         )
-        mail_input.send_keys(os.environ['email_latency'])
+        # mail_input.send_keys(os.environ['email_latency'])
+        mail_input.send_keys("test.platform454@gmail.com")
         mail_input.send_keys(Keys.ENTER)
         password_input = self._interaction_manager.wait_until_interactable(
             '/html/body/frontegg-app/div[2]/div[2]/input'
         )
-        password_input.send_keys(os.environ['login_pass_latency'])
+        # password_input.send_keys(os.environ['login_pass_latency'])
+        password_input.send_keys("Platformtest1!")
         password_input.send_keys(Keys.ENTER)
         _logger.info("Logged in to Armo")
 
@@ -69,9 +71,8 @@ class LatencyTest:
         # Click on the failed resource button.
         self._interaction_manager.click('//*[@id="framework-control-table-failed-0"]/div/armo-router-link/a/armo-button/button', click_delay=1)
         # Click on the fix button in the rules list.
-        self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-basic/table/tbody/tr/td[2]/armo-resource-ignore-rules-cell/div/div[2]/armo-fix-button/armo-button')
-
-        
+        self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-with-namespace/table/tbody/tr/td[3]/armo-resource-ignore-rules-cell/div/div[2]/armo-fix-button/armo-button')
+                                         
         # Switch to the last window.
         self._interaction_manager.switch_to_window(-1)
 

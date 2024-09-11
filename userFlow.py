@@ -172,7 +172,7 @@ def navigate_to_vulnerabilities(driver, wait):
     
     cluster_manager = ClusterManager(driver)    
     print("waiting for the vulnerabilities page to be displayed - 1 min")
-    time.sleep(60)
+    # time.sleep(60)
     # Click on the Workloads tab
     cluster_manager.click_menu_item_vuln_view("Workloads")
     
@@ -602,8 +602,10 @@ def perform_cleanup(driver):
         
 def main():
     # Assigning your variables
-    email_user_flow = os.environ.get('email_user_flow')
-    login_pass_user_flow = os.environ.get('login_pass_user_flow')
+    # email_user_flow = os.environ.get('email_user_flow')
+    # login_pass_user_flow = os.environ.get('login_pass_user_flow')
+    email_user_flow = "borisv@armosec.io"
+    login_pass_user_flow = "Bv110584!"
     prod_url = "https://cloud.armosec.io/compliance"
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
 
@@ -618,18 +620,18 @@ def main():
         cluster_manager.login(email_user_flow, login_pass_user_flow, url)
         login_time = time.time() - start_time
 
-        create_attack_path(manifest_filename='manifest.yaml')
+        # create_attack_path(manifest_filename='manifest.yaml')
         
         # Connecting the cluster
-        connect_cluster = ConnectCluster(driver)
-        connect_cluster.click_get_started()
-        connect_cluster.connect_cluster_helm()
-        connect_cluster.verify_installation()
-        connect_cluster.view_cluster_button()
-        connect_cluster.view_connected_cluster()
+        # connect_cluster = ConnectCluster(driver)
+        # connect_cluster.click_get_started()
+        # connect_cluster.connect_cluster_helm()
+        # connect_cluster.verify_installation()
+        # connect_cluster.view_cluster_button()
+        # connect_cluster.view_connected_cluster()
         onboarding_time = time.time() - start_time
 
-        # attack path
+        # attack patč
         # navigate_to_attack_path(wait)
         # time.sleep(5)
 
@@ -678,7 +680,7 @@ def main():
             
     finally:
         # Cleanup cluster from Armo platrom
-        perform_cleanup(driver)
+        # perform_cleanup(driver)
         driver.quit()        
 
 
