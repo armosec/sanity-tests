@@ -620,15 +620,15 @@ def main():
         cluster_manager.login(email_user_flow, login_pass_user_flow, url)
         login_time = time.time() - start_time
 
-        # create_attack_path(manifest_filename='manifest.yaml')
+        create_attack_path(manifest_filename='manifest.yaml')
         
         # Connecting the cluster
-        # connect_cluster = ConnectCluster(driver)
-        # connect_cluster.click_get_started()
-        # connect_cluster.connect_cluster_helm()
-        # connect_cluster.verify_installation()
-        # connect_cluster.view_cluster_button()
-        # connect_cluster.view_connected_cluster()
+        connect_cluster = ConnectCluster(driver)
+        connect_cluster.click_get_started()
+        connect_cluster.connect_cluster_helm()
+        connect_cluster.verify_installation()
+        connect_cluster.view_cluster_button()
+        connect_cluster.view_connected_cluster()
         onboarding_time = time.time() - start_time
 
         # attack patč
@@ -680,7 +680,7 @@ def main():
             
     finally:
         # Cleanup cluster from Armo platrom
-        # perform_cleanup(driver)
+        perform_cleanup(driver)
         driver.quit()        
 
 

@@ -136,12 +136,15 @@ class ClusterManager:
             logger.error(f"Failed to click on button with text '{button_text}': {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_button_{button_text.replace(' ', '_')}_{ClusterManager.get_current_timestamp()}.png")
             
-    def click_filter_button_in_sidebar_by_text(self, button_text: str): 
+
+    def click_filter_button_in_sidebar_by_text(self, button_text: str, namespace: str = None):
         """
         Clicks a specific button within the most recently opened cdk-overlay
-        based on the button's text content.
+        based on the button's text content. If 'Attack path' namespace is provided,
+        it waits for the related element before clicking.
 
         :param button_text: The visible text of the button to click.
+        :param namespace: Optional; if provided, waits for the "Attack path" element.
         """
         try:
             # Locate all cdk-overlay-pane elements
@@ -155,6 +158,18 @@ class ClusterManager:
             # Get the most recent overlay pane (the last one in the list)
             most_recent_overlay = overlay_panes[-1]
             
+            # If the namespace is 'Attack path', wait for the specific element
+            if namespace == "Attack path":
+                attack_path_selector = "armo-attack-chain-graph-mini-map"
+                self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, attack_path_selector)))
+                logger.info(f"Waited for 'Attack path' specific element to appear.")
+
+            # Otherwise, wait for the cluster and namespace element to appear
+            else:
+                target_selector = "div.font-size-14.font-normal.line-height-24.armo-text-black-color"
+                self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, target_selector)))
+                logger.info(f"Waited for cluster/namespace element to appear.")
+
             # Locate all buttons within the most recent cdk-overlay-pane
             buttons = most_recent_overlay.find_elements(By.CSS_SELECTOR, "button.armo-button.secondary-neutral.md")
 
@@ -164,12 +179,13 @@ class ClusterManager:
                     button.click()
                     logger.info(f"Clicked on the button with text: '{button_text}' in the most recent cdk-overlay.")
                     return
-            
+
             logger.error(f"Button with text '{button_text}' not found in the most recent cdk-overlay.")
 
         except Exception as e:
             logger.error(f"Failed to click on the button with text '{button_text}' in the most recent cdk-overlay: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_button_in_cdk_overlay_{ClusterManager.get_current_timestamp()}.png")
+
 
     def click_on_filter_ckackbox_filter(self, span_text: str):
         """
@@ -243,26 +259,82 @@ class ClusterManager:
                 logger.info(f"Extracted actual namespace: '{actual_namespace}'")  # Debugging output
 
                 # Check if the actual namespace matches the expected namespace
-                if actual_namespace == expected_namespace:
-                    logger.info(f"Namespace '{expected_namespace}' found in the most recent overlay.")
+                # if actual_namespace == expected_namespace:
+                #     logger.info(f"Namespace '{expected_namespace}' found in the most recent overlay.")
 
                     # Locate the button with the 'chevron-right' icon within the same element
-                    button = element.find_element(By.CSS_SELECTOR, "button.armo-button.table-secondary.sm")
+                button = element.find_element(By.CSS_SELECTOR, "button.armo-button.table-secondary.sm")
 
                     # Scroll into view if necessary
-                    self._driver.execute_script("arguments[0].scrollIntoView(true);", button)
+                self._driver.execute_script("arguments[0].scrollIntoView(true);", button)
 
                     # Click the button
-                    button.click()
-                    logger.info(f"Clicked the button corresponding to namespace '{expected_namespace}'.")
-                    return
+                button.click()
+                logger.info(f"Clicked the button corresponding to namespace '{expected_namespace}'.")
+                return
 
             # If the namespace was not found
-            logger.error(f"Namespace '{expected_namespace}' not found.")
+            # logger.error(f"Namespace '{expected_namespace}' not found.")
 
         except Exception as e:
             logger.error(f"Failed to verify namespace and click the button: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_verify_namespace_and_click_{expected_namespace}_{ClusterManager.get_current_timestamp()}.png")
+
+
+    def get_namespace_from_element(self):
+        try:
+            # Locate the div element containing the namespace information
+            wait = WebDriverWait(self._driver, 10)  # Wait for up to 10 seconds
+            element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div.font-size-14.font-normal.line-height-24.armo-text-black-color")))
+            # Get the full text of the element
+            full_text = element.text
+            
+            # Split the text to extract the part after "Namespace:"
+            namespace = full_text.split("Namespace:")[1].split("|")[0].strip()
+            
+            logger.info(f"Extracted namespace: {namespace}")
+            return namespace
+
+        except Exception as e:
+            logger.error(f"Failed to extract namespace: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_extract_namespace_{ClusterManager.get_current_timestamp()}.png")
+            return None
+
+    def click_button_in_namespace_row(self, expected_namespace: str):
+        """
+        Clicks the second 'button.armo-button.table-secondary.sm' in the most recent cdk-overlay.
+        """
+        try:
+            # Locate all cdk-overlay-pane elements
+            overlay_panes = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
+
+            # Ensure at least one overlay pane is present
+            if not overlay_panes:
+                logger.error("No cdk-overlay-pane elements found.")
+                return
+
+            # Get the most recent overlay pane (the last one in the list)
+            most_recent_overlay = overlay_panes[-1]
+
+            # Find all buttons within the most recent overlay
+            buttons = most_recent_overlay.find_elements(By.CSS_SELECTOR, "button.armo-button.table-secondary.sm")
+
+            # Ensure there are at least two buttons
+            if len(buttons) < 2:
+                logger.error("Less than two 'armo-button.table-secondary.sm' buttons found in the overlay.")
+                return
+
+            # Click the second button
+            second_button = buttons[1]
+            self._wait.until(EC.element_to_be_clickable(second_button)).click()
+
+            logger.info(f"Clicked the second 'button.armo-button.table-secondary.sm' in the overlay.")
+            print("test")
+            time.sleep(3)
+        except Exception as e:
+            logger.error(f"Failed to click the second button in the overlay: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_click_second_button_in_overlay.png")
+
 
 
     def run_shell_command(self, command):

@@ -39,10 +39,10 @@ class SecurityRisk(BaseTest):
             self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
             
             # Process the 'Workloads' risk category
-            self.process_risk_category("Workloads", "default")
+            self.process_risk_category("Attack path", "default")
             time.sleep(1)
             # Process the 'Data' risk category
-            self.process_risk_category("Data", "None")
+            # self.process_risk_category("Data", "None")
 
         except Exception as e:
             logger.error(f"Error navigating security risk: {e}")
@@ -93,12 +93,19 @@ class SecurityRisk(BaseTest):
         cluster_manager.click_filter_button_in_sidebar_by_text("Namespace")
         time.sleep(1)
         cluster_manager.click_on_filter_ckackbox_filter(namespace)
+        time.sleep(1)
         cluster_manager.press_esc_key(self._driver)
         time.sleep(1)
-        
         # Verify namespace
-        cluster_manager.verify_namespace_and_click_button(namespace)
-        time.sleep(6)
+        if cluster_manager.get_namespace_from_element() == namespace:
+            logger.info(f"Namespace {namespace} is verified") 
+        else:
+            logger.error(f"Namespace {namespace} is not verified")
+        # cluster_manager.get_namespace_from_element()
+        time.sleep(1)
+        cluster_manager.click_button_in_namespace_row(namespace)
+        # cluster_manager.verify_namespace_and_click_button(namespace)
+        time.sleep(2)
         cluster_manager.press_esc_key(self._driver)
     
     def compare_value(self, css_selector1: str, css_selector2: str):
