@@ -602,10 +602,8 @@ def perform_cleanup(driver):
         
 def main():
     # Assigning your variables
-    # email_user_flow = os.environ.get('email_user_flow')
-    # login_pass_user_flow = os.environ.get('login_pass_user_flow')
-    email_user_flow = "borisv@armosec.io"
-    login_pass_user_flow = "Bv110584!"
+    email_user_flow = os.environ.get('email_user_flow')
+    login_pass_user_flow = os.environ.get('login_pass_user_flow')
     prod_url = "https://cloud.armosec.io/compliance"
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
 
