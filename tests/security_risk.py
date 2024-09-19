@@ -22,11 +22,18 @@ class SecurityRisk(BaseTest):
         # Log in to the system
         login_url = self.get_login_url()
         self.login(login_url)
+        cluster_manager.create_attack_path()
 
         try:
             logger.info("Running Security Risk test")
+            connect_cluster.click_get_started()
+            connect_cluster.connect_cluster_helm()
+            connect_cluster.verify_installation()
+            connect_cluster.view_cluster_button()
+            connect_cluster.view_connected_cluster()
             self.navigate_to_security_risk()
         finally:
+            self.perform_cleanup()  
             logger.info("Security risk test completed")
     
     def navigate_to_security_risk(self):
@@ -39,10 +46,13 @@ class SecurityRisk(BaseTest):
             self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
             
             # Process the 'Workloads' risk category
-            self.process_risk_category("Attack path", "default")
+            self.process_risk_category("Workloads", "default") 
             time.sleep(1)
-            # Process the 'Data' risk category
-            # self.process_risk_category("Data", "None")
+            self.process_risk_category("Data", "None")
+            time.sleep(1)
+            self.process_risk_category("Network configuration", "default")
+            time.sleep(1)
+            self.process_risk_category("Attack path", "default")
 
         except Exception as e:
             logger.error(f"Error navigating security risk: {e}")
@@ -72,12 +82,12 @@ class SecurityRisk(BaseTest):
         self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
         
         # Click on the first security risk and apply filters
-        self.process_first_security_risk(cluster_manager, namespace)
+        self.process_first_security_risk(category_name, namespace)
         
         # Close the filter
         cluster_manager.click_close_icon_in_filter_button(category_name)
     
-    def process_first_security_risk(self, cluster_manager, namespace):
+    def process_first_security_risk(self,category_name, namespace):
         """
         Clicks on the first security risk and applies namespace filter.
         """
@@ -90,22 +100,20 @@ class SecurityRisk(BaseTest):
         time.sleep(1)
         
         # Apply Namespace filter
-        cluster_manager.click_filter_button_in_sidebar_by_text("Namespace")
+        cluster_manager.click_filter_button_in_sidebar_by_text(category_name=category_name, button_text="Namespace")
         time.sleep(1)
         cluster_manager.click_on_filter_ckackbox_filter(namespace)
         time.sleep(1)
         cluster_manager.press_esc_key(self._driver)
         time.sleep(1)
         # Verify namespace
-        if cluster_manager.get_namespace_from_element() == namespace:
+        if cluster_manager.get_namespace_from_element(category_name) == namespace:
             logger.info(f"Namespace {namespace} is verified") 
         else:
             logger.error(f"Namespace {namespace} is not verified")
-        # cluster_manager.get_namespace_from_element()
         time.sleep(1)
-        cluster_manager.click_button_in_namespace_row(namespace)
-        # cluster_manager.verify_namespace_and_click_button(namespace)
-        time.sleep(2)
+        cluster_manager.click_button_in_namespace_row(category_name,namespace)
+        time.sleep(1)
         cluster_manager.press_esc_key(self._driver)
     
     def compare_value(self, css_selector1: str, css_selector2: str):

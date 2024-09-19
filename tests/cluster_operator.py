@@ -137,7 +137,7 @@ class ClusterManager:
             self._driver.save_screenshot(f"./failed_to_click_button_{button_text.replace(' ', '_')}_{ClusterManager.get_current_timestamp()}.png")
             
 
-    def click_filter_button_in_sidebar_by_text(self, button_text: str, namespace: str = None):
+    def click_filter_button_in_sidebar_by_text(self,category_name,button_text: str):
         """
         Clicks a specific button within the most recently opened cdk-overlay
         based on the button's text content. If 'Attack path' namespace is provided,
@@ -159,17 +159,23 @@ class ClusterManager:
             most_recent_overlay = overlay_panes[-1]
             
             # If the namespace is 'Attack path', wait for the specific element
-            if namespace == "Attack path":
+            if category_name == "Attack path":
                 attack_path_selector = "armo-attack-chain-graph-mini-map"
                 self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, attack_path_selector)))
                 logger.info(f"Waited for 'Attack path' specific element to appear.")
 
             # Otherwise, wait for the cluster and namespace element to appear
-            else:
+            elif category_name == "Workloads" or category_name == "Data":    
                 target_selector = "div.font-size-14.font-normal.line-height-24.armo-text-black-color"
                 self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, target_selector)))
                 logger.info(f"Waited for cluster/namespace element to appear.")
-
+                
+            else:
+                category_name = "Network configuration"
+                network_selector = "td.mat-cell.cdk-cell.cdk-column-namespace.mat-column-namespace"
+                self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, network_selector)))
+                logger.info(f"Waited for network configuration element to appear.")
+                
             # Locate all buttons within the most recent cdk-overlay-pane
             buttons = most_recent_overlay.find_elements(By.CSS_SELECTOR, "button.armo-button.secondary-neutral.md")
 
@@ -221,121 +227,110 @@ class ClusterManager:
             logger.error(f"Failed to click on the span with text '{span_text}' in the second cdk-overlay: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_span_in_second_cdk_overlay_{ClusterManager.get_current_timestamp()}.png")
             
-
-    def verify_namespace_and_click_button(self, expected_namespace: str):
-        """
-        Verifies if the given namespace is present within the most recent cdk-overlay
-        and clicks on the corresponding button with the 'chevron-right' icon.
-
-        :param expected_namespace: The namespace string to verify.
-        """
-        try:
-            # Locate all cdk-overlay-pane elements
-            overlay_panes = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
-
-            # Ensure at least one overlay pane is present
-            if not overlay_panes:
-                logger.error("No cdk-overlay-pane elements found.")
-                return
-
-            # Get the most recent overlay pane (the last one in the list)
-            most_recent_overlay = overlay_panes[-1]
-
-            # Locate the div elements that contain the text "Namespace:" in the most recent overlay
-            elements = most_recent_overlay.find_elements(By.CSS_SELECTOR, "div.header-line")
-
-            # Loop through the elements to find the one containing the expected namespace
-            for element in elements:
-                # Locate the span containing the namespace text
-                namespace_span = element.find_element(By.XPATH, ".//span[contains(text(), 'Namespace:')]")
-                namespace_text = namespace_span.text.strip()  # Remove any extra whitespace
-
-                logger.info(f"Found namespace span text: '{namespace_text}'")  # Debugging output
-
-                # Extract the actual namespace (removing "Namespace:" prefix and any whitespace)
-                # We assume that 'Namespace: None' or 'Namespace: default' is the format.
-                actual_namespace = namespace_text.split("Namespace:")[-1].strip()  # Extract after 'Namespace:'
-
-                logger.info(f"Extracted actual namespace: '{actual_namespace}'")  # Debugging output
-
-                # Check if the actual namespace matches the expected namespace
-                # if actual_namespace == expected_namespace:
-                #     logger.info(f"Namespace '{expected_namespace}' found in the most recent overlay.")
-
-                    # Locate the button with the 'chevron-right' icon within the same element
-                button = element.find_element(By.CSS_SELECTOR, "button.armo-button.table-secondary.sm")
-
-                    # Scroll into view if necessary
-                self._driver.execute_script("arguments[0].scrollIntoView(true);", button)
-
-                    # Click the button
-                button.click()
-                logger.info(f"Clicked the button corresponding to namespace '{expected_namespace}'.")
-                return
-
-            # If the namespace was not found
-            # logger.error(f"Namespace '{expected_namespace}' not found.")
-
-        except Exception as e:
-            logger.error(f"Failed to verify namespace and click the button: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_verify_namespace_and_click_{expected_namespace}_{ClusterManager.get_current_timestamp()}.png")
-
-
-    def get_namespace_from_element(self):
-        try:
-            # Locate the div element containing the namespace information
-            wait = WebDriverWait(self._driver, 10)  # Wait for up to 10 seconds
-            element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div.font-size-14.font-normal.line-height-24.armo-text-black-color")))
-            # Get the full text of the element
-            full_text = element.text
             
-            # Split the text to extract the part after "Namespace:"
-            namespace = full_text.split("Namespace:")[1].split("|")[0].strip()
+    def get_namespace_from_element(self, category_name: str):
+        print("Category name: ", category_name)
+        try:
+            if category_name == "Workloads" or category_name == "Data":
+                wait = WebDriverWait(self._driver, 30)  # Wait for up to 30 seconds
+                element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div.font-size-14.font-normal.line-height-24.armo-text-black-color")))
+                # Get the full text of the element
+                full_text = element.text
             
-            logger.info(f"Extracted namespace: {namespace}")
-            return namespace
+                # Split the text to extract the part after "Namespace:"
+                namespace = full_text.split("Namespace:")[1].split("|")[0].strip()
+            
+                logger.info(f"Extracted namespace: {namespace}")
+                return namespace
+            
+            elif category_name == "Network configuration":
+                    wait = WebDriverWait(self._driver, 30)  # Wait for up to 30 seconds
+                    namespace_element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "td.mat-cell.cdk-cell.cdk-column-namespace.mat-column-namespace")))
+                    namespace = namespace_element.text.strip()
+                    logger.info(f"Extracted namespace: {namespace}")
+                    return namespace
+            else:
+                category_name = "Attack path"
+                print("Category name: ", category_name)
+                # attack_path_selector = "armo-attack-chain-graph-mini-map"
+                # self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, attack_path_selector)))
+                # namespace_div = self._driver.find_element(By.CSS_SELECTOR, "div.armo-text-black-color.font-size-14.line-height-24.mb-2.text-wrap-balance")
+                # second_namespace_div = namespace_div[1]
+                # full_text = second_namespace_div.text
+                # print("Full text: ", full_text)
+                # namespace = full_text.split("Namespace:")[1].split("|")[0].strip()
+                # logger.info(f"Extracted namespace: {namespace}")
 
         except Exception as e:
             logger.error(f"Failed to extract namespace: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_extract_namespace_{ClusterManager.get_current_timestamp()}.png")
             return None
 
-    def click_button_in_namespace_row(self, expected_namespace: str):
-        """
-        Clicks the second 'button.armo-button.table-secondary.sm' in the most recent cdk-overlay.
-        """
+    def click_button_in_namespace_row(self,category_name ,expected_namespace: str):
         try:
-            # Locate all cdk-overlay-pane elements
-            overlay_panes = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
+            if category_name == "Workloads" or category_name == "Data":
+                # Locate all cdk-overlay-pane elements
+                overlay_panes = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
 
-            # Ensure at least one overlay pane is present
-            if not overlay_panes:
-                logger.error("No cdk-overlay-pane elements found.")
-                return
+                # Ensure at least one overlay pane is present
+                if not overlay_panes:
+                    logger.error("No cdk-overlay-pane elements found.")
+                    return
 
-            # Get the most recent overlay pane (the last one in the list)
-            most_recent_overlay = overlay_panes[-1]
+                # Get the most recent overlay pane (the last one in the list)
+                most_recent_overlay = overlay_panes[-1]
 
-            # Find all buttons within the most recent overlay
-            buttons = most_recent_overlay.find_elements(By.CSS_SELECTOR, "button.armo-button.table-secondary.sm")
+                # Find all buttons within the most recent overlay
+                buttons = most_recent_overlay.find_elements(By.CSS_SELECTOR, "button.armo-button.table-secondary.sm")
 
-            # Ensure there are at least two buttons
-            if len(buttons) < 2:
-                logger.error("Less than two 'armo-button.table-secondary.sm' buttons found in the overlay.")
-                return
+                # Ensure there are at least two buttons
+                if len(buttons) < 2:
+                    logger.error("Less than two 'armo-button.table-secondary.sm' buttons found in the overlay.")
+                    return
 
-            # Click the second button
-            second_button = buttons[1]
-            self._wait.until(EC.element_to_be_clickable(second_button)).click()
+                # Click the second button
+                second_button = buttons[1]
+                self._wait.until(EC.element_to_be_clickable(second_button)).click()
 
-            logger.info(f"Clicked the second 'button.armo-button.table-secondary.sm' in the overlay.")
-            print("test")
-            time.sleep(3)
+                logger.info(f"Clicked the second 'button.armo-button.table-secondary.sm' in the overlay.")
+                
+            elif category_name == "Network configuration":
+                try:
+                    network_selector = "td.mat-cell.cdk-cell.cdk-column-namespace.mat-column-namespace"
+                    namespace_element = self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, network_selector)))
+                    namespace_element.click()
+                    logger.info("Clicked on the namespace element in the Network configuration category.")
+                except Exception as e:
+                    logger.error(f"Failed to click on the namespace element in the Network configuration category: {str(e)}")
+                    self._driver.save_screenshot(f"./failed_to_click_on_namespace_element_{ClusterManager.get_current_timestamp()}.png")
+                    
+                try:
+                    # Wait for the element with text 'kind: NetworkPolicy' to be visible
+                    wait = WebDriverWait(self._driver, 60)
+                    pre_elements = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "td.value.added > pre")))
+                    first_pre_element = pre_elements[0] 
+                    if first_pre_element:
+                        logger.info("Element with 'kind: NetworkPolicy' is visible.")
+                    else:
+                        logger.error("Element with 'kind: NetworkPolicy' was not found.")
+
+                except TimeoutException as e:
+                    logger.error("Timed out waiting for the element with 'kind: NetworkPolicy' to be visible.")
+                    self._driver.save_screenshot(f"./failed_to_find_networkpolicy_element_{ClusterManager.get_current_timestamp()}.png")
+                    
+            else:
+                try:
+                    category_name = "Attack path"
+                    fix_button = self._wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "[data-test-id='fix-button']")))
+                    fix_button.click()
+                    logger.info(f"Clicked the 'Fix' button in the '{category_name}' category.")
+                except Exception as e:
+                    logger.error(f"Failed to click the 'Fix' button in the '{category_name}' category: {str(e)}")
+                    self._driver.save_screenshot(f"./failed_to_click_fix_button_{ClusterManager.get_current_timestamp()}.png")                
+                
         except Exception as e:
             logger.error(f"Failed to click the second button in the overlay: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_second_button_in_overlay.png")
-
-
 
     def run_shell_command(self, command):
         try:
