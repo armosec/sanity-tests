@@ -472,8 +472,18 @@ class IgnoreRule:
         except:
             logger.error("failed to find the Accepting the Risk button")
             self._driver.save_screenshot(f"./Accepting_Risk_button_error_{ClusterManager.get_current_timestamp()}.png")
+            
+    def click_ignore_rule_button_sidebar(self):
+        try:
+            self._interaction_manager.click('armo-ignore-rules-button button.armo-button.table-secondary.sm', By.CSS_SELECTOR)
+            logger.info("Click on ignore rule button on side sidebar.")
+        except:
+            logger.error("failed to click on ignore rule button on sidebar")
+            self._driver.save_screenshot(f"./ignore_rule_button_error_sidebar_{ClusterManager.get_current_timestamp()}.png")
+
 
     def get_ignore_rule_field(self, index):
+        time.sleep(3)
         css_selector = ".mat-tooltip-trigger.field-value.truncate.ng-star-inserted"
         all_fields = self._driver.find_elements(By.CSS_SELECTOR, css_selector)
         field_text = all_fields[index].text.strip()
@@ -487,6 +497,29 @@ class IgnoreRule:
         except:
             logger.error("failed to click on save button")
             self._driver.save_screenshot(f"./failed_to_click_on_save_button_{ClusterManager.get_current_timestamp()}.png")
+            
+    def click_save_button_sidebar(self):
+        try:
+            # Wait for at least two buttons to be present
+            WebDriverWait(self._driver, 10).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "button.armo-button.primary.xl"))
+            )
+            
+            # Find all buttons with the given CSS selector
+            buttons = self._driver.find_elements(By.CSS_SELECTOR, "button.armo-button.primary.xl")
+            
+            # Ensure there are at least two buttons
+            if len(buttons) >= 2:
+                # Click the second button (index 1)
+                buttons[1].click()
+                logger.info("Successfully clicked the second 'Save' button.")
+            else:
+                logger.error("There are less than two 'Save' buttons.")
+                
+        except Exception as e:
+            logger.error(f"Failed to click on the second 'Save' button: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_click_second_save_button_{ClusterManager.get_current_timestamp()}.png")
+
 
     def igor_rule_icon_check(self):
         expected_svgsource = "/assets/icons/v2/general/edit-ignore.svg#edit-ignore"
@@ -525,9 +558,42 @@ class RiskAcceptancePage:
         except Exception as e:
             logger.error(f"Error clicking on Risk Acceptance page: {e}")
             self._driver.save_screenshot(f"./failed_to_click_on_risk_acceptance_page_{ClusterManager.get_current_timestamp()}.png")
+            
+    def navigate_to_risk_acceptance_form_sidebar(self):
+        try:
+            # Wait for the overlay to appear
+            overlay_panes = WebDriverWait(self._driver, 10).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.cdk-overlay-pane"))
+            )
+            
+            # Ensure we have found at least one overlay
+            if not overlay_panes:
+                logger.error("No overlay pane found.")
+                return
+            
+            # Get the most recent overlay pane (the last one in the list)
+            most_recent_overlay = overlay_panes[-1]
+
+            # Define the CSS selector to find the "Risk Acceptance" button inside the most recent overlay
+            button_XPATH = "//a[@href='/risk-acceptance']/armo-button/button"
+
+            # Find the "Risk Acceptance" button inside the overlay using CSS_SELECTOR
+            risk_acceptance_button = WebDriverWait(most_recent_overlay, 10).until(
+                EC.element_to_be_clickable((By.XPATH, button_XPATH))
+            )
+            
+            # Click the button
+            risk_acceptance_button.click()
+            logger.info("Clicked on the 'Risk Acceptance' button inside.")
+        
+        except Exception as e:
+            logger.error(f"Failed to click on the 'Risk Acceptance' button in the sidebar: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_click_risk_acceptance_button_sidebar_{ClusterManager.get_current_timestamp()}.png")
+
 
     def click_severity_element(self, css_selector):
         try:
+            element = WebDriverWait(self._driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, css_selector)))
             self._interaction_manager.click(css_selector, By.CSS_SELECTOR)
             logger.info("Clicked on the severity element.")
         except Exception:

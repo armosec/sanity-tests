@@ -220,7 +220,8 @@ class AttachPath(BaseTest):
         risk_acceptance.delete_ignore_rule()
         time.sleep(3)
             
-    def compare_yaml_code_elements(self, driver, parent_selector, timeout: int = 10) -> bool:
+    @staticmethod
+    def compare_yaml_code_elements(driver, parent_selector, timeout: int = 10) -> bool:
         try:
             # Wait until the parent element is present
             parent_element = WebDriverWait(driver, timeout).until(
