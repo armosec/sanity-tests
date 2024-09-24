@@ -7,5 +7,6 @@ def initialize_driver():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     driver = webdriver.Chrome(options=chrome_options)
-    driver.set_window_size(1280, 800)
+    # driver.set_window_size(1280, 800)
+    driver.maximize_window()
     return driver
