@@ -33,7 +33,7 @@ class SecurityRisk(BaseTest):
             connect_cluster.view_connected_cluster()
             self.navigate_to_security_risk()
         finally:
-            # self.perform_cleanup()  
+            self.perform_cleanup()
             logger.info("Security risk test completed")
     
     def navigate_to_security_risk(self):
@@ -52,7 +52,7 @@ class SecurityRisk(BaseTest):
             time.sleep(1)
             self.process_risk_category("Network configuration", "default")
             time.sleep(1)
-            # self.process_risk_category("Attack path", "default")
+            self.process_risk_category("Attack path", "default")
 
         except Exception as e:
             logger.error(f"Error navigating in security risk page: {e}")
@@ -119,11 +119,20 @@ class SecurityRisk(BaseTest):
                 logger.info("SBS yamls - The number of rows is equal .")
             else:
                 logger.error("SBS yamls - The number of rows is NOT equal.")
+        
+        if category_name == "Attack path":
+            try:
+                element = WebDriverWait(self._driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "td.mat-cell.cdk-cell.cdk-column-name.mat-column-name")))
+                logger.info("Attack path page loaded")
+            except TimeoutException:
+                logger.error("Attack path page not loaded")
+                self._driver.save_screenshot(f"./failed_to_load_attack_path_page_{ClusterManager.get_current_timestamp()}.png")
                 
-        # Create Risk Accep
-        self.create_risk_accept(self._driver)
+        # Create Risk Acceptance        
+        self.create_risk_accept(self._driver, category_name)
         time.sleep(2)
-        RiskAcceptancePage.navigate_to_risk_acceptance_form_sidebar(self)
+        RiskAcceptancePage.navigate_to_risk_acceptance_form_sidebar(self, category_name)
     
         try:
             element = WebDriverWait(self._driver, 10).until(
@@ -170,17 +179,23 @@ class SecurityRisk(BaseTest):
             logger.error(f"The values are different: {text1} vs {text2}")
         
         return text1, text2
-            
-    def create_risk_accept(self, driver):
+    
+    def create_risk_accept(self, driver, category_name):
+
         risk_accept = IgnoreRule(driver)
-        risk_accept.click_ignore_rule_button_sidebar()
-        logger.info("Clicked on the 'Accept Risk' button")
+        if category_name == "Attack path":
+            risk_accept.click_ignore_on_from_attach_path()
+        else:
+            risk_accept.click_ignore_rule_button_sidebar()
+
         time.sleep(1)
-        container_name=risk_accept.get_ignore_rule_field(2)
+        container_name = risk_accept.get_ignore_rule_field(2)
         logger.info(f"Container name: {container_name}")
         time.sleep(1.5)
-        risk_accept.click_save_button_sidebar()
-        # return container_name
+        if category_name == "Attack path":
+            risk_accept.save_ignore_rule()
+        else:
+            risk_accept.click_save_button_sidebar()
     
     def risk_acceptance_page(self):
         risk_acceptance = RiskAcceptancePage(self._driver)

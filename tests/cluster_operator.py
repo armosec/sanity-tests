@@ -251,15 +251,20 @@ class ClusterManager:
                     return namespace
             else:
                 category_name = "Attack path"
-                print("Category name: ", category_name)
-                # attack_path_selector = "armo-attack-chain-graph-mini-map"
-                # self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, attack_path_selector)))
-                # namespace_div = self._driver.find_element(By.CSS_SELECTOR, "div.armo-text-black-color.font-size-14.line-height-24.mb-2.text-wrap-balance")
-                # second_namespace_div = namespace_div[1]
-                # full_text = second_namespace_div.text
-                # print("Full text: ", full_text)
-                # namespace = full_text.split("Namespace:")[1].split("|")[0].strip()
-                # logger.info(f"Extracted namespace: {namespace}")
+                attack_path_selector = "armo-attack-chain-graph-mini-map"
+                self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, attack_path_selector)))
+                namespace_divs = self._driver.find_elements(By.CSS_SELECTOR, "div.armo-text-black-color.font-size-14.line-height-24.mb-2.text-wrap-balance")
+                
+                for div in namespace_divs:
+                    full_text = div.text
+                    if "Namespace:" in full_text:
+                        namespace = full_text.split("Namespace:")[1].strip()
+                        break
+                else:
+                    raise ValueError("Namespace not found in any div")
+                
+            logger.info(f"Extracted namespace: {namespace}")
+            return namespace
 
         except Exception as e:
             logger.error(f"Failed to extract namespace: {str(e)}")
@@ -480,6 +485,18 @@ class IgnoreRule:
         except:
             logger.error("failed to click on ignore rule button on sidebar")
             self._driver.save_screenshot(f"./ignore_rule_button_error_sidebar_{ClusterManager.get_current_timestamp()}.png")
+            
+            
+    def click_ignore_on_from_attach_path(self):
+        try:
+            button = WebDriverWait(self._driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "button.armo-button.secondary-neutral.xl")))
+            button.click()
+            logger.info("Clicked the 'Accept the risk' button from attach path.")
+    
+        except TimeoutException as e:
+            logger.error(f"Failed to click on 'Accepting the Risk' button from attach path: {str(e)}")
+            self._driver.save_screenshot(f"./Accepting_Risk_button_error_rfrom _attach_path_{ClusterManager.get_current_timestamp()}.png")
 
 
     def get_ignore_rule_field(self, index):
@@ -559,31 +576,34 @@ class RiskAcceptancePage:
             logger.error(f"Error clicking on Risk Acceptance page: {e}")
             self._driver.save_screenshot(f"./failed_to_click_on_risk_acceptance_page_{ClusterManager.get_current_timestamp()}.png")
             
-    def navigate_to_risk_acceptance_form_sidebar(self):
+    def navigate_to_risk_acceptance_form_sidebar(self, category_name):
         try:
-            # Wait for the overlay to appear
-            overlay_panes = WebDriverWait(self._driver, 10).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.cdk-overlay-pane"))
-            )
-            
-            # Ensure we have found at least one overlay
-            if not overlay_panes:
-                logger.error("No overlay pane found.")
-                return
-            
-            # Get the most recent overlay pane (the last one in the list)
-            most_recent_overlay = overlay_panes[-1]
+            most_recent_overlay = None  # Initialize the variable to avoid referencing before assignment
+            if category_name != "Attack path":
+                print("tetststststst")
+                # Wait for the overlay to appear
+                overlay_panes = WebDriverWait(self._driver, 10).until(
+                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.cdk-overlay-pane")))
+                
+                # Ensure we have found at least one overlay
+                if not overlay_panes:
+                    logger.error("No overlay pane found.")
+                    return
+                
+                # Get the most recent overlay pane (the last one in the list)
+                most_recent_overlay = overlay_panes[-1]
+            else:
+                most_recent_overlay = self._driver
 
             # Define the CSS selector to find the "Risk Acceptance" button inside the most recent overlay
             button_XPATH = "//a[@href='/risk-acceptance']/armo-button/button"
 
             # Find the "Risk Acceptance" button inside the overlay using CSS_SELECTOR
             risk_acceptance_button = WebDriverWait(most_recent_overlay, 10).until(
-                EC.element_to_be_clickable((By.XPATH, button_XPATH))
-            )
+                EC.presence_of_element_located((By.XPATH, button_XPATH)))
             
             # Click the button
-            risk_acceptance_button.click()
+            risk_acceptance_button.click()   
             logger.info("Clicked on the 'Risk Acceptance' button inside.")
         
         except Exception as e:
