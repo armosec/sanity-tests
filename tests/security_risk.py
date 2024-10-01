@@ -102,7 +102,7 @@ class SecurityRisk(BaseTest):
         # Apply Namespace filter
         cluster_manager.click_filter_button_in_sidebar_by_text(category_name=category_name, button_text="Namespace")
         time.sleep(1)
-        cluster_manager.click_on_filter_ckackbox_filter(namespace)
+        cluster_manager.click_on_filter_ckackbox_sidebar(namespace)
         time.sleep(1)
         cluster_manager.press_esc_key(self._driver)
         time.sleep(1)

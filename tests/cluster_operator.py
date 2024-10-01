@@ -74,13 +74,22 @@ class ClusterManager:
         except Exception as e:
             logger.error("Failed to press the ESC key.", str(e))
 
-    def click_filter_button(self, xpath, filter_name):
+    def click_filter_button(self, filter_name):
         try:
-            self._interaction_manager.click(xpath, By.XPATH)
-            logger.info(f"{filter_name} filter clicked")
+            # Define the XPath to locate the button based on the filter name
+            filter_button_xpath = f"//span[text()='{filter_name}']/ancestor::button"
+            
+            # Wait for the button to be clickable
+            filter_button = WebDriverWait(self._driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, filter_button_xpath)))
+            
+            # Click the button
+            filter_button.click()
+            logger.info(f"Successfully clicked on the '{filter_name}' filter.")
+            
         except Exception as e:
-            logger.error(f"Failed to click on {filter_name} filter button:", str(e))
-            self._driver.save_screenshot(f"./failed_to_click_on_{filter_name}_filter_button_{self.get_current_timestamp()}.png")
+            logger.error(f"Failed to click on the '{filter_name}' filter: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_click_{filter_name}_filter_{ClusterManager.get_current_timestamp()}.png")
             
     def click_close_icon_in_filter_button(self, filter_type: str):
         """
@@ -193,7 +202,28 @@ class ClusterManager:
             self._driver.save_screenshot(f"./failed_to_click_button_in_cdk_overlay_{ClusterManager.get_current_timestamp()}.png")
 
 
-    def click_on_filter_ckackbox_filter(self, span_text: str):
+    def click_on_filter_ckackbox(self, name: str):
+        try:
+            interaction_manager = InteractionManager(self._driver)
+            
+            # Define the XPath to locate the checkbox label dynamically based on the label name
+            checkbox_label_xpath = f"//span[contains(@class, 'mat-checkbox-label') and .//span[contains(text(), '{name}')]]"
+            
+            # Wait for the checkbox label element to exist
+            checkbox_label = interaction_manager.wait_until_exists(checkbox_label_xpath, By.XPATH)
+            
+            # Small delay to ensure element is ready for interaction
+            time.sleep(0.5)
+            
+            # Click on the checkbox label
+            checkbox_label.click()
+            logger.info(f"Checkbox selected: {name}")
+            
+        except Exception as e:
+            logger.error(f"Failed to select the checkbox for label '{name}': {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_select_checkbox_{name}_{ClusterManager.get_current_timestamp()}.png")
+
+    def click_on_filter_ckackbox_sidebar(self, span_text: str):
         """
         Clicks a specific <span> element within the second cdk-overlay based on the span's text content.
 

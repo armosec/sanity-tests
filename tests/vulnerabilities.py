@@ -31,6 +31,7 @@ class Vulnerabilities(BaseTest):
     def navigate_to_vulnerabilities(self):
         driver = self._driver
         interaction_manager = self._interaction_manager
+        cluster_manager = ClusterManager(self._driver, self._wait)
         
         try:
             interaction_manager.click('image-scanning-left-menu-item', By.ID)
@@ -39,22 +40,18 @@ class Vulnerabilities(BaseTest):
             logger.error("Failed to click on vulnerabilities")
             driver.save_screenshot(f"./failed_to_click_on_vulnerabilities_{ClusterManager.get_current_timestamp()}.png")
         
-        cluster_manager = ClusterManager(driver, self._wait)
         try:
             cluster_manager.click_on_vuln_view_button("Workloads")
         except Exception as e:
             logger.error(f"Failed to click on vuln view button or menu item: {e}")
             driver.save_screenshot(f"./failed_to_click_vuln_view_or_menu_item_{ClusterManager.get_current_timestamp()}.png")
-
-        try:
-            name_space = interaction_manager.wait_until_exists('/html/body/armo-root/div/div/div/armo-workloads-page/div[2]/armo-table-filters/armo-created-filters-list/div/armo-multi-select-filter[2]/armo-common-trigger-button/armo-button/button', By.XPATH)
-            name_space.click()
-            logger.info("Namespace filter clicked")
-        except:
-            logger.error("Failed to click on namespace filter")
-            driver.save_screenshot(f"./failed_to_click_on_namespace_filter_{ClusterManager.get_current_timestamp()}.png")
         
+        time.sleep(1)
+        cluster_manager.click_filter_button("Workload")
+            
+        # click on the select all button
         try:
+            time.sleep(1)
             select_all_button = interaction_manager.wait_until_exists("//span[contains(@class, 'color-blue') and contains(text(), 'Select all')]", By.XPATH)
             driver.execute_script("arguments[0].click();", select_all_button)
             logger.info("All namespaces selected")
@@ -62,8 +59,7 @@ class Vulnerabilities(BaseTest):
             logger.error("Failed to select all namespaces")
             driver.save_screenshot(f"./failed_to_select_all_namespaces_{ClusterManager.get_current_timestamp()}.png")
 
-        time.sleep(2)
-        
+        time.sleep(2)        
         try:
             checkboxes_container_xpath = '//ul[@class="m-0 px-0 pt-1 font-size-14"]'
             checkboxes_container = interaction_manager.wait_until_exists(checkboxes_container_xpath, By.XPATH)
@@ -86,7 +82,8 @@ class Vulnerabilities(BaseTest):
         except:
             logger.error("Failed to verify selected checkboxes")
             driver.save_screenshot(f"./failed_to_verify_selected_checkboxes_{ClusterManager.get_current_timestamp()}.png")
-
+            
+        # clicl on the clear button
         try:
             clear_button = interaction_manager.wait_until_exists("//span[contains(@class, 'color-blue') and contains(@class, 'font-size-12') and contains(text(), 'Clear')]", By.XPATH)
             clear_button.click()
@@ -107,31 +104,16 @@ class Vulnerabilities(BaseTest):
             driver.save_screenshot(f"./failed_to_verify_unselected_checkboxes_{ClusterManager.get_current_timestamp()}.png")
 
         ClusterManager.press_esc_key(driver)
-
-        try:
-            name_space = interaction_manager.wait_until_exists('/html/body/armo-root/div/div/div/armo-workloads-page/div[2]/armo-table-filters/armo-created-filters-list/div/armo-multi-select-filter[2]/armo-common-trigger-button/armo-button/button', By.XPATH)
-            name_space.click()
-            logger.info("Namespace filter clicked")
-        except:
-            logger.error("Failed to click on namespace filter")
-            driver.save_screenshot(f"./failed_to_click_on_namespace_filter_{ClusterManager.get_current_timestamp()}.png")
-
-        try:
-            checkbox_label_xpath = "//span[contains(@class, 'mat-checkbox-label') and .//span[contains(text(), 'default')]]"
-            checkbox_label = interaction_manager.wait_until_exists(checkbox_label_xpath, By.XPATH)
-            time.sleep(0.5)
-            checkbox_label.click()
-            logger.info("Namespace selected: default")
-        except:
-            logger.error("Failed to select the namespace")
-            driver.save_screenshot(f"./failed_to_select_the_namespace_{ClusterManager.get_current_timestamp()}.png")
-
-        ClusterManager.press_esc_key(driver)
+        
+        cluster_manager.click_filter_button("Namespace")
         time.sleep(1)
-
+        cluster_manager.click_on_filter_ckackbox("default")
+        time.sleep(1)
+        cluster_manager.press_esc_key(driver)
+    
         try:
             severity_filter_elements = driver.find_elements(By.XPATH, "//div[@class='severity-background']")
-            severity_filter_elements[2].click()
+            severity_filter_elements[1].click()
             logger.info("Clicked on the medium severity filter")
         except Exception as e:
             logger.error(f"Failed to click on the medium severity filter: {str(e)}")
