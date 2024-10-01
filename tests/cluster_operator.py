@@ -402,7 +402,7 @@ class ConnectCluster:
             logger.error("View cluster button was not found or clickable.")
             self._driver.save_screenshot(f"./view_cluster_button_error_{ClusterManager.get_current_timestamp()}.png")
 
-    def view_connected_cluster(self, custom_wait_time=10, max_attempts=2):
+    def view_connected_cluster(self, custom_wait_time=15, max_attempts=2):
         try:
             # time.sleep(2)
             wait = WebDriverWait(self._driver, timeout=custom_wait_time, poll_frequency=0.001)
@@ -411,10 +411,11 @@ class ConnectCluster:
         except TimeoutException as e:
             if max_attempts > 0:
                 logger.error(f"Failed to find view cluster connected. Refreshing page (Attempts left: {max_attempts}).")
-                self._driver.save_screenshot(f"./view_connected_cluster_error_{ClusterManager.get_current_timestamp()}_attempt_{max_attempts}.png")
+                # self._driver.save_screenshot(f"./view_connected_cluster_error_{ClusterManager.get_current_timestamp()}_attempt_{max_attempts}.png")
                 self._driver.refresh()
                 self.view_connected_cluster(custom_wait_time, max_attempts - 1)
             else:
+                self._driver.save_screenshot(f"./view_connected_cluster_error_{ClusterManager.get_current_timestamp()}.png")
                 raise Exception("Element not found after maximum retry attempts.")
 
 class Cleanup:
@@ -580,7 +581,6 @@ class RiskAcceptancePage:
         try:
             most_recent_overlay = None  # Initialize the variable to avoid referencing before assignment
             if category_name != "Attack path":
-                print("tetststststst")
                 # Wait for the overlay to appear
                 overlay_panes = WebDriverWait(self._driver, 10).until(
                     EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.cdk-overlay-pane")))
