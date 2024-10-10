@@ -130,6 +130,74 @@ class ClusterManager:
             logger.error(f"Failed to click on '{button_name}' button: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_{button_name.replace(' ', '_')}_button_{self.get_current_timestamp()}.png")
             
+            
+    def click_on_tab_in_vulne_page(self, partial_href):
+        try:
+            # Use XPath to locate the anchor tag with the given partial href
+            tab = WebDriverWait(self._driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, f"//a[contains(@href, '{partial_href}')]"))
+            )
+            tab.click()
+            logger.info(f"Clicked on the tab with href containing '{partial_href}'.")
+        except Exception as e:
+            logger.error(f"Failed to click on the tab with href containing '{partial_href}': {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_click_tab_{partial_href}_{ClusterManager.get_current_timestamp()}.png")
+            
+            
+    def click_tab_on_sidebar(self, tab_name):
+        try:
+            # Define the XPath for the third tab with the specific name
+            tab_xpath = f"(//div[contains(@class, 'mat-tab-label') and .//div[text()='{tab_name}']])[3]"
+
+            # Wait for the tab element to be visible and present
+            tab_element = WebDriverWait(self._driver, 15).until(
+                EC.visibility_of_element_located((By.XPATH, tab_xpath))
+            )
+            
+            # Scroll the tab element into view
+            self._driver.execute_script("arguments[0].scrollIntoView(true);", tab_element)
+
+            # Ensure the tab is clickable
+            WebDriverWait(self._driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, tab_xpath))
+            )
+
+            # Click the tab
+            tab_element.click()
+            print(f"Successfully clicked on the third tab with name: {tab_name}")
+
+        except TimeoutException:
+            print(f"Timeout: The third tab with name '{tab_name}' could not be found.")
+            self._driver.save_screenshot(f"./failed_to_click_third_tab_{tab_name}_timeout.png")
+        except Exception as e:
+            print(f"Failed to click the third tab with name '{tab_name}'. Error: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_click_third_tab_{tab_name}_error.png")
+
+
+    def click_overlay_button(self):
+        try:
+            # XPath to find all buttons inside the overlay
+            buttons_xpath = "//div[contains(@class, 'cdk-overlay-pane')]//button[contains(@class, 'armo-button') and contains(@class, 'table-secondary') and contains(@class, 'sm')]"
+            
+            # Wait for the presence of multiple buttons in the overlay
+            buttons = WebDriverWait(self._driver, 10).until(
+                EC.presence_of_all_elements_located((By.XPATH, buttons_xpath))
+            )
+
+            # Check if at least two buttons are found
+            if len(buttons) >= 2:
+                # Click the second button (index 1 because lists are zero-indexed)
+                second_button = buttons[1]
+                second_button.click()
+                logger.info("Successfully clicked the second button inside the overlay.")
+            else:
+                logger.error("Less than two buttons found in the overlay.")
+
+        except Exception as e:
+            logger.error(f"Failed to click the second button inside the overlay. Error: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_click_second_overlay_button.png")
+
+
     def click_button_by_text(self, button_text: str):
         try:
             # Find all buttons with the specific class
@@ -383,6 +451,32 @@ class ClusterManager:
         manifest_path = os.path.join(current_directory, manifest_filename)
         command = f"kubectl apply -f {manifest_path}"
         self.run_shell_command(command)
+        
+    def get_value_by_label(self, label_name):
+        
+        try:
+            # Define XPath to locate the row based on the label name
+            label_xpath = f"//tr[.//span[text()='{label_name}']]/td[contains(@class, 'cdk-column-value')]//span"
+            
+            # Wait until the element is visible
+            WebDriverWait(self._driver, 10).until(
+                EC.visibility_of_element_located((By.XPATH, label_xpath))
+            )
+            
+            # Use the interaction_manager's get_text function to fetch the value
+            value = self._interaction_manager.get_text(label_xpath, By.XPATH)
+            
+            if value:
+                logger.info(f"Found value for label '{label_name}': {value.strip()}")
+                return value.strip()
+            else:
+                logger.error(f"Value for label '{label_name}' not found.")
+                return None
+
+        except Exception as e:
+            logger.error(f"Error fetching value for label '{label_name}': {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_fetch_{label_name}_value_{ClusterManager.get_current_timestamp()}.png")
+            return None
 
 
 class ConnectCluster:
@@ -535,7 +629,7 @@ class IgnoreRule:
         css_selector = ".mat-tooltip-trigger.field-value.truncate.ng-star-inserted"
         all_fields = self._driver.find_elements(By.CSS_SELECTOR, css_selector)
         field_text = all_fields[index].text.strip()
-        logger.info(f"The RESOURCE is: '{field_text}'")
+        # logger.info(f"The RESOURCE is: '{field_text}'")
         return field_text
     
     def save_ignore_rule(self):
