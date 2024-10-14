@@ -132,6 +132,18 @@ class InteractionManager:
         text = element.text
         # _logger.info(f'Text found: "{text}"')
         return text
+    
+    def count_rows(self) -> int:
+        try:
+            # Find all the <tr> elements within the <tbody> (replace with your actual <tbody> locator if necessary)
+            rows = self.driver.find_elements(By.XPATH, "//tbody//tr")
+            
+            # Get the count of rows
+            row_count = len(rows)
+            return row_count
+        except Exception as e:
+            _logger.error(f"Failed to count rows. Error: {str(e)}")
+            return 0
 
     def switch_to_window(self, windows_index: int) -> None:
         _logger.info(f'Switching to window index {windows_index}')

@@ -510,6 +510,7 @@ class ConnectCluster:
                 logger.error(e.stderr.decode('utf-8'))
 
     def verify_installation(self):
+        
         try:
             self._interaction_manager.click('armo-dialog-footer .mat-button-wrapper', By.CSS_SELECTOR)
         except TimeoutException as e:
@@ -526,9 +527,9 @@ class ConnectCluster:
             logger.error("View cluster button was not found or clickable.")
             self._driver.save_screenshot(f"./view_cluster_button_error_{ClusterManager.get_current_timestamp()}.png")
 
-    def view_connected_cluster(self, custom_wait_time=15, max_attempts=2):
+    def view_connected_cluster(self, custom_wait_time=10, max_attempts=2):
         try:
-            # time.sleep(2)
+            time.sleep(2)
             wait = WebDriverWait(self._driver, timeout=custom_wait_time, poll_frequency=0.001)
             wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
             logger.info("View cluster connected found.")

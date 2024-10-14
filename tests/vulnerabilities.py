@@ -5,7 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-from .cluster_operator import ClusterManager, IgnoreRule, ConnectCluster, RiskAcceptancePage, Cleanup
+from .cluster_operator import ClusterManager, IgnoreRule, ConnectCluster, RiskAcceptancePage
+from .vulne_cve import VulneCvePage
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +25,9 @@ class Vulnerabilities(BaseTest):
             connect_cluster.view_connected_cluster()
             self.navigate_to_vulnerabilities()
             self.risk_acceptance_page()
+            self.run_vulne_cve_test()
         finally:
-            # self.perform_cleanup()  
+            self.perform_cleanup()  
             logger.info("Cleanup completed successfully")
 
     def navigate_to_vulnerabilities(self):
@@ -118,6 +120,7 @@ class Vulnerabilities(BaseTest):
         # except Exception as e:
         #     logger.error(f"Failed to click on the medium severity filter: {str(e)}")
         #     driver.save_screenshot(f"./failed_to_click_on_medium_severity_filter_{ClusterManager.get_current_timestamp()}.png")
+        time.sleep(1)
         try:
             rows = WebDriverWait(self._driver, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "tr[role='row']")))
@@ -132,6 +135,10 @@ class Vulnerabilities(BaseTest):
         time.sleep(1)
         cluster_manager.click_on_filter_ckackbox("High")
         cluster_manager.press_esc_key(driver)
+        time.sleep(1)
+        num_of_high_cve = interaction_manager.count_rows()
+        logger.info(f"Number of high CVEs: {num_of_high_cve}")
+        driver.save_screenshot(f"./number_of_high_cves_{ClusterManager.get_current_timestamp()}.png")
 
         try:
             time.sleep(1)
@@ -152,8 +159,9 @@ class Vulnerabilities(BaseTest):
                 driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
         except:
             logger.error("Failed to get image tag")
-            driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
-            
+            driver.save_screenshot(f"./failed_to_get_image_tag_{ClusterManager.get_current_timestamp()}.png")
+        
+        # click on the bottom ">" in the saide panel
         cluster_manager.click_overlay_button()
         time.sleep(1)
         workload_name = interaction_manager.get_text("(//td[contains(@class, 'cdk-column-value')])[1]")
@@ -166,17 +174,25 @@ class Vulnerabilities(BaseTest):
         ignore_rule.click_ignore_button()
         logger.info("Clicked on the 'Accept Risk' button")
         time.sleep(1)
-        Deplyment_name_from_ignore_rule_modal = ignore_rule.get_ignore_rule_field(2)
-        workload_name
-        logger.info(f"Workload name: {Deplyment_name_from_ignore_rule_modal}")
-        if Deplyment_name_from_ignore_rule_modal == workload_name:
+        workload_name_from_ignore_rule_modal = ignore_rule.get_ignore_rule_field(2)
+        logger.info(f"Workload name: {workload_name_from_ignore_rule_modal}")
+        if workload_name_from_ignore_rule_modal == workload_name:
             logger.info("Workload name is verified")
         else:    
             logger.error("Workload name is not verified")       
             
         time.sleep(1)
         ignore_rule.save_ignore_rule() 
-        time.sleep(1)
+        time.sleep(2)
+        num_of_high_cve_after_risk_accept = interaction_manager.count_rows()
+        if (num_of_high_cve - 2)== num_of_high_cve_after_risk_accept:
+            logger.info("Risk acceptance is successful- The number of high CVEs is reduced by 2")
+        else:
+            logger.error(f"Failed - Risk acceptance is not successful. The number of high CVEs is not reduced by 2.\n"
+                        f"Actual: {num_of_high_cve_after_risk_accept}\n"
+                        f"Expected: {num_of_high_cve - 2}")
+                         
+            driver.save_screenshot(f"./failed_risk_acceptance_{ClusterManager.get_current_timestamp()}.png")
         # ignore_rule.igor_rule_icon_check()
         # return container_name
         
@@ -184,10 +200,10 @@ class Vulnerabilities(BaseTest):
         time.sleep(1)
         
         deployment_name = cluster_manager.get_value_by_label("NAME")
-        if deployment_name == Deplyment_name_from_ignore_rule_modal:
-            logger.info("Container name is verified")
+        if deployment_name == workload_name_from_ignore_rule_modal:
+            logger.info("Workload name is verified")
         else:    
-            logger.error("Container name is not verified")
+            logger.error("Workload name is not verified")
             
         cluster_manager.click_on_tab_in_vulne_page("images")
         image_tag_1 = interaction_manager.get_text("(//button[@class='armo-button tertiary sm'])[1]")
@@ -196,6 +212,9 @@ class Vulnerabilities(BaseTest):
         else:    
             logger.error("Image tag is not verified")
             driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
+
+    def run_vulne_cve_test(self):
+        VulneCvePage.vulne_cve_test(self)            
     
     def risk_acceptance_page(self):
         risk_acceptance = RiskAcceptancePage(self._driver)
