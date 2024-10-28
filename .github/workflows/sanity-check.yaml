@@ -62,7 +62,6 @@ jobs:
         fail-fast: false    
         matrix:
           TEST: ${{ fromJson(needs.wf-preparation.outputs.TEST_NAMES) }}
-          BASE_CONFIG: ["production", "production-us"]
       needs: wf-preparation
       runs-on: ubuntu-latest
       steps:
@@ -86,23 +85,14 @@ jobs:
         - name: Generate uuid
           id: uuid
           run: |
-            echo "RANDOM_UUID=${{ matrix.BASE_CONFIG }}-$(uuidgen)" >> $GITHUB_OUTPUT
-            
-        - name: Generate Kind config file
-          run: |
-            cat <<EOF > kind-config.yaml
-            kind: Cluster
-            apiVersion: kind.x-k8s.io/v1alpha4
-            networking:
-              apiServerPort: ${{ matrix.BASE_CONFIG == 'production' && 6443 || 6444 }}
-            EOF
-
+            echo "RANDOM_UUID=systets-$(uuidgen)" >> $GITHUB_OUTPUT
         - name: Create k8s Kind Cluster
           id: kind-cluster-install
           uses: helm/kind-action@v1.3.0
           with:
             cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
-            config_path: ./kind-config.yaml
+            # kubectl_version: v1.23.12
+            # verbosity:
 
         - name: run-tests
           if: ${{ inputs.RETRY_JOB == false }}
