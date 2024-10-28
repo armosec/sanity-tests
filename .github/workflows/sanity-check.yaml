@@ -62,6 +62,7 @@ jobs:
         fail-fast: false    
         matrix:
           TEST: ${{ fromJson(needs.wf-preparation.outputs.TEST_NAMES) }}
+          BASE_CONFIG: ["production", "production-us"]
       needs: wf-preparation
       runs-on: ubuntu-latest
       steps:
@@ -85,7 +86,8 @@ jobs:
         - name: Generate uuid
           id: uuid
           run: |
-            echo "RANDOM_UUID=systets-$(uuidgen)" >> $GITHUB_OUTPUT
+            echo "RANDOM_UUID=${{ matrix.BASE_CONFIG }}-$(uuidgen)" >> $GITHUB_OUTPUT
+            
         - name: Create k8s Kind Cluster
           id: kind-cluster-install
           uses: helm/kind-action@v1.3.0

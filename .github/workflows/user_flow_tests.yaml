@@ -222,7 +222,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run Attach path Test
+    - name: Run security risk Test
       run: |
         python main.py ${{ env.ENVIRONMENT }} security-risk $TEST_EMAIL $TEST_PASSWORD
 
