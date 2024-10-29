@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  ks-and-repo-test:
+  eu-test:
     permissions:  
       contents: write 
       actions: read
@@ -28,8 +28,21 @@ jobs:
                       ]'
     secrets: inherit
 
+  us-test:
+    permissions:  
+      contents: write 
+      actions: read
+    name: run-sanity-check
+    uses: ./.github/workflows/sanity-check-us.yaml 
+    with:
+      RETRY_JOB: false
+      BINARY_TESTS: '[ 
+                        "scan_nsa_and_submit_to_backend"
+                      ]'
+    secrets: inherit
+
   # better-up-time:
-  #   needs: [ks-and-repo-test]
+  #   needs: [eu-test, us-test]
   #   name: better-up-time
   #   runs-on: ubuntu-latest
   #   if: failure()
@@ -42,14 +55,29 @@ jobs:
   #           --header 'Content-Type: application/json' \
   #           --data '{"summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed ! "}'
 
-  call-reran:
+  call-eu-reran:
     permissions:  
       contents: write 
       actions: read
-    needs: [ks-and-repo-test]
-    if: failure()
-    name: repeated-test
+    needs: [eu-test]
+    if: needs.eu-test.result == 'failure'
+    name: repeated-eu-test
     uses: ./.github/workflows/sanity-check.yaml # @sanity_check
+    with:
+      RETRY_JOB: true
+      BINARY_TESTS: '[ 
+                        "scan_nsa_and_submit_to_backend"
+                      ]'
+    secrets: inherit
+
+  call-us-reran:
+    permissions:  
+      contents: write 
+      actions: read
+    needs: [us-test]
+    if: needs.us-test.result == 'failure'
+    name: repeated-us-test
+    uses: ./.github/workflows/sanity-check-us.yaml # @sanity_check
     with:
       RETRY_JOB: true
       BINARY_TESTS: '[ 
