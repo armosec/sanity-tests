@@ -119,9 +119,17 @@ jobs:
             command: |
               echo "Running tests on ${{ matrix.BASE_CONFIG }}"
               source systests_python_env/bin/activate
+
+              # Set the environment argument based on BASE_CONFIG
+              if [[ "${{ matrix.BASE_CONFIG }}" == "eu" ]]; then
+                ENVIRONMENT="production"
+              elif [[ "${{ matrix.BASE_CONFIG }}" == "us" ]]; then
+                ENVIRONMENT="production-us"
+              fi
+              
               python3 systest-cli.py \
                 -t ${{ matrix.TEST }} \
-                -b ${{ matrix.BASE_CONFIG }} \
+                -b $ENVIRONMENT \
                 --logger DEBUG \
                 --kwargs helm_branch=release
               deactivate
@@ -135,9 +143,17 @@ jobs:
             while true; do
               timestamp=$(date +"%Y-%m-%d %H:%M:%S")
               echo "$timestamp,0" >> ~/sanity_logs.csv
+
+              # Set the environment argument based on BASE_CONFIG
+              if [[ "${{ matrix.BASE_CONFIG }}" == "eu" ]]; then
+                ENVIRONMENT="production"
+              elif [[ "${{ matrix.BASE_CONFIG }}" == "us" ]]; then
+                ENVIRONMENT="production-us"
+              fi
+
               python3 systest-cli.py \
                 -t ${{ matrix.TEST }} \
-                -b ${{ matrix.BASE_CONFIG }} \
+                -b $ENVIRONMENT \
                 --logger DEBUG \
                 --kwargs helm_branch=release
               deactivate
