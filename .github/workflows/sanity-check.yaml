@@ -81,14 +81,14 @@ jobs:
             python-version: '3.8.13'
             cache: 'pip' 
 
-        - name: Create Kind Config
-          run: |
-            cat <<EOF > kind-config.yaml
-            kind: Cluster
-            apiVersion: kind.x-k8s.io/v1alpha4
-            networking:
-              apiServerPort: ${{ matrix.BASE_CONFIG == 'production' && 6443 || 6444 }}  # Unique port for each cluster
-            EOF
+        # - name: Create Kind Config
+        #   run: |
+        #     cat <<EOF > kind-config.yaml
+        #     kind: Cluster
+        #     apiVersion: kind.x-k8s.io/v1alpha4
+        #     networking:
+        #       apiServerPort: ${{ matrix.BASE_CONFIG == 'production' && 6443 || 6444 }}  # Unique port for each cluster
+        #     EOF
 
         - name: Generate UUID for Cluster Name
           id: uuid
@@ -99,7 +99,7 @@ jobs:
           uses: helm/kind-action@v1.3.0
           with:
             cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
-            config_path: ./kind-config.yaml
+            # config_path: ./kind-config.yaml
 
         - name: Wait for cluster readiness
           run: sleep 30  # Allows time for the cluster to initialize
