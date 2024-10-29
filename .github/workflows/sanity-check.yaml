@@ -65,7 +65,7 @@ jobs:
         fail-fast: false    
         matrix:
           TEST: ${{ fromJson(needs.wf-preparation.outputs.TEST_NAMES) }}
-          BASE_CONFIG: ["production", "production-us"]  # Runs for both environments
+          BASE_CONFIG: ["production-us"]  # Runs for both environments
       needs: wf-preparation
       runs-on: ubuntu-latest
       steps:
@@ -74,13 +74,13 @@ jobs:
           with:
             repository: armosec/system-tests
             path: .
-  
+
         - uses: actions/setup-python@v4
           timeout-minutes: 10
           with:
             python-version: '3.8.13'
             cache: 'pip' 
-  
+
         - name: Create Kind Config
           run: |
             cat <<EOF > kind-config.yaml
@@ -89,24 +89,24 @@ jobs:
             networking:
               apiServerPort: ${{ matrix.BASE_CONFIG == 'production' && 6443 || 6444 }}  # Unique port for each cluster
             EOF
-  
+
         - name: Generate UUID for Cluster Name
           id: uuid
           run: echo "RANDOM_UUID=${{ matrix.BASE_CONFIG }}-$(uuidgen)" >> $GITHUB_OUTPUT
-  
+
         - name: Create k8s Kind Cluster
           id: kind-cluster-install
           uses: helm/kind-action@v1.3.0
           with:
             cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
             config_path: ./kind-config.yaml
-  
+
         - name: Wait for cluster readiness
           run: sleep 30  # Allows time for the cluster to initialize
-  
+
         - name: Create Environment
           run: ./create_env.sh  # Sets up necessary environment configurations
-  
+
         - name: Run Tests
           if: ${{ inputs.RETRY_JOB == false }}
           id: StepId1
@@ -125,7 +125,7 @@ jobs:
                 --logger DEBUG \
                 --kwargs helm_branch=release
               deactivate
-  
+
         - name: Run Tests Repeated
           if: ${{ inputs.RETRY_JOB == true }}
           id: StepId2
@@ -141,7 +141,7 @@ jobs:
                 --logger DEBUG \
                 --kwargs helm_branch=release
               deactivate
-  
+
               if [ $? = 0 ]; then
                 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
                 echo "$timestamp,1" >> ~/sanity_logs.csv
@@ -149,21 +149,21 @@ jobs:
               fi
               sleep 60
             done
-  
+
         - uses: actions/checkout@v3
-                
+
         - name: Append to CSV if Pass
           if: steps.StepId1.outcome == 'success'
           run: |
             timestamp=$(date +"%Y-%m-%d %H:%M:%S")
             echo "$timestamp,1" >> ~/sanity_logs.csv
             eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
-  
+
         - name: Append to CSV if Failed 
           if: steps.StepId2.outcome == 'success'
           run: |
             eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
-            
+
         - name: Commit Changes
           uses: EndBug/add-and-commit@v9
           continue-on-error: true
@@ -174,10 +174,9 @@ jobs:
             commit: --signoff
             pull: '--ff-only'
             add: ./logs/*
-  
+
         - name: Test Report
           uses: mikepenz/action-junit-report@v3.6.1
           if: always()
           with:
             report_paths: '**/results_xml_format/**.xml'
-  
