@@ -3,7 +3,7 @@ name: Run API Tests
 on:
   schedule:
   - cron: "17,42 * * * *"  # Runs at the 17th and 42nd minute of every hour
-  push:
+  # push:
     # branches:
     # - main
 
