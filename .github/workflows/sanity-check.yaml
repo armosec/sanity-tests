@@ -92,7 +92,7 @@ jobs:
 
         - name: Generate UUID for Cluster Name
           id: uuid
-          run: echo "RANDOM_UUID=${{ matrix.BASE_CONFIG }}-$(uuidgen)" >> $GITHUB_OUTPUT
+          run: echo "RANDOM_UUID=$(uuidgen)" >> $GITHUB_OUTPUT
 
         - name: Create k8s Kind Cluster
           id: kind-cluster-install
@@ -117,8 +117,6 @@ jobs:
             max_attempts: 2
             retry_on: any
             command: |
-              echo "Running tests on ${{ matrix.BASE_CONFIG }}"
-              source systests_python_env/bin/activate
 
               # Set the environment argument based on BASE_CONFIG
               if [[ "${{ matrix.BASE_CONFIG }}" == "eu" ]]; then
@@ -126,7 +124,8 @@ jobs:
               elif [[ "${{ matrix.BASE_CONFIG }}" == "us" ]]; then
                 ENVIRONMENT="production-us"
               fi
-
+              echo "Running tests on $ENVIRONMENT"
+              source systests_python_env/bin/activate
               python3 systest-cli.py \
                 -t ${{ matrix.TEST }} \
                 -b $ENVIRONMENT \
