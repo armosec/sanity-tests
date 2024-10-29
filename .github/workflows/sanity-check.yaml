@@ -132,7 +132,7 @@ jobs:
               echo "$timestamp,0" >> ~/sanity_logs.csv
               python3 systest-cli.py \
                 -t ${{ matrix.TEST }} \
-                -b production \
+                -b production-us \
                 --logger DEBUG \
                 --kwargs helm_branch=release \
                 deactivate
