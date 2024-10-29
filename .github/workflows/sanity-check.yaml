@@ -65,7 +65,7 @@ jobs:
         fail-fast: false    
         matrix:
           TEST: ${{ fromJson(needs.wf-preparation.outputs.TEST_NAMES) }}
-          BASE_CONFIG: ["production-us"]  # Runs for both environments
+          BASE_CONFIG: ["us"]  # Runs for both environments
       needs: wf-preparation
       runs-on: ubuntu-latest
       steps:
