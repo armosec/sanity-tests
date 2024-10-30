@@ -20,7 +20,7 @@ jobs:
       contents: write 
       actions: read
     name: run-sanity-check
-    uses: ./.github/workflows/sanity-check.yaml # @sanity_check
+    uses: ./.github/workflows/sanity-check-eu.yaml # @sanity_check
     with:
       RETRY_JOB: false
       BINARY_TESTS: '[ 
