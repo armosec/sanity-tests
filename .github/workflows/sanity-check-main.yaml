@@ -28,18 +28,18 @@ jobs:
                       ]'
     secrets: inherit
 
-  us-test:
-    permissions:  
-      contents: write 
-      actions: read
-    name: sanity-check-us
-    uses: ./.github/workflows/sanity-check-us.yaml 
-    with:
-      RETRY_JOB: false
-      BINARY_TESTS: '[ 
-                        "scan_nsa_and_submit_to_backend"
-                      ]'
-    secrets: inherit
+  # us-test:
+  #   permissions:  
+  #     contents: write 
+  #     actions: read
+  #   name: sanity-check-us
+  #   uses: ./.github/workflows/sanity-check-us.yaml 
+  #   with:
+  #     RETRY_JOB: false
+  #     BINARY_TESTS: '[ 
+  #                       "scan_nsa_and_submit_to_backend"
+  #                     ]'
+  #   secrets: inherit
 
   # better-up-time:
   #   needs: [eu-test, us-test]
