@@ -19,7 +19,7 @@ jobs:
     permissions:  
       contents: write 
       actions: read
-    name: run-sanity-check
+    name: sanity-check-eu
     uses: ./.github/workflows/sanity-check-eu.yaml # @sanity_check
     with:
       RETRY_JOB: false
@@ -32,7 +32,7 @@ jobs:
     permissions:  
       contents: write 
       actions: read
-    name: run-sanity-check
+    name: sanity-check-us
     uses: ./.github/workflows/sanity-check-us.yaml 
     with:
       RETRY_JOB: false
