@@ -87,6 +87,7 @@ jobs:
           run: |
             sed -i 's/${{ env.SHARED_DASHBOARD_CONF }}/${{ env.API_URL }}/g' configurations/system/backends.py
             sed -i 's/${{ env.SHARED_API_CONF }}/${{ env.API_URL }}/g' configurations/system/backends.py
+            sed -i 's/${{ env.SHARED_AUTH_URL }}/${{ env.AUTH_URL }}/g' configurations/system/backends.py
 
 
         - name: create env
