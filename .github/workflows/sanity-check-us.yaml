@@ -73,6 +73,7 @@ jobs:
         PROD_US_DASHBOARD_CONF: api.us.armosec.io
         PROD_US_API_CONF: api.us.armosec.io
         CUSTOMER: CyberArmorTests
+        CLIENT_ID: ${{ secrets.CLIENT_ID_PROD_US }}
       steps:
         - name: Checkout systests repo
           uses: actions/checkout@v3
@@ -128,7 +129,7 @@ jobs:
                   -t ${{ matrix.TEST }} \
                   -b production-us \
                   --logger DEBUG \
-                  --customer ${{ env.CUSTOMER }}       \
+                  --customer ${{ env.CLIENT_ID }}\
                   --kwargs helm_branch=release \
                   deactivate
 
