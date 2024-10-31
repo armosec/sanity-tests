@@ -8,7 +8,6 @@ env:
   SECRET_KEY: ${{ secrets.SECRET_KEY_PROD_US }}
   REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
   REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-  # Controls when the workflow will run
 on:
   # Triggers the workflow every 30 minutes
   # schedule:
@@ -64,8 +63,13 @@ jobs:
           TEST: ${{ fromJson(needs.wf-preparation.outputs.TEST_NAMES) }}
       needs: wf-preparation
       runs-on: ubuntu-latest
+      env:
+        ENVIRONMENT: production-us
+        SHARED_DASHBOARD_CONF: api.us.armosec.io
+        SHARED_API_CONF: api.us.armosec.io
+        API_URL: 'api.us.armosec.io'
+        AUTH_URL: 'https://auth.us.armosec.io'
       steps:
-
         - name: Checkout systests repo
           uses: actions/checkout@v3
           with:
@@ -76,7 +80,13 @@ jobs:
           timeout-minutes: 10
           with:
             python-version: '3.8.13'
-            cache: 'pip' 
+            cache: 'pip'
+
+        - name: Set environment configuration
+          run: |
+            sed -i 's/${{ env.SHARED_DASHBOARD_CONF }}/${{ inputs.API_URL }}/g' configurations/system/backends.py
+            sed -i 's/${{ env.SHARED_API_CONF }}/${{ inputs.API_URL }}/g' configurations/system/backends.py
+            sed -i 's/${{ env.SHARED_AUTH_URL }}/${{ inputs.AUTH_URL }}/g' configurations/system/backends.py
 
         - name: create env
           timeout-minutes: 10
