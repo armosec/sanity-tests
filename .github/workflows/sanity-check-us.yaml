@@ -84,9 +84,9 @@ jobs:
 
         - name: Set environment configuration
           run: |
-            sed -i 's/${{ env.SHARED_DASHBOARD_CONF }}/${{ inputs.API_URL }}/g' configurations/system/backends.py
-            sed -i 's/${{ env.SHARED_API_CONF }}/${{ inputs.API_URL }}/g' configurations/system/backends.py
-            sed -i 's/${{ env.SHARED_AUTH_URL }}/${{ inputs.AUTH_URL }}/g' configurations/system/backends.py
+            sed -i 's/${{ env.SHARED_DASHBOARD_CONF }}/${{ env.API_URL }}/g' configurations/system/backends.py
+            sed -i 's/${{ env.SHARED_API_CONF }}/${{ env.API_URL }}/g' configurations/system/backends.py
+            sed -i 's/${{ env.SHARED_AUTH_URL }}/${{ env.AUTH_URL }}/g' configurations/system/backends.py
 
         - name: create env
           timeout-minutes: 10
