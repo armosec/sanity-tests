@@ -67,11 +67,12 @@ jobs:
         ENVIRONMENT: production-us
         SHARED_DASHBOARD_CONF: api.us.armosec.io
         SHARED_API_CONF: api.us.armosec.io
-        API_URL: 'api.us.armosec.io'
-        AUTH_URL: 'https://auth.us.armosec.io'
+        API_URL: api.us.armosec.io
+        AUTH_URL: https://auth.us.armosec.io
         SHARED_AUTH_URL: auth.us.armosec.io
         PROD_US_DASHBOARD_CONF: api.us.armosec.io
         PROD_US_API_CONF: api.us.armosec.io
+        CUSTOMER: CyberArmorTests
       steps:
         - name: Checkout systests repo
           uses: actions/checkout@v3
@@ -84,12 +85,6 @@ jobs:
           with:
             python-version: '3.8.13'
             cache: 'pip'
-
-        - name: ENV
-          run: |
-            echo "ENVIRONMENT=production-us" >> $GITHUB_ENV
-            echo "SHARED_DASHBOARD_CONF=${{ env.PROD_US_DASHBOARD_CONF}}" >> $GITHUB_ENV
-            echo "SHARED_API_CONF=${{ env.PROD_US_API_CONF}}" >> $GITHUB_ENV
 
         # - name: Set environment configuration
         #   run: |
@@ -106,6 +101,7 @@ jobs:
           id: uuid
           run: |
             echo "RANDOM_UUID=systets-$(uuidgen)" >> $GITHUB_OUTPUT
+
         - name: Create k8s Kind Cluster
           id: kind-cluster-install
           uses: helm/kind-action@v1.3.0
@@ -132,6 +128,7 @@ jobs:
                   -t ${{ matrix.TEST }} \
                   -b production-us \
                   --logger DEBUG \
+                  --customer ${{ env.CUSTOMER }}       \
                   --kwargs helm_branch=release \
                   deactivate
 
