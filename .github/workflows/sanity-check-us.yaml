@@ -70,6 +70,8 @@ jobs:
         API_URL: 'api.us.armosec.io'
         AUTH_URL: 'https://auth.us.armosec.io'
         SHARED_AUTH_URL: auth.us.armosec.io
+        PROD_US_DASHBOARD_CONF: api.us.armosec.io
+        PROD_US_API_CONF: api.us.armosec.io
       steps:
         - name: Checkout systests repo
           uses: actions/checkout@v3
@@ -83,11 +85,17 @@ jobs:
             python-version: '3.8.13'
             cache: 'pip'
 
-        - name: Set environment configuration
+        - name: ENV
           run: |
-            sed -i 's/${{ env.SHARED_DASHBOARD_CONF }}/${{ env.API_URL }}/g' configurations/system/backends.py
-            sed -i 's/${{ env.SHARED_API_CONF }}/${{ env.API_URL }}/g' configurations/system/backends.py
-            sed -i 's/${{ env.SHARED_AUTH_URL }}/${{ env.AUTH_URL }}/g' configurations/system/backends.py
+            echo "ENVIRONMENT=production-us" >> $GITHUB_ENV
+            echo "SHARED_DASHBOARD_CONF=${{ env.PROD_US_DASHBOARD_CONF}}" >> $GITHUB_ENV
+            echo "SHARED_API_CONF=${{ env.PROD_US_API_CONF}}" >> $GITHUB_ENV
+
+        # - name: Set environment configuration
+        #   run: |
+        #     sed -i 's/${{ env.SHARED_DASHBOARD_CONF }}/${{ env.API_URL }}/g' configurations/system/backends.py
+        #     sed -i 's/${{ env.SHARED_API_CONF }}/${{ env.API_URL }}/g' configurations/system/backends.py
+        #     sed -i 's/${{ env.SHARED_AUTH_URL }}/${{ env.AUTH_URL }}/g' configurations/system/backends.py
 
 
         - name: create env
