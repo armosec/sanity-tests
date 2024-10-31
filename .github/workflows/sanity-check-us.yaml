@@ -68,7 +68,7 @@ jobs:
         SHARED_DASHBOARD_CONF: api.us.armosec.io
         SHARED_API_CONF: api.us.armosec.io
         API_URL: 'api.us.armosec.io'
-        AUTH_URL: 'auth.us.armosec.io'
+        AUTH_URL: 'https://auth.us.armosec.io'
         SHARED_AUTH_URL: auth.us.armosec.io
       steps:
         - name: Checkout systests repo
