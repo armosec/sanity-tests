@@ -129,7 +129,7 @@ jobs:
                   -t ${{ matrix.TEST }} \
                   -b production-us \
                   --logger DEBUG \
-                  --customer ${{ env.CLIENT_ID }}\
+                  --customer CyberArmorTests \
                   --kwargs helm_branch=release \
                   deactivate
 
@@ -152,6 +152,7 @@ jobs:
                 -t ${{ matrix.TEST }} \
                 -b production-us \
                 --logger DEBUG \
+                --customer CyberArmorTests \
                 --kwargs helm_branch=release \
                 deactivate
 
