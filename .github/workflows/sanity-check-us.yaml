@@ -124,6 +124,8 @@ jobs:
             echo "ENVIRONMENT=production-us" >> $GITHUB_ENV
             echo "SHARED_DASHBOARD_CONF=${{ env.PROD_US_DASHBOARD_CONF}}" >> $GITHUB_ENV
             echo "SHARED_API_CONF=${{ env.PROD_US_API_CONF}}" >> $GITHUB_ENV
+            echo "CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
+            echo "SECRET_KEY=$SECRET_KEY" >> $GITHUB_ENV
 
         - name: validate conf change
 
