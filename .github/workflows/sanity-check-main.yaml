@@ -15,31 +15,31 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  eu-test:
-    permissions:  
-      contents: write 
-      actions: read
-    name: sanity-check-eu
-    uses: ./.github/workflows/sanity-check-eu.yaml # @sanity_check
-    with:
-      RETRY_JOB: false
-      BINARY_TESTS: '[ 
-                        "scan_nsa_and_submit_to_backend"
-                      ]'
-    secrets: inherit
-
-  # us-test:
+  # eu-test:
   #   permissions:  
   #     contents: write 
   #     actions: read
-  #   name: sanity-check-us
-  #   uses: ./.github/workflows/sanity-check-us.yaml 
+  #   name: sanity-check-eu
+  #   uses: ./.github/workflows/sanity-check-eu.yaml # @sanity_check
   #   with:
   #     RETRY_JOB: false
   #     BINARY_TESTS: '[ 
   #                       "scan_nsa_and_submit_to_backend"
   #                     ]'
   #   secrets: inherit
+
+  us-test:
+    permissions:  
+      contents: write 
+      actions: read
+    name: sanity-check-us
+    uses: ./.github/workflows/sanity-check-us.yaml 
+    with:
+      RETRY_JOB: false
+      BINARY_TESTS: '[ 
+                        "scan_nsa_and_submit_to_backend"
+                      ]'
+    secrets: inherit
 
   # better-up-time:
   #   needs: [eu-test, us-test]
@@ -55,32 +55,32 @@ jobs:
   #           --header 'Content-Type: application/json' \
   #           --data '{"summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed ! "}'
 
-  call-eu-reran:
-    permissions:  
-      contents: write 
-      actions: read
-    needs: [eu-test]
-    if: ${{ failure() && needs.eu-test.result != 'success' }}  # Run only if eu-test fails
-    name: repeated-eu-test
-    uses: ./.github/workflows/sanity-check-eu.yaml # @sanity_check
-    with:
-      RETRY_JOB: true
-      BINARY_TESTS: '[ 
-                        "scan_nsa_and_submit_to_backend"
-                      ]'
-    secrets: inherit
-
-  # call-us-reran:
+  # call-eu-reran:
   #   permissions:  
   #     contents: write 
   #     actions: read
-  #   needs: [us-test]
-  #   if: ${{ failure() && needs.us-test.result != 'success' }}  # Run only if us-test fails
-  #   name: repeated-us-test
-  #   uses: ./.github/workflows/sanity-check-us.yaml # @sanity_check
+  #   needs: [eu-test]
+  #   if: ${{ failure() && needs.eu-test.result != 'success' }}  # Run only if eu-test fails
+  #   name: repeated-eu-test
+  #   uses: ./.github/workflows/sanity-check-eu.yaml # @sanity_check
   #   with:
   #     RETRY_JOB: true
   #     BINARY_TESTS: '[ 
   #                       "scan_nsa_and_submit_to_backend"
   #                     ]'
   #   secrets: inherit
+
+  call-us-reran:
+    permissions:  
+      contents: write 
+      actions: read
+    needs: [us-test]
+    if: ${{ failure() && needs.us-test.result != 'success' }}  # Run only if us-test fails
+    name: repeated-us-test
+    uses: ./.github/workflows/sanity-check-us.yaml # @sanity_check
+    with:
+      RETRY_JOB: true
+      BINARY_TESTS: '[ 
+                        "scan_nsa_and_submit_to_backend"
+                      ]'
+    secrets: inherit
