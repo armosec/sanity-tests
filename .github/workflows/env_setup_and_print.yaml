@@ -1,0 +1,42 @@
+name: Env Setup and Print
+
+on:
+  push:
+
+jobs:
+  test-environment:
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: production-us
+      SHARED_DASHBOARD_CONF: api.us.armosec.io
+      SHARED_API_CONF: api.us.armosec.io
+      API_URL: api.us.armosec.io
+      AUTH_URL: https://auth.us.armosec.io
+      SHARED_AUTH_URL: auth.us.armosec.io
+      PROD_US_DASHBOARD_CONF: api.us.armosec.io
+      PROD_US_API_CONF: api.us.armosec.io
+      CUSTOMER: ${{ secrets.CUSTOMER }}
+      USERNAME: ${{ secrets.USERNAME }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID_PROD_US }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY_PROD_US }}
+      REGISTRY_USERNAME: ${{ secrets.SYSTEM_TEST_QUAY_REGISTRY_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.SYSTEM_TEST_QUAY_REGISTRY_PASSWORD }}
+
+    steps:
+      - name: Checkout systests repo
+        uses: actions/checkout@v3
+        with:
+          repository: armosec/system-tests
+          path: .
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.13'
+          cache: 'pip'
+
+      - name: Print Environment Variables
+        run: |
+          echo "Printing all environment variables:"
+          env
