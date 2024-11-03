@@ -95,6 +95,14 @@ jobs:
             python-version: '3.8.13'
             cache: 'pip'
 
+        - name: Verify CLIENT_ID_PROD_US is not empty
+          run: |
+            if [ -z "${{ secrets.CLIENT_ID_PROD_US }}" ]; then
+              echo "CLIENT_ID_PROD_US is not set or is empty."
+              exit 1
+            else
+              echo "CLIENT_ID_PROD_US is set."
+            fi
         # - name: Set environment configuration
         #   run: |
         #     sed -i 's/${{ env.SHARED_DASHBOARD_CONF }}/${{ env.API_URL }}/g' configurations/system/backends.py
@@ -121,6 +129,7 @@ jobs:
 
         - name: set env
           run: |
+            echo ""
             echo "ENVIRONMENT=production-us" >> $GITHUB_ENV
             echo "SHARED_DASHBOARD_CONF=${{ env.PROD_US_DASHBOARD_CONF}}" >> $GITHUB_ENV
             echo "SHARED_API_CONF=${{ env.PROD_US_API_CONF}}" >> $GITHUB_ENV
