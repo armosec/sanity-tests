@@ -36,7 +36,20 @@ jobs:
           python-version: '3.8.13'
           cache: 'pip'
 
-      - name: Print Environment Variables
+      - name: Print Selected Environment Variables
         run: |
-          echo "Printing all environment variables:"
-          env
+          echo "ENVIRONMENT: $ENVIRONMENT"
+          echo "SHARED_DASHBOARD_CONF: $SHARED_DASHBOARD_CONF"
+          echo "SHARED_API_CONF: $SHARED_API_CONF"
+          echo "API_URL: $API_URL"
+          echo "AUTH_URL: $AUTH_URL"
+          echo "SHARED_AUTH_URL: $SHARED_AUTH_URL"
+          echo "PROD_US_DASHBOARD_CONF: $PROD_US_DASHBOARD_CONF"
+          echo "PROD_US_API_CONF: $PROD_US_API_CONF"
+          echo "CUSTOMER: $CUSTOMER"
+          echo "USERNAME: $USERNAME"
+          echo "PASSWORD: $PASSWORD"
+          echo "CLIENT_ID: $CLIENT_ID"
+          echo "SECRET_KEY: $SECRET_KEY"
+          echo "REGISTRY_USERNAME: $REGISTRY_USERNAME"
+          echo "REGISTRY_PASSWORD: $REGISTRY_PASSWORD"
