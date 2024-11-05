@@ -8,14 +8,6 @@ env:
   SECRET_KEY: ${{ secrets.SECRET_KEY_PROD_US }}
   REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
   REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-  ENVIRONMENT: production-us
-  SHARED_DASHBOARD_CONF: api.us.armosec.io
-  SHARED_API_CONF: api.us.armosec.io
-  API_URL: api.us.armosec.io
-  # AUTH_URL: https://auth.us.armosec.io
-  # SHARED_AUTH_URL: auth.us.armosec.io
-  PROD_US_DASHBOARD_CONF: api.us.armosec.io
-  PROD_US_API_CONF: api.us.armosec.io
 on:
   # Triggers the workflow every 30 minutes
   # schedule:
@@ -71,17 +63,6 @@ jobs:
           TEST: ${{ fromJson(needs.wf-preparation.outputs.TEST_NAMES) }}
       needs: wf-preparation
       runs-on: ubuntu-latest
-      # env:
-      #   ENVIRONMENT: production-us
-      #   SHARED_DASHBOARD_CONF: api.us.armosec.io
-      #   SHARED_API_CONF: api.us.armosec.io
-      #   API_URL: api.us.armosec.io
-      #   AUTH_URL: https://auth.us.armosec.io
-      #   SHARED_AUTH_URL: auth.us.armosec.io
-      #   PROD_US_DASHBOARD_CONF: api.us.armosec.io
-      #   PROD_US_API_CONF: api.us.armosec.io
-      #   CUSTOMER: CyberArmorTests
-      #   CLIENT_ID: ${{ secrets.CLIENT_ID_PROD_US }}
       steps:
         - name: Checkout systests repo
           uses: actions/checkout@v3
@@ -103,12 +84,6 @@ jobs:
             else
               echo "CLIENT_ID_PROD_US is set."
             fi
-        # - name: Set environment configuration
-        #   run: |
-        #     sed -i 's/${{ env.SHARED_DASHBOARD_CONF }}/${{ env.API_URL }}/g' configurations/system/backends.py
-        #     sed -i 's/${{ env.SHARED_API_CONF }}/${{ env.API_URL }}/g' configurations/system/backends.py
-        #     sed -i 's/${{ env.SHARED_AUTH_URL }}/${{ env.AUTH_URL }}/g' configurations/system/backends.py
-
 
         - name: create env
           timeout-minutes: 10
@@ -136,10 +111,6 @@ jobs:
             echo "CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
             echo "SECRET_KEY=$SECRET_KEY" >> $GITHUB_ENV
 
-        - name: validate conf change
-
-          run: cat configurations/system/backends.py
-
         - name: run tests on US
           if: ${{ inputs.RETRY_JOB == false }}
           id: StepId1
@@ -150,10 +121,10 @@ jobs:
             max_attempts: 2
             retry_on: any
             command: |
-              echo "Using Client ID: ${{ env.CLIENT_ID }}"
-              echo "Using Secret Key: ${{ env.SECRET_KEY }}"
-              echo "#----- Running System test: ${{ matrix.TEST }} on Environment: ${{ env.ENVIRONMENT }} -----#"
-              echo "#----- Running Command [ python3 systest-cli.py -t ${{ matrix.TEST }} -b ${{ env.ENVIRONMENT }} --logger DEBUG --customer ${{ env.CUSTOMER }} --delete_test_tenant ALWAYS --duration 3 --kwargs helm_branch=${{ inputs.IN_CLUSTER_CHART_BRANCH }}] -----#"
+              # echo "Using Client ID: ${{ env.CLIENT_ID }}"
+              # echo "Using Secret Key: ${{ env.SECRET_KEY }}"
+              # echo "#----- Running System test: ${{ matrix.TEST }} on Environment: ${{ env.ENVIRONMENT }} -----#"
+              # echo "#----- Running Command [ python3 systest-cli.py -t ${{ matrix.TEST }} -b ${{ env.ENVIRONMENT }} --logger DEBUG --customer ${{ env.CUSTOMER }} --delete_test_tenant ALWAYS --duration 3 --kwargs helm_branch=${{ inputs.IN_CLUSTER_CHART_BRANCH }}] -----#"
               echo "Test history:"
               echo " ${{ matrix.TEST }} " >/tmp/testhistory
               cat /tmp/testhistory
@@ -167,7 +138,6 @@ jobs:
                   deactivate
 
             
-    
         - name: run-tests-repeated
           if: ${{ inputs.RETRY_JOB == true }}
           id: StepId2
