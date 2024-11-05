@@ -149,35 +149,35 @@ jobs:
 
         - uses: actions/checkout@v3
               
-        - name: Append to CSV if pass
-          if: steps.StepId1.outcome == 'success'
-          run: |
-            # append to local csv if test pass
-            timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-            echo "$timestamp,1" >> ~/sanity_logs.csv
-            eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
+        # - name: Append to CSV if pass
+        #   if: steps.StepId1.outcome == 'success'
+        #   run: |
+        #     # append to local csv if test pass
+        #     timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+        #     echo "$timestamp,1" >> ~/sanity_logs.csv
+        #     eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
 
-        - name: Append to CSV if failed 
-          if: steps.StepId2.outcome == 'success'
-          run: |
-            eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
+        # - name: Append to CSV if failed 
+        #   if: steps.StepId2.outcome == 'success'
+        #   run: |
+        #     eval sed\ s/\$/\\$'\n'/g\ ~/sanity_logs.csv | cat >> "logs/sanity_logs.csv"
             
-        - name: Wait before commit
-          run: sleep 5
+        # - name: Wait before commit
+        #   run: sleep 5
 
-        - name: Commit changes
-          uses: EndBug/add-and-commit@v9
-          continue-on-error: true
-          with:
-            message: "Update sanity logs with new data"
-            author_name: bvolovat
-            author_email: borisv@armosec.io
-            commit: --signoff
-            pull: '--ff-only'
-            add: ./logs/*
+        # - name: Commit changes
+        #   uses: EndBug/add-and-commit@v9
+        #   continue-on-error: true
+        #   with:
+        #     message: "Update sanity logs with new data"
+        #     author_name: bvolovat
+        #     author_email: borisv@armosec.io
+        #     commit: --signoff
+        #     pull: '--ff-only'
+        #     add: ./logs/*
 
-        - name: Test Report
-          uses: mikepenz/action-junit-report@v3.6.1
-          if: always() # always run even if the previous step fails
-          with:
-            report_paths: '**/results_xml_format/**.xml'       
+        # - name: Test Report
+        #   uses: mikepenz/action-junit-report@v3.6.1
+        #   if: always() # always run even if the previous step fails
+        #   with:
+        #     report_paths: '**/results_xml_format/**.xml'       
