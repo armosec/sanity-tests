@@ -1,7 +1,7 @@
 name: Env Setup and Print
 
-on:
-  push:
+# on:
+#   push:
 
 jobs:
   test-environment:
