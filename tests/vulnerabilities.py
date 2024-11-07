@@ -27,7 +27,7 @@ class Vulnerabilities(BaseTest):
             self.risk_acceptance_page()
             self.run_vulne_cve_test()
         finally:
-            self.perform_cleanup()  
+            # self.perform_cleanup()  
             logger.info("Cleanup completed successfully")
 
     def navigate_to_vulnerabilities(self):
