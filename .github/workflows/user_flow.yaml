@@ -5,9 +5,9 @@ on:
 # Triggers the workflow at 5 minutes past the hour, every hour
   schedule:
   - cron: "05 * * * *"
-  # push:
-  #   branches:
-  #   - user_flow
+  push:
+    branches:
+    - main
 
 jobs:
   run-flowUser-test-eu:

@@ -165,14 +165,14 @@ def navigate_to_dashboard(driver, wait):
 
     
 def navigate_to_vulnerabilities(driver, wait):
+    print("waiting for the vulnerabilities page to be displayed - 1 min")
+    time.sleep(60)
     # Click on the vulnerabilities page
     vulnerabilities = driver.find_element(By.ID, 'image-scanning-left-menu-item')
     driver.execute_script("arguments[0].click();", vulnerabilities)
     print("Vulnerabilities clicked")
     
     cluster_manager = ClusterManager(driver)    
-    print("waiting for the vulnerabilities page to be displayed - 1 min")
-    time.sleep(60)
     # Click on the Workloads tab
     cluster_manager.click_menu_item_vuln_view("Workloads")
     
