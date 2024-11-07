@@ -172,7 +172,7 @@ def navigate_to_vulnerabilities(driver, wait):
     
     cluster_manager = ClusterManager(driver)    
     print("waiting for the vulnerabilities page to be displayed - 1 min")
-    # time.sleep(60)
+    time.sleep(60)
     # Click on the Workloads tab
     cluster_manager.click_menu_item_vuln_view("Workloads")
     
