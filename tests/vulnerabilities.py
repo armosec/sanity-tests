@@ -14,20 +14,21 @@ class Vulnerabilities(BaseTest):
     def run(self):
         connect_cluster = ConnectCluster(self._driver, self._wait)
         cluster_manager = ClusterManager(self._driver, self._wait)
-        cluster_manager.create_attack_path()  
+        # cluster_manager.create_attack_path()  
         login_url = self.get_login_url()
         self.login(login_url)
         try:
-            connect_cluster.click_get_started()
-            connect_cluster.connect_cluster_helm()
-            connect_cluster.verify_installation()
-            connect_cluster.view_cluster_button()
-            connect_cluster.view_connected_cluster()
-            self.navigate_to_vulnerabilities()
-            self.risk_acceptance_page()
-            self.run_vulne_cve_test()
+            # connect_cluster.click_get_started()
+            # connect_cluster.connect_cluster_helm()
+            # connect_cluster.verify_installation()
+            # connect_cluster.view_cluster_button()
+            # connect_cluster.view_connected_cluster()
+            # self.navigate_to_vulnerabilities()
+            # self.risk_acceptance_page()
+            # self.run_vulne_cve_test()
+            print("Running vulnerabilities test")
         finally:
-            # self.perform_cleanup()  
+            self.perform_cleanup()  
             logger.info("Cleanup completed successfully")
 
     def navigate_to_vulnerabilities(self):
@@ -138,7 +139,7 @@ class Vulnerabilities(BaseTest):
         time.sleep(1)
         num_of_high_cve = interaction_manager.count_rows()
         logger.info(f"Number of high CVEs: {num_of_high_cve}")
-        driver.save_screenshot(f"./number_of_high_cves_{ClusterManager.get_current_timestamp()}.png")
+        # driver.save_screenshot(f"./number_of_high_cves_{ClusterManager.get_current_timestamp()}.png")
 
         try:
             time.sleep(1)

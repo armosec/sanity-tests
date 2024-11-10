@@ -56,3 +56,51 @@ class VulneCvePage(BaseTest):
         time.sleep(1)
         ignore_rule.save_ignore_rule()
         
+        time.sleep(2)
+        # Click on the first row
+        try:
+            cve_cells = self._driver.find_elements(By.CSS_SELECTOR, "td.mat-cell.cdk-column-name.mat-column-name span.mat-tooltip-trigger")
+
+            # Check if there are any elements found and click the first one
+            if cve_cells:
+                cve_cells[0].click()
+                print("Clicked on the first matching CVE cell.")
+            else:
+                print("No matching CVE cells found.")
+        except TimeoutException:
+            logger.error("Failed to click on the first row")
+        
+        time.sleep(1)
+
+
+        cve_severity = interaction_manager.get_text("/html/body/armo-root/div/div/div/armo-cves-details-page/armo-tabs/armo-cves-details-tab/armo-vulnerabilities-details-list/div/table/tbody/tr[4]/td[2]/span")
+        print(cve_severity)
+        
+        button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.armo-button.tertiary.sm")))
+        button[0].click()
+        time.sleep(1)
+        cluster_manager.click_tab_on_sidebar(tab_name="Runtime Analysis")
+        time.sleep(1)
+        
+        # click on the bottom ">" in the saide panel
+        cluster_manager.click_overlay_button()
+        time.sleep(1)
+        workload_name = interaction_manager.get_text("(//td[contains(@class, 'cdk-column-value')])[1]")
+        cluster_manager.press_esc_key(driver)
+
+        cluster_manager.click_on_tab_in_vulne_page("images")
+        workload_name = interaction_manager.get_text("/html/body/armo-root/div/div/div/armo-cves-details-page/armo-tabs/armo-cves-images-tab/armo-vulnerabilities-shared-table/div/table/tbody/tr/td[4]")
+
+
+        time.sleep(1)
+        driver.save_screenshot(f"./test-1_{ClusterManager.get_current_timestamp()}.png")
+        cluster_manager.click_on_tab_in_vulne_page("workloads",index=1)
+        print("TEST-2")
+        driver.save_screenshot(f"./test-2_{ClusterManager.get_current_timestamp()}.png")
+        time.sleep(1)
+
+        
+
+        
+        
+        

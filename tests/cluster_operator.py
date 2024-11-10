@@ -131,17 +131,27 @@ class ClusterManager:
             self._driver.save_screenshot(f"./failed_to_click_{button_name.replace(' ', '_')}_button_{self.get_current_timestamp()}.png")
             
             
-    def click_on_tab_in_vulne_page(self, partial_href):
+    def click_on_tab_in_vulne_page(self, partial_href, index=0):
         try:
-            # Use XPath to locate the anchor tag with the given partial href
-            tab = WebDriverWait(self._driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, f"//a[contains(@href, '{partial_href}')]"))
+            # Locate all tabs with the given partial href
+            tabs = WebDriverWait(self._driver, 10).until(
+                EC.presence_of_all_elements_located((By.XPATH, f"//a[contains(@href, '{partial_href}')]"))
             )
-            tab.click()
-            logger.info(f"Clicked on the tab with href containing '{partial_href}'.")
+            
+            # Check if the specified index is within the range of available tabs
+            if index < len(tabs):
+                # Click on the tab at the specified index
+                tab = WebDriverWait(self._driver, 10).until(
+                    EC.element_to_be_clickable(tabs[index])
+                )
+                tab.click()
+                logger.info(f"Clicked on the tab with href containing '{partial_href}' at index {index}.")
+            else:
+                logger.error(f"No tab found with href containing '{partial_href}' at index {index}. Available tabs: {len(tabs)}")
+                
         except Exception as e:
-            logger.error(f"Failed to click on the tab with href containing '{partial_href}': {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_click_tab_{partial_href}_{ClusterManager.get_current_timestamp()}.png")
+            logger.error(f"Failed to click on the tab with href containing '{partial_href}' at index {index}: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_click_tab_{partial_href}_index_{index}_{ClusterManager.get_current_timestamp()}.png")
             
             
     def click_tab_on_sidebar(self, tab_name):
@@ -512,7 +522,7 @@ class ConnectCluster:
     def verify_installation(self):
         
         try:
-            self._interaction_manager.click('armo-dialog-footer .mat-button-wrapper', By.CSS_SELECTOR)
+            self._interaction_manager.click('button.armo-button.primary.md', By.CSS_SELECTOR)
         except TimeoutException as e:
             logger.error("Verify button was not found or clickable.")
             self._driver.save_screenshot(f"./verify_button_erro_{ClusterManager.get_current_timestamp()}.png")
@@ -567,7 +577,7 @@ class Cleanup:
 
     def click_more_options_button(self):
         time.sleep(1)
-        self._interaction_manager.click('button.armo-button.table-secondary.sm', By.CSS_SELECTOR)
+        self._interaction_manager.click('button.armo-button.table-secondary.sm', By.CSS_SELECTOR, index=2)
         logger.info("Click on more options button.")
 
     def choose_delete_option(self):

@@ -205,8 +205,8 @@ class ConnectCluster:
 
     def view_cluster_button(self):
         try:
-            view_cluster_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-connection-wizard-connection-step-footer .armo-button'))) 
-            self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'armo-connection-wizard-connection-step-footer .armo-button')))
+            view_cluster_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.primary.md'))) 
+            self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'button.armo-button.primary.md')))
             time.sleep(2)
             self.driver.execute_script("arguments[0].click();", view_cluster_button)
         except TimeoutException as e:
@@ -255,9 +255,17 @@ class Cleanup:
 
     def click_more_options_button(self):
         time.sleep(1)
-        more_options_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm')))
-        more_options_button.click()
-        print("Click on more options button.")
+        # Find all elements matching the CSS selector
+        more_options_buttons = self.wait.until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm'))
+        )
+        
+        # Check if there are at least three elements
+        if len(more_options_buttons) >= 3:
+            more_options_buttons[2].click()  # Click on the third element (index 2)
+            print("Clicked on the third 'more options' button.")
+        else:
+            print("Less than three 'more options' buttons found.")
 
     def choose_delete_option(self):
         time.sleep(0.5)
