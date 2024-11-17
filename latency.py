@@ -69,11 +69,12 @@ class LatencyTest:
         # Click on the failed resource button.
         self._interaction_manager.click('//*[@id="framework-control-table-failed-0"]/div/armo-router-link/a/armo-button/button', click_delay=1)
         # Click on the fix button in the rules list.
-        self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-with-namespace/table/tbody/tr/td[3]/armo-resource-ignore-rules-cell/div/div[2]/armo-fix-button/armo-button')
+        self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-resources-ignore-rules-page/div[3]/armo-resources-ignore-rules-list/div/armo-resources-ignore-rules-list-expanded-object/table/tbody/tr/td[4]/armo-resource-ignore-rules-cell/div/div[2]/armo-fix-button/armo-button')
                                          
         # Switch to the last window.
-        self._interaction_manager.switch_to_window(-1)
-
+        # self._interaction_manager.switch_to_window(-1)
+        SBS_panel =self._interaction_manager.wait_until_exists('//armo-side-by-side-remediation')
+        _logger.info(f"side bt side is displayed: {SBS_panel.is_displayed()}")
         _logger.info("Navigated to compliance")
 
     def run(self) -> None:

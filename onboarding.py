@@ -92,7 +92,7 @@ class OnboardingTest:
         _logger.info("Verifying installation")
         try:
             self._interaction_manager.click(
-                "//armo-dialog-footer//*[contains(@class, 'mat-button-wrapper')]"
+                "//div[@id='cdk-overlay-0']//armo-dialog-footer//button[contains(@class, 'armo-button') and contains(text(), 'Verify installation')]"
             )
         except TimeoutException as e:
             _logger.error("Verify button was not found or clickable.",

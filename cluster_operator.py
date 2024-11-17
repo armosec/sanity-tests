@@ -269,7 +269,7 @@ class Cleanup:
 
     def choose_delete_option(self):
         time.sleep(0.5)
-        delete_button = self.driver.find_element(By.XPATH, "//button[text()='Delete']")
+        delete_button = self.driver.find_element(By.XPATH, "//button[@mat-menu-item and contains(@class, 'mat-mdc-menu-item') and span[text()='Delete']]")
         delete_button.click()
         print("Click on delete button option.")
 

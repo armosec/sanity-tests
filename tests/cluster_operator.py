@@ -582,12 +582,12 @@ class Cleanup:
 
     def choose_delete_option(self):
         time.sleep(0.5)
-        self._interaction_manager.click("//button[text()='Delete']", By.XPATH)
+        self._interaction_manager.click("//button[@mat-menu-item and contains(@class, 'mat-mdc-menu-item') and span[text()='Delete']]", By.XPATH)
         logger.info("Click on delete button option.")
 
     def confirm_delete(self):
         time.sleep(0.5)
-        self._interaction_manager.click("button.mat-stroked-button[color='warn']", By.CSS_SELECTOR)
+        self._interaction_manager.click("//button[.//span[text()='Delete']]", By.CSS_SELECTOR)
         logger.info("Click on confirm delete button.")
 
     def wait_for_empty_table(self):
