@@ -269,6 +269,7 @@ if __name__ == "__main__":
             'images_view_table_with_risk_spotlight': f"{float(images_view_table_with_risk_spotlight_time):.2f}",
             'sbom_view_table_no_filter': f"{float(sbom_view_table_no_filter_time):.2f}",
             # 'sbom_view_table_with_risk_spotlight': f"{float(sbom_view_table_with_risk_spotlight_time):.2f}",
+            'sbom_view_table_with_risk_spotlight': 0,
             'attackchains': f"{float(attackchains_time):.2f}",
             'vulnerability_overtime': f"{float(vulnerability_overtime_time):.2f}"
         }
