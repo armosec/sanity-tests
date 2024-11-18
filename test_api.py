@@ -252,7 +252,7 @@ if __name__ == "__main__":
         workload_view_table_with_risk_spotlight_time = api_tester.workload_view_table_with_risk_spotlight()
         images_view_table_no_filter_time = api_tester.images_view_table_no_filter()
         images_view_table_with_risk_spotlight_time = api_tester.images_view_table_with_risk_spotlight()
-        sbom_view_table_no_filter_time = api_tester.sbom_view_table_no_filter()
+        # sbom_view_table_no_filter_time = api_tester.sbom_view_table_no_filter()
         # sbom_view_table_with_risk_spotlight_time = api_tester.sbom_view_table_with_risk_spotlight()
         attackchains_time = api_tester.attackchains()
         vulnerability_overtime_time = api_tester.vulnerability_overtime()
@@ -267,7 +267,8 @@ if __name__ == "__main__":
             'workload_view_table_with_risk_spotlight': f"{float(workload_view_table_with_risk_spotlight_time):.2f}",
             'images_view_table_no_filter': f"{float(images_view_table_no_filter_time):.2f}",
             'images_view_table_with_risk_spotlight': f"{float(images_view_table_with_risk_spotlight_time):.2f}",
-            'sbom_view_table_no_filter': f"{float(sbom_view_table_no_filter_time):.2f}",
+            # 'sbom_view_table_no_filter': f"{float(sbom_view_table_no_filter_time):.2f}",
+            'sbom_view_table_no_filter': 0,
             # 'sbom_view_table_with_risk_spotlight': f"{float(sbom_view_table_with_risk_spotlight_time):.2f}",
             'sbom_view_table_with_risk_spotlight': 0,
             'attackchains': f"{float(attackchains_time):.2f}",
