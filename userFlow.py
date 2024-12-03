@@ -13,7 +13,6 @@ from selenium.common.exceptions import NoSuchElementException, StaleElementRefer
 from selenium.common.exceptions import TimeoutException
 
 
-
 def navigate_to_dashboard(driver, wait):
         
     # Click on the compliance
@@ -30,8 +29,8 @@ def navigate_to_dashboard(driver, wait):
     # Click on the cluster (the first one) 
     time.sleep(1)
     try:
-        wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')))
-        cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
+        wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[3]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')))
+        cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[3]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
         driver.execute_script("arguments[0].click();", cluster)
         print("First Cluster selected")
     except:
@@ -62,29 +61,26 @@ def navigate_to_dashboard(driver, wait):
     
     # choose the C-0271 control
     try:
-        # Wait for the checkbox to be present
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, ".mat-checkbox"))
-        )
-
-        # Execute JavaScript to toggle the checkbox
-        # Find the checkbox by its unique attribute, like a label or aria-label
+        time.sleep(2)
         script = """
-        let checkboxes = document.querySelectorAll('.mat-checkbox');
-        for (let box of checkboxes) {
-            let label = box.querySelector('.value.truncate');
+        let checkboxes = document.querySelectorAll('li.d-flex.align-items-center.px-3.pointer.ng-star-inserted');
+        for (let checkbox of checkboxes) {
+            let label = checkbox.querySelector('span.mat-mdc-tooltip-trigger.value.truncate');
             if (label && label.textContent.includes('C-0271')) {
-                box.click(); // Toggles the checkbox
-                break; // Assuming you only need to click the first matching checkbox
+                let input = checkbox.querySelector('input[type="checkbox"]');
+                if (input) {
+                    input.click(); // Simulate the click
+                    return 'clicked';
+                }
             }
         }
         """
         driver.execute_script(script)
-        print("Checkbox of C-0271 clicked.")
+
+        print("Checkbox for C-0271 clicked successfully.")
     except Exception as e:
         print("Failed to click the checkbox.", str(e))
         driver.save_screenshot(f"./failed_to_click_c-0271_checkbox_{ClusterManager.get_current_timestamp()}.png")
-
 
     # click on the esc button
     ClusterManager.press_esc_key(driver)
@@ -141,7 +137,7 @@ def navigate_to_dashboard(driver, wait):
     
     # Wait until the table of the esourse is present  
     try:
-        wait = WebDriverWait(driver, 60, 0.001)
+        # wait = WebDriverWait(driver, 60, 0.001)
         # wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "armo-resources-ignore-rules-list.ng-star-inserted")))
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "armo-button button.armo-button.primary.sm")))
         print("Table of the resourse is present")
@@ -208,7 +204,7 @@ def navigate_to_vulnerabilities(driver, wait):
         # Check if the checkbox is selected
         if checkbox.is_selected():
             # The span that contains the text label
-            label_span = checkbox_element.find_element(By.XPATH, ".//span[@class='mat-tooltip-trigger value truncate']")
+            label_span = checkbox_element.find_element(By.XPATH, ".//span[@class='mat-mdc-tooltip-trigger value truncate']")
             # Append the text label to the list if it's not empty
             label_text = label_span.text.strip()
             if label_text:
@@ -261,21 +257,28 @@ def navigate_to_vulnerabilities(driver, wait):
         driver.save_screenshot(f"./failed_to_click_on_namespace_filter_{ClusterManager.get_current_timestamp()}.png")
 
     # Coose the namespace -default 
+    time.sleep(1)
     try:
-        time.sleep(1)
-        checkbox_label_xpath = "//span[contains(@class, 'mat-checkbox-label') and .//span[contains(text(), 'default')]]"
-        checkbox_label = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, checkbox_label_xpath)))
-        time.sleep(0.5)
-        checkbox_label.click()
-        print("namespace selected: default ") 
-    except:
-        print("failed to select the namespace")
-        driver.save_screenshot(f"./failed_to_select_the_namespace_{ClusterManager.get_current_timestamp()}.png")
+        # Locate all mat-checkbox elements
+        checkbox_elements = driver.find_elements(By.XPATH, "//mat-checkbox")
 
+        for checkbox_element in checkbox_elements:
+            # Locate the label span inside the mat-checkbox
+            label_span = checkbox_element.find_element(By.XPATH, ".//span[@class='mat-mdc-tooltip-trigger value truncate']")
+            if "default" in label_span.text:
+                # Locate the input and click
+                input_element = checkbox_element.find_element(By.XPATH, ".//input[@type='checkbox']")
+                driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", input_element)
+                input_element.click()
+                print("Clicked the 'default' checkbox.")
+                break
+    except Exception as e:
+        print(f"Failed to click the 'default' checkbox: {e}")
 
     # click on the esc button
+    time.sleep(1)   
     ClusterManager.press_esc_key(driver)
+    
     # driver.refresh() # refresh the page to get the vulnerabilities - test
     # Click on the severity filter
     try:
@@ -305,7 +308,7 @@ def navigate_to_vulnerabilities(driver, wait):
     return container_name
 
 def navigate_to_network_policy(driver, wait):
-    
+    time.sleep(2)
     print("Reset pods in the 'default' namespace...")        
     ClusterManager.run_shell_command("kubectl delete pods -n default --all")
         
@@ -333,7 +336,7 @@ def navigate_to_network_policy(driver, wait):
     time.sleep(0.5)
     try:
         label_for_checkbox = driver.find_element(By.XPATH, "//div[contains(@class,'cdk-overlay-pane')]//span[contains(text(), 'Network policy is recommended')]/ancestor::label")
-        label_for_checkbox.click()   
+        label_for_checkbox.click()
         print("clicked NP is recommende checkbox")
     except Exception as e:
         print(f"Failed to click on 'Network policy is recommended' checkbox: {e}")
@@ -375,7 +378,7 @@ def navigate_to_network_policy(driver, wait):
         });
         svg.dispatchEvent(event);
         """, button)
-     
+        time.sleep(1)
         print("NP opened")
     except:
         print("failed to open NP")
@@ -433,7 +436,7 @@ def risk_acceptance_page(driver, wait):
     print("Navigated to Risk Acceptance page")
     time.sleep(1)
     risk_acceptance.switch_tab("Vulnerabilities")
-    risk_acceptance.click_severity_element("td.mat-cell.mat-column-vulnerabilities-0-severityScore")
+    risk_acceptance.click_severity_element("td.mat-mdc-cell span.high-severity-color")
     time.sleep(1)
     risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
     time.sleep(2.5)
@@ -442,7 +445,7 @@ def risk_acceptance_page(driver, wait):
 
     risk_acceptance.switch_tab("Compliance")
     time.sleep(1)
-    risk_acceptance.click_severity_element("td.mat-cell.cdk-column-posturePolicies-0-severityScore")
+    risk_acceptance.click_severity_element("td.mat-mdc-cell span.high-severity-color")
     time.sleep(1)
     risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
     time.sleep(2.5)
@@ -629,7 +632,7 @@ def main():
         connect_cluster.view_connected_cluster()
         onboarding_time = time.time() - start_time
 
-        # attack patč
+        # attack path
         # navigate_to_attack_path(wait)
         # time.sleep(5)
 

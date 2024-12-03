@@ -12,22 +12,23 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-_setup_driver = None
+
 
 def initialize_driver():
-    global setup_driver
     chrome_options = Options()
+    # Uncomment for headless mode if needed
     chrome_options.add_argument("--headless")
-    _setup_driver = webdriver.Chrome(options=chrome_options)
-    _setup_driver.set_window_size(1280,800)
-    # _setup_driver.maximize_window()
-    return _setup_driver
+    chrome_options.add_argument("--start-maximized")
+    chrome_options.add_argument("--disable-infobars")
+    chrome_options.add_argument("--disable-extensions")
+    driver = webdriver.Chrome(options=chrome_options)
+    return driver
 
 
 class ClusterManager:
     def __init__(self,driver):
         self.driver = driver
-        self.wait = WebDriverWait(self.driver, timeout=90, poll_frequency=0.001)
+        self.wait = WebDriverWait(self.driver, timeout=60, poll_frequency=0.001)
 
     def login(self, email_onboarding, login_pass_onboarding, url):
         driver = self.driver
@@ -289,13 +290,24 @@ class IgnoreRule:
         self.driver = driver
         self.wait = WebDriverWait(self.driver, timeout=90, poll_frequency=0.001)
 
-    def click_ignore_button(self, wait, driver):
+    # click on 3 dots button
+    def click_ignore_button(self, wait, driver,index=2):
         try:
-            wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm')))
-            driver.find_element(By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm')
-            driver.execute_script("arguments[0].click();", driver.find_element(By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm'))
-        except:
-            print("failed to click on 3 dots button")
+            # Wait for all "3 dots" buttons to be visible
+            buttons = wait.until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm')))
+
+            # Ensure the index is within bounds
+            if index >= len(buttons):
+                raise IndexError(f"Invalid index {index}. Only {len(buttons)} buttons found.")
+
+            # Select the button at the specified index and click it
+            button = buttons[index]
+            driver.execute_script("arguments[0].click();", button)
+            print(f"Clicked '3 dots' button at index {index}")
+        except IndexError as e:
+            print(f"Index error: {e}")
+        except Exception as e:
+            print(f"Failed to click '3 dots' button: {e}")
             driver.save_screenshot(f"./ignore_button_error_{ClusterManager.get_current_timestamp()}.png")
             
         try:
@@ -310,7 +322,7 @@ class IgnoreRule:
     # Check if there are at the fields not empty
     def get_ignore_rule_field(self ,driver, index):
         # Define the CSS selector
-        css_selector = ".mat-tooltip-trigger.field-value.truncate.ng-star-inserted"
+        css_selector = ".mat-mdc-tooltip-trigger.field-value.truncate.ng-star-inserted"
         all_fields = driver.find_elements(By.CSS_SELECTOR, css_selector)
 
         # Access the field at the specified index
@@ -349,7 +361,7 @@ class IgnoreRule:
 
         # Click on the revoke button
         try:
-            revoke_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.mat-focus-indicator.base-button.big-button.mat-stroked-button.mat-button-base.mat-warn')))
+            revoke_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.error.md')))
             revoke_button.click()
             print("Ignore rule deleted.")
         except:
