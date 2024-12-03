@@ -197,7 +197,7 @@ class ConnectCluster:
 
     def verify_installation(self):
         try:
-            verify_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-dialog-footer .mat-button-wrapper')))
+            verify_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.primary.md')))
             self.driver.execute_script("arguments[0].click();", verify_button)
         except TimeoutException as e:
             print("Verify button was not found or clickable.")
@@ -206,10 +206,16 @@ class ConnectCluster:
 
     def view_cluster_button(self):
         try:
-            view_cluster_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.primary.md'))) 
-            self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'button.armo-button.primary.md')))
+            # Use XPath to locate the "View cluster" button
+            view_cluster_button = self.wait.until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'View cluster')]")))
+            self.wait.until(
+                EC.visibility_of_element_located((By.XPATH, "//button[contains(text(), 'View cluster')]")))
             time.sleep(2)
+
+            # Click the button using JavaScript
             self.driver.execute_script("arguments[0].click();", view_cluster_button)
+            print("Clicked the 'View cluster' button successfully.")
         except TimeoutException as e:
             print("View cluster button was not found or clickable.")
             self.driver.save_screenshot(f"./view_cluster_button_error_{ClusterManager.get_current_timestamp()}.png")
@@ -219,7 +225,7 @@ class ConnectCluster:
         try:
             time.sleep(2)
             wait = WebDriverWait(self.driver, timeout=custom_wait_time, poll_frequency=0.001)
-            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
+            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "img[src='/assets/images/cluster-status/connected.svg']")))
             print("View cluster connected found.")
         except TimeoutException as e:
             if max_attempts > 0:
