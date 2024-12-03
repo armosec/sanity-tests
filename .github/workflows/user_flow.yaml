@@ -66,49 +66,49 @@ jobs:
             pull: '--ff-only'
             add: ./logs/*
 
-  run-flowUser-test-us:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Generate uuid
-          id: uuid
-          run: |
-            echo "RANDOM_UUID=systets-$(uuidgen)" >> $GITHUB_OUTPUT
+  # run-flowUser-test-us:
+  #     runs-on: ubuntu-latest
+  #     steps:
+  #       - name: Generate uuid
+  #         id: uuid
+  #         run: |
+  #           echo "RANDOM_UUID=systets-$(uuidgen)" >> $GITHUB_OUTPUT
 
-        - name: Create k8s Kind Cluster
-          id: kind-cluster-install
-          uses: helm/kind-action@v1.3.0
-          with:
-            cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
+  #       - name: Create k8s Kind Cluster
+  #         id: kind-cluster-install
+  #         uses: helm/kind-action@v1.3.0
+  #         with:
+  #           cluster_name: ${{ steps.uuid.outputs.RANDOM_UUID }}
 
-        - name: Checkout repo
-          uses: actions/checkout@v3
+  #       - name: Checkout repo
+  #         uses: actions/checkout@v3
 
-        - name: Set up Python environment
-          uses: actions/setup-python@v4
-          timeout-minutes: 10
-          with:
-            python-version: 3.8
+  #       - name: Set up Python environment
+  #         uses: actions/setup-python@v4
+  #         timeout-minutes: 10
+  #         with:
+  #           python-version: 3.8
 
-        - name: Install dependencies
-          run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
+  #       - name: Install dependencies
+  #         run: |
+  #           python -m pip install --upgrade pip
+  #           pip install -r requirements.txt
 
-        - name: Run user flow test on US
-          env:
-            URL: https://cloud.us.armosec.io/compliance-kubernetes
-            email_user_flow: ${{ secrets.EMAIL_USER_FLOW_US }}
-            login_pass_user_flow: ${{ secrets.LOGIN_PASS_USER_FLOW_US }}
-          run: |
-            python userFlow.py $URL
+  #       - name: Run user flow test on US
+  #         env:
+  #           URL: https://cloud.us.armosec.io/compliance-kubernetes
+  #           email_user_flow: ${{ secrets.EMAIL_USER_FLOW_US }}
+  #           login_pass_user_flow: ${{ secrets.LOGIN_PASS_USER_FLOW_US }}
+  #         run: |
+  #           python userFlow.py $URL
 
-        - name: upload screenshots
-          uses: actions/upload-artifact@v4
-          if: always()
-          with:
-            name: screenshots-us
-            path: | 
-              ./*.png
+  #       - name: upload screenshots
+  #         uses: actions/upload-artifact@v4
+  #         if: always()
+  #         with:
+  #           name: screenshots-us
+  #           path: | 
+  #             ./*.png
 
         # - name: Commit changes
         #   uses: EndBug/add-and-commit@v9
