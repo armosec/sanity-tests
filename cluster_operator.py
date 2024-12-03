@@ -17,7 +17,7 @@ from selenium.webdriver.chrome.options import Options
 def initialize_driver():
     chrome_options = Options()
     # Uncomment for headless mode if needed
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")
     chrome_options.add_argument("--start-maximized")
     chrome_options.add_argument("--disable-infobars")
     chrome_options.add_argument("--disable-extensions")
@@ -276,7 +276,7 @@ class Cleanup:
 
     def confirm_delete(self):
         time.sleep(0.5)
-        confirm_delete_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.mat-stroked-button[color='warn']")))
+        confirm_delete_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.armo-button.error.md")))
         confirm_delete_button.click()
         print("Click on confirm delete button.")
 
