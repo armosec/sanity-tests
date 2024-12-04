@@ -261,7 +261,7 @@ class Cleanup:
         print("Click on settings button.")
 
     def click_more_options_button(self):
-        time.sleep(1)
+        time.sleep(2)
         # Find all elements matching the CSS selector
         more_options_buttons = self.wait.until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm'))
@@ -298,12 +298,13 @@ class IgnoreRule:
 
     # click on 3 dots button
     def click_ignore_button(self, wait, driver,index=2):
+        time.sleep(1)
         try:
             # Wait for all "3 dots" buttons to be visible
             buttons = wait.until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm')))
 
             # Ensure the index is within bounds
-            if index >= len(buttons):
+            if index > len(buttons):
                 raise IndexError(f"Invalid index {index}. Only {len(buttons)} buttons found.")
 
             # Select the button at the specified index and click it

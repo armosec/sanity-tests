@@ -29,8 +29,8 @@ def navigate_to_dashboard(driver, wait):
     # Click on the cluster (the first one) 
     time.sleep(1)
     try:
-        wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[3]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')))
-        cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[3]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
+        wait.until(EC.presence_of_element_located((By.XPATH, "//td[contains(@class, 'cdk-column-isConnected') and .//img[contains(@alt, 'Connected')]]")))
+        cluster = driver.find_element(By.XPATH, "//td[contains(@class, 'cdk-column-isConnected') and .//img[contains(@alt, 'Connected')]]")
         driver.execute_script("arguments[0].click();", cluster)
         print("First Cluster selected")
     except:
@@ -676,8 +676,8 @@ def main():
             f"Attack Path Time: {log_data['AC_time']} sec")
 
 
-        with open("./logs/flow_user_logs.csv", "a") as f:
-            f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
+        # with open("./logs/flow_user_logs.csv", "a") as f:
+        #     f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
             
     finally:
         # Cleanup cluster from Armo platrom
