@@ -676,8 +676,8 @@ def main():
             f"Attack Path Time: {log_data['AC_time']} sec")
 
 
-        # with open("./logs/flow_user_logs.csv", "a") as f:
-        #     f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
+        with open("./logs/flow_user_logs.csv", "a") as f:
+            f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
             
     finally:
         # Cleanup cluster from Armo platrom
