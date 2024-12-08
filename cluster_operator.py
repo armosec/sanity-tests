@@ -313,6 +313,7 @@ class IgnoreRule:
             print(f"Clicked '3 dots' button at index {index}")
         except IndexError as e:
             print(f"Index error: {e}")
+            print(f"Found {len(buttons)} buttons matching the selector.")
         except Exception as e:
             print(f"Failed to click '3 dots' button: {e}")
             driver.save_screenshot(f"./ignore_button_error_{ClusterManager.get_current_timestamp()}.png")
