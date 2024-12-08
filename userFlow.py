@@ -335,7 +335,7 @@ def navigate_to_network_policy(driver, wait):
     # Click on the 'NP is recommended' checkbox  
     time.sleep(0.5)
     try:
-        label_for_checkbox = driver.find_element(By.XPATH, "//div[contains(@class,'cdk-overlay-pane')]//span[contains(text(), 'Network policy is recommended')]/ancestor::label")
+        label_for_checkbox = driver.find_element(By.XPATH, "//div[contains(@class,'cdk-overlay-pane')]//span[contains(text(), 'Missing profile')]/ancestor::label")
         label_for_checkbox.click()
         print("clicked NP is recommende checkbox")
     except Exception as e:
