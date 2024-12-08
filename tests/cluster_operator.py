@@ -602,6 +602,7 @@ class IgnoreRule:
         self._interaction_manager = InteractionManager(driver)
 
     def click_ignore_button(self):
+        time.sleep(2)
         try:
             self._interaction_manager.click('button.armo-button.table-secondary.sm', By.CSS_SELECTOR,index=2)
         except:

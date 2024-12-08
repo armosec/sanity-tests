@@ -298,7 +298,7 @@ class IgnoreRule:
 
     # click on 3 dots button
     def click_ignore_button(self, wait, driver,index=2):
-        time.sleep(1)
+        time.sleep(2)
         try:
             # Wait for all "3 dots" buttons to be visible
             buttons = wait.until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm')))
