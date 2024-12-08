@@ -73,22 +73,21 @@ class Compliance(BaseTest):
             print("failed to set 271 for C-00271 control")
             driver.save_screenshot(f"./failed_to_set_271_for_C-00271_control_{ClusterManager.get_current_timestamp()}.png")
         
+        # Click on the checkbox for the control C-0271
         try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, ".mat-checkbox"))
-            )
-            script = """
-            let checkboxes = document.querySelectorAll('.mat-checkbox');
-            for (let box of checkboxes) {
-                let label = box.querySelector('.value.truncate');
-                if (label && label.textContent.includes('C-0271')) {
-                    box.click(); // Toggles the checkbox
-                    break; // Assuming you only need to click the first matching checkbox
-                }
-            }
-            """
-            driver.execute_script(script)
-            logger.info("Checkbox of C-0271 clicked.")
+            # Locate all mat-checkbox elements
+            checkbox_elements = driver.find_elements(By.XPATH, "//mat-checkbox")
+    
+            for checkbox_element in checkbox_elements:
+                # Locate the label span inside the mat-checkbox
+                label_span = checkbox_element.find_element(By.XPATH, ".//span[@class='mat-mdc-tooltip-trigger value truncate']")
+                if "default" in label_span.text:
+                    # Locate the input and click
+                    input_element = checkbox_element.find_element(By.XPATH, ".//input[@type='checkbox']")
+                    driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", input_element)
+                    input_element.click()
+                    print("Clicked the checkbox.")
+                    break
         except Exception as e:
             logger.error("Failed to click the checkbox.", str(e))
             driver.save_screenshot(f"./failed_to_click_c-0271_checkbox_{ClusterManager.get_current_timestamp()}.png")
@@ -171,7 +170,7 @@ class Compliance(BaseTest):
         print("Navigated to Risk Acceptance page")
         risk_acceptance.switch_tab("Compliance")
         time.sleep(1)
-        risk_acceptance.click_severity_element("td.mat-cell.cdk-column-posturePolicies-0-severityScore")
+        risk_acceptance.click_severity_element("td.mat-mdc-cell span.high-severity-color")
         time.sleep(1)
         risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
         time.sleep(2.5)

@@ -541,7 +541,7 @@ class ConnectCluster:
         try:
             time.sleep(2)
             wait = WebDriverWait(self._driver, timeout=custom_wait_time, poll_frequency=0.001)
-            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'armo-cluster-scans-table .mat-tooltip-trigger')))
+            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "img[src='/assets/images/cluster-status/connected.svg']")))
             logger.info("View cluster connected found.")
         except TimeoutException as e:
             if max_attempts > 0:
@@ -576,7 +576,7 @@ class Cleanup:
         logger.info("Click on settings button.")
 
     def click_more_options_button(self):
-        time.sleep(1)
+        time.sleep(2)
         self._interaction_manager.click('button.armo-button.table-secondary.sm', By.CSS_SELECTOR, index=2)
         logger.info("Click on more options button.")
 
@@ -587,7 +587,7 @@ class Cleanup:
 
     def confirm_delete(self):
         time.sleep(0.5)
-        self._interaction_manager.click("//button[.//span[text()='Delete']]", By.CSS_SELECTOR)
+        self._interaction_manager.click("button.armo-button.error.md", By.CSS_SELECTOR)
         logger.info("Click on confirm delete button.")
 
     def wait_for_empty_table(self):
@@ -603,7 +603,7 @@ class IgnoreRule:
 
     def click_ignore_button(self):
         try:
-            self._interaction_manager.click('button.armo-button.table-secondary.sm', By.CSS_SELECTOR)
+            self._interaction_manager.click('button.armo-button.table-secondary.sm', By.CSS_SELECTOR,index=2)
         except:
             logger.error("failed to click on 3 dots button")
             self._driver.save_screenshot(f"./ignore_button_error_{ClusterManager.get_current_timestamp()}.png")
@@ -637,7 +637,7 @@ class IgnoreRule:
 
     def get_ignore_rule_field(self, index):
         time.sleep(3)
-        css_selector = ".mat-tooltip-trigger.field-value.truncate.ng-star-inserted"
+        css_selector = ".mat-mdc-tooltip-trigger.field-value.truncate.ng-star-inserted"
         all_fields = self._driver.find_elements(By.CSS_SELECTOR, css_selector)
         field_text = all_fields[index].text.strip()
         # logger.info(f"The RESOURCE is: '{field_text}'")
@@ -690,7 +690,7 @@ class IgnoreRule:
             self._driver.save_screenshot(f"./delete_ignore_rule_button_error_{ClusterManager.get_current_timestamp()}.png")
 
         try:
-            self._interaction_manager.click('.mat-focus-indicator.base-button.big-button.mat-stroked-button.mat-button-base.mat-warn', By.CSS_SELECTOR)
+            self._interaction_manager.click('button.armo-button.error.md', By.CSS_SELECTOR)
             logger.info("Ignore rule deleted.")
         except:
             logger.error("Revoke button not found.")
