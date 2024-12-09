@@ -1,6 +1,7 @@
 name: Run API Tests
 
 on:
+  workflow_dispatch:
   schedule:
   - cron: "17,42 * * * *"  # Runs at the 17th and 42nd minute of every hour
   # push:
