@@ -17,7 +17,7 @@ from selenium.webdriver.chrome.options import Options
 def initialize_driver():
     chrome_options = Options()
     # Uncomment for headless mode if needed
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")
     chrome_options.add_argument("--start-maximized")
     chrome_options.add_argument("--disable-infobars")
     chrome_options.add_argument("--disable-extensions")
@@ -261,7 +261,7 @@ class Cleanup:
         print("Click on settings button.")
 
     def click_more_options_button(self):
-        time.sleep(2)
+        time.sleep(2.5)
         # Find all elements matching the CSS selector
         more_options_buttons = self.wait.until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'button.armo-button.table-secondary.sm'))
