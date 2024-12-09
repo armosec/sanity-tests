@@ -529,10 +529,18 @@ class ConnectCluster:
 
     def view_cluster_button(self):
         try:
-            self._interaction_manager.click('armo-connection-wizard-connection-step-footer .armo-button', By.CSS_SELECTOR)
-            self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'armo-connection-wizard-connection-step-footer .armo-button')))
-            time.sleep(2)
-            self._interaction_manager.click('armo-connection-wizard-connection-step-footer .armo-button', By.CSS_SELECTOR)
+            # # self._interaction_manager.click('armo-connection-wizard-connection-step-footer .armo-button', By.CSS_SELECTOR)
+            # self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'armo-connection-wizard-connection-step-footer .armo-button')))
+            # time.sleep(2)
+            # self._interaction_manager.click('armo-connection-wizard-connection-step-footer .armo-button', By.CSS_SELECTOR)
+            buttons = self._wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'armo-connection-wizard-connection-step-footer .armo-button')))
+            for button in buttons:
+                if button.text.strip() == "View cluster":
+                    # Click the button
+                    self._interaction_manager.click(button)
+                    logger.info("Clicked on the 'View cluster' button.")
+                    return
+            logger.error("Button with text 'View cluster' was not found.")
         except TimeoutException as e:
             logger.error("View cluster button was not found or clickable.")
             self._driver.save_screenshot(f"./view_cluster_button_error_{ClusterManager.get_current_timestamp()}.png")

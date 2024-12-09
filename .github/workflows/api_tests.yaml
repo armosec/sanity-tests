@@ -273,3 +273,22 @@ jobs:
         commit: --signoff
         pull: '--ff-only'
         add: ./logs/api_test_log_Mimecast.csv 
+
+    - name: Run API test with BitDefender
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_BITDEFENDER }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name BitDefender
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for BitDefender"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_BitDefender.csv 

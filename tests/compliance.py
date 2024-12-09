@@ -19,6 +19,8 @@ class Compliance(BaseTest):
         self.login(login_url)
         try:
             print("Running Compliance test")
+            interact = self._interaction_manager
+            interact.click('configuration-scanning-left-menu-item', By.ID) # Click on Compliance
             connect_cluster.click_get_started()
             connect_cluster.connect_cluster_helm()
             connect_cluster.verify_installation()
