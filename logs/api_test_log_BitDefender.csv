@@ -1,3 +1,2 @@
-timestamp,login_time,cve_view_no_filter,cve_view_with_risk_spotlight,workload_view_table_no_filter,workload_view_table_with_risk_spotlight,images_view_table_no_filter,images_view_table_with_risk_spotlight,sbom_view_table_no_filter,sbom_view_table_with_risk_spotlight,attackchains,vulnerability_overtime
 2024-12-09 10:42:20,0.52,28.54,36.63,1.00,60.15,2.24,60.13,0,0,7.45,28.92
 2024-12-09 10:48:13,0.67,1.07,2.65,0.60,21.75,0.44,60.13,0,0,5.58,18.27
