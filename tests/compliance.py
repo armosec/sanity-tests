@@ -76,6 +76,7 @@ class Compliance(BaseTest):
             driver.save_screenshot(f"./failed_to_set_271_for_C-00271_control_{ClusterManager.get_current_timestamp()}.png")
         
         # Click on the checkbox for the control C-0271
+        time.sleep(2) # Wait for the control to load
         try:
             # Locate all mat-checkbox elements
             checkbox_elements = driver.find_elements(By.XPATH, "//mat-checkbox")
@@ -83,7 +84,7 @@ class Compliance(BaseTest):
             for checkbox_element in checkbox_elements:
                 # Locate the label span inside the mat-checkbox
                 label_span = checkbox_element.find_element(By.XPATH, ".//span[@class='mat-mdc-tooltip-trigger value truncate']")
-                if "default" in label_span.text:
+                if "C-0271" in label_span.text:
                     # Locate the input and click
                     input_element = checkbox_element.find_element(By.XPATH, ".//input[@type='checkbox']")
                     driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", input_element)

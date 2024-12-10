@@ -496,6 +496,7 @@ class ConnectCluster:
         self._interaction_manager = InteractionManager(driver)
 
     def click_get_started(self):
+        time.sleep(0.5)
         try:
             self._interaction_manager.click('//*[@id="action-section"]/armo-button/button', By.XPATH)
             logger.info("Click on get started button.")
