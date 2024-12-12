@@ -18,14 +18,16 @@ class Vulnerabilities(BaseTest):
         login_url = self.get_login_url()
         self.login(login_url)
         try:
-            # connect_cluster.click_get_started()
-            # connect_cluster.connect_cluster_helm()
-            # connect_cluster.verify_installation()
-            # connect_cluster.view_cluster_button()
-            # connect_cluster.view_connected_cluster()
-            # self.navigate_to_vulnerabilities()
-            # self.risk_acceptance_page()
-            # self.run_vulne_cve_test()
+            interact = self._interaction_manager
+            interact.click('image-scanning-left-menu-item', By.ID) # Click on vulnerabilities page
+            connect_cluster.click_get_started()
+            connect_cluster.connect_cluster_helm()
+            connect_cluster.verify_installation()
+            connect_cluster.view_cluster_button()
+            connect_cluster.view_connected_cluster()
+            self.navigate_to_vulnerabilities()
+            self.risk_acceptance_page()
+            self.run_vulne_cve_test()
             print("Running vulnerabilities test")
         finally:
             self.perform_cleanup()  
@@ -110,9 +112,12 @@ class Vulnerabilities(BaseTest):
         time.sleep(1)
         cluster_manager.click_filter_button("Namespace")
         time.sleep(1)
-        cluster_manager.click_on_filter_ckackbox("default")
+        cluster_manager.click_checkbox_by_name("default")
         time.sleep(1)
-        cluster_manager.press_esc_key(driver)
+        print("TEST")
+        ClusterManager.click_close_filter(driver)
+        time.sleep(1)
+        driver.save_screenshot(f"ffcccc.png")
     
         # try:
         #     severity_filter_elements = driver.find_elements(By.XPATH, "//div[@class='severity-background']")
@@ -134,8 +139,9 @@ class Vulnerabilities(BaseTest):
             
         cluster_manager.click_filter_button("Severity")
         time.sleep(1)
-        cluster_manager.click_on_filter_ckackbox("High")
-        cluster_manager.press_esc_key(driver)
+        cluster_manager.click_checkbox_by_name("High")
+        
+        ClusterManager.click_close_filter(driver)
         time.sleep(1)
         num_of_high_cve = interaction_manager.count_rows()
         logger.info(f"Number of high CVEs: {num_of_high_cve}")
@@ -146,11 +152,11 @@ class Vulnerabilities(BaseTest):
             interaction_manager.click("(//button[@class='armo-button tertiary sm'])[2]", By.XPATH)
             logger.info("Clicked on the first row in the table")
         except TimeoutException:
-            logger.error("Failed to find any rows in the table")
-            driver.save_screenshot(f"./failed_to_find_rows_in_table_{ClusterManager.get_current_timestamp()}.png")
+            logger.error("Failed to click on rows in the table")
+            driver.save_screenshot(f"./failed_to_clicl_rows_in_table_{ClusterManager.get_current_timestamp()}.png")
         
         cluster_manager.click_tab_on_sidebar(tab_name="Runtime Analysis")
-        time.sleep(1)
+        time.sleep(1.5)
         try:
             image_tag = interaction_manager.get_text("//span[contains(text(), 'docker.io/library/alpine')]")
             if image_tag == "docker.io/library/alpine:3.18.2":
@@ -166,7 +172,7 @@ class Vulnerabilities(BaseTest):
         cluster_manager.click_overlay_button()
         time.sleep(1)
         workload_name = interaction_manager.get_text("(//td[contains(@class, 'cdk-column-value')])[1]")
-        cluster_manager.press_esc_key(driver)
+        ClusterManager.press_esc_key(driver)
         
         
         
@@ -224,7 +230,7 @@ class Vulnerabilities(BaseTest):
         print("Navigated to risk acceptance page")
         time.sleep(1)
         risk_acceptance.switch_tab("Vulnerabilities")
-        risk_acceptance.click_severity_element("td.mat-cell.mat-column-vulnerabilities-0-severityScore")
+        risk_acceptance.click_severity_element("td.mat-mdc-cell span.high-severity-color")
         time.sleep(1)
         risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
         time.sleep(2.5)

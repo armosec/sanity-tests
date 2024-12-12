@@ -28,15 +28,15 @@ class VulneCvePage(BaseTest):
         time.sleep(1)    
         cluster_manager.click_filter_button("Namespace")
         time.sleep(1)
-        cluster_manager.click_on_filter_ckackbox("default")
+        cluster_manager.click_checkbox_by_name("default")
         time.sleep(1)
-        cluster_manager.press_esc_key(driver)
+        ClusterManager.click_close_filter(driver)
         time.sleep(1)
         cluster_manager.click_filter_button("Workload")
         time.sleep(1)
-        cluster_manager.click_on_filter_ckackbox("alpine-deployment")        
+        cluster_manager.click_checkbox_by_name("alpine-deployment")        
         time.sleep(1)
-        cluster_manager.press_esc_key(driver)
+        ClusterManager.click_close_filter(driver,index=1)
         time.sleep(1)   
         cluster_manager.click_filter_button("In Use")
         time.sleep(0.5)
@@ -46,8 +46,9 @@ class VulneCvePage(BaseTest):
         time.sleep(1)
         cluster_manager.click_filter_button("Severity")
         time.sleep(1)
-        cluster_manager.click_on_filter_ckackbox("Medium") 
-        cluster_manager.press_esc_key(driver)       
+        cluster_manager.click_checkbox_by_name("Medium") 
+        time.sleep(1)
+        ClusterManager.click_close_filter(driver,index=2)       
         time.sleep(1)
         
         ignore_rule = IgnoreRule(driver)
@@ -59,7 +60,7 @@ class VulneCvePage(BaseTest):
         time.sleep(2)
         # Click on the first row
         try:
-            cve_cells = self._driver.find_elements(By.CSS_SELECTOR, "td.mat-cell.cdk-column-name.mat-column-name span.mat-tooltip-trigger")
+            cve_cells = self._driver.find_elements(By.XPATH, "//span[normalize-space(text())='Medium']")
 
             # Check if there are any elements found and click the first one
             if cve_cells:
@@ -73,11 +74,11 @@ class VulneCvePage(BaseTest):
         time.sleep(1)
 
 
-        cve_severity = interaction_manager.get_text("/html/body/armo-root/div/div/div/armo-cves-details-page/armo-tabs/armo-cves-details-tab/armo-vulnerabilities-details-list/div/table/tbody/tr[4]/td[2]/span")
+        cve_severity = interaction_manager.get_text("//span[contains(@class, 'medium-severity-color') and normalize-space(text())='Medium']")
         print(cve_severity)
         
-        button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.armo-button.tertiary.sm")))
-        button[0].click()
+        button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//armo-button[contains(@class, 'link-button') and .//button[contains(@class, 'armo-button') and contains(@class, 'tertiary') and contains(@class, 'sm')]]")))
+        button.click()
         time.sleep(1)
         cluster_manager.click_tab_on_sidebar(tab_name="Runtime Analysis")
         time.sleep(1)
@@ -85,19 +86,25 @@ class VulneCvePage(BaseTest):
         # click on the bottom ">" in the saide panel
         cluster_manager.click_overlay_button()
         time.sleep(1)
-        workload_name = interaction_manager.get_text("(//td[contains(@class, 'cdk-column-value')])[1]")
+        workload_name = interaction_manager.get_text("//td[contains(@class, 'mat-mdc-cell') and normalize-space(text())='alpine-deployment']")
         cluster_manager.press_esc_key(driver)
 
         cluster_manager.click_on_tab_in_vulne_page("images")
-        workload_name = interaction_manager.get_text("/html/body/armo-root/div/div/div/armo-cves-details-page/armo-tabs/armo-cves-images-tab/armo-vulnerabilities-shared-table/div/table/tbody/tr/td[4]")
+        workload_name_1 = interaction_manager.get_text("//td[contains(@class, 'mat-mdc-cell') and .//span[normalize-space(text())='alpine-container']]")
 
+        if workload_name == workload_name_1:
+            print("Workload name is the same")
+        else:    
+            print("Workload name is different")
+            print(workload_name,    workload_name_1) 
 
         time.sleep(1)
-        driver.save_screenshot(f"./test-1_{ClusterManager.get_current_timestamp()}.png")
+        # driver.save_screenshot(f"./test-1_{ClusterManager.get_current_timestamp()}.png")
         cluster_manager.click_on_tab_in_vulne_page("workloads",index=1)
         print("TEST-2")
-        driver.save_screenshot(f"./test-2_{ClusterManager.get_current_timestamp()}.png")
         time.sleep(1)
+        # driver.save_screenshot(f"./test-2_{ClusterManager.get_current_timestamp()}.png")
+      
 
         
 

@@ -73,6 +73,43 @@ class ClusterManager:
             logger.info("ESC key pressed successfully.")
         except Exception as e:
             logger.error("Failed to press the ESC key.", str(e))
+            
+
+    def click_close_filter(driver, index=0):
+        try:
+            # Define the XPath to locate all <armo-icon> elements
+            armo_icon_xpath = "//armo-icon[@svgsource='assets/icons/v2/general/close.svg#close']"
+
+            # Wait until at least one <armo-icon> element is present
+            armo_icon_elements = WebDriverWait(driver, 10).until(
+                EC.presence_of_all_elements_located((By.XPATH, armo_icon_xpath)))
+
+            # Ensure the index is within bounds
+            if index >= len(armo_icon_elements):
+                raise IndexError(f"Invalid index {index}. Only {len(armo_icon_elements)} elements found.")
+
+            # Wait for the overlay to disappear, if present
+            WebDriverWait(driver, 10).until(
+                EC.invisibility_of_element_located((By.CLASS_NAME, "cdk-overlay-backdrop")))
+
+            # Select the <armo-icon> element at the specified index
+            armo_icon_element = armo_icon_elements[index]
+
+            # Scroll the element into view
+            driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", armo_icon_element)
+
+            # Use ActionChains to move to the element and click
+            actions = ActionChains(driver)
+            actions.move_to_element(armo_icon_element).click().perform()
+
+            logger.info(f"Successfully clicked on the <armo-icon> element at index {index}.")
+
+        except IndexError as e:
+            logger.error(f"Index error: {e}")
+        except Exception as e:
+            logger.error(f"Failed to click on the <armo-icon> element at index {index}: {str(e)}")
+            driver.save_screenshot(f"./failed_to_click_armo_icon_{ClusterManager.get_current_timestamp()}.png")
+
 
     def click_filter_button(self, filter_name):
         try:
@@ -157,20 +194,18 @@ class ClusterManager:
     def click_tab_on_sidebar(self, tab_name):
         try:
             # Define the XPath for the third tab with the specific name
-            tab_xpath = f"(//div[contains(@class, 'mat-tab-label') and .//div[text()='{tab_name}']])[3]"
+            tab_xpath = f"//span[@class='mdc-tab__text-label' and text()='{tab_name}']"
 
             # Wait for the tab element to be visible and present
             tab_element = WebDriverWait(self._driver, 15).until(
-                EC.visibility_of_element_located((By.XPATH, tab_xpath))
-            )
+                EC.visibility_of_element_located((By.XPATH, tab_xpath)))
             
             # Scroll the tab element into view
             self._driver.execute_script("arguments[0].scrollIntoView(true);", tab_element)
 
             # Ensure the tab is clickable
             WebDriverWait(self._driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, tab_xpath))
-            )
+                EC.element_to_be_clickable((By.XPATH, tab_xpath)))
 
             # Click the tab
             tab_element.click()
@@ -280,26 +315,36 @@ class ClusterManager:
             self._driver.save_screenshot(f"./failed_to_click_button_in_cdk_overlay_{ClusterManager.get_current_timestamp()}.png")
 
 
-    def click_on_filter_ckackbox(self, name: str):
+    def click_checkbox_by_name(self, label_name):
+        """
+        Clicks a checkbox with the specified label name in a dynamic overlay.
+        
+        :param driver: The Selenium WebDriver instance.
+        :param label_name: The label text associated with the checkbox to click.
+        """
         try:
-            interaction_manager = InteractionManager(self._driver)
-            
-            # Define the XPath to locate the checkbox label dynamically based on the label name
-            checkbox_label_xpath = f"//span[contains(@class, 'mat-checkbox-label') and .//span[contains(text(), '{name}')]]"
-            
-            # Wait for the checkbox label element to exist
-            checkbox_label = interaction_manager.wait_until_exists(checkbox_label_xpath, By.XPATH)
-            
-            # Small delay to ensure element is ready for interaction
-            time.sleep(0.5)
-            
-            # Click on the checkbox label
-            checkbox_label.click()
-            logger.info(f"Checkbox selected: {name}")
-            
+            # Wait for the overlay containing the checkboxes to appear
+            overlay_xpath = "//div[contains(@class, 'mat-mdc-menu-panel')]"
+            WebDriverWait(self._driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, overlay_xpath))
+            )
+
+            # Build the dynamic XPath for the checkbox input
+            checkbox_xpath = f"//span[text()='{label_name}']/ancestor::mat-checkbox//input[@type='checkbox']"
+
+            # Locate the checkbox input
+            checkbox_input = self._driver.find_element(By.XPATH, checkbox_xpath)
+
+            # Scroll the checkbox into view to ensure it's visible
+            self._driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", checkbox_input)
+
+            # Click the checkbox using JavaScript to bypass potential overlay issues
+            self._driver.execute_script("arguments[0].click();", checkbox_input)
+            print(f"Successfully clicked the checkbox labeled '{label_name}'.")
         except Exception as e:
-            logger.error(f"Failed to select the checkbox for label '{name}': {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_select_checkbox_{name}_{ClusterManager.get_current_timestamp()}.png")
+            print(f"Failed to click the checkbox labeled '{label_name}': {e}")
+            self._driver.save_screenshot(f"./failed_to_click_checkbox_{label_name.replace(' ', '_')}.png")
+
 
     def click_on_filter_ckackbox_sidebar(self, span_text: str):
         """
