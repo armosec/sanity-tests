@@ -14,7 +14,7 @@ class Vulnerabilities(BaseTest):
     def run(self):
         connect_cluster = ConnectCluster(self._driver, self._wait)
         cluster_manager = ClusterManager(self._driver, self._wait)
-        # cluster_manager.create_attack_path()  
+        cluster_manager.create_attack_path()  
         login_url = self.get_login_url()
         self.login(login_url)
         try:
