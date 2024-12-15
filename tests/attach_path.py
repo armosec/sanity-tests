@@ -49,6 +49,8 @@ class AttachPath(BaseTest):
             wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, f"[data-test-id='{data_test_id}']")))
             logger.info("Attack path is displayed.")
 
+            logger.info("waiting for the attack path to load - 30 seconds")
+            time.sleep(30)
             # Obtain descriptions
             descriptions = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[data-test-id='description']")))
 
