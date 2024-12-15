@@ -15,11 +15,13 @@ class AttachPath(BaseTest):
     def run(self):
         connect_cluster = ConnectCluster(self._driver, self._wait)
         connect_maneger = ClusterManager(self._driver, self._wait)
+        interaction_manager = InteractionManager(self._driver)
         connect_maneger.create_attack_path()
         login_url = self.get_login_url()
         self.login(login_url)
         try:
             logger.info("Running Attach Path test")
+            interaction_manager.click("attack-path-left-menu-item", by=By.ID) # Click on the Attack Path menu item
             connect_cluster.click_get_started()
             connect_cluster.connect_cluster_helm()
             connect_cluster.verify_installation()
@@ -213,7 +215,7 @@ class AttachPath(BaseTest):
         logger.info("Navigated to risk acceptance page")
         time.sleep(1)
         risk_acceptance.switch_tab("Vulnerabilities")
-        risk_acceptance.click_severity_element("td.mat-cell.mat-column-vulnerabilities-0-severityScore")
+        risk_acceptance.click_severity_element("span.font-semi-bold.severity.py-1.critical-severity-color")
         time.sleep(1)
         risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
         time.sleep(2.5)
