@@ -21,7 +21,6 @@ class AttachPath(BaseTest):
         self.login(login_url)
         try:
             logger.info("Running Attach Path test")
-            # interaction_manager.click("attack-path-left-menu-item", by=By.ID) # Click on the Attack Path menu item
             connect_cluster.click_get_started()
             connect_cluster.connect_cluster_helm()
             connect_cluster.verify_installation()
@@ -30,7 +29,7 @@ class AttachPath(BaseTest):
             self.navigate_to_attach_path()
             self.risk_acceptance_page()
         finally:
-            # self.perform_cleanup() TEST
+            self.perform_cleanup()
             logger.info("Attach path test completed")
 
     def navigate_to_attach_path(self):
@@ -77,6 +76,7 @@ class AttachPath(BaseTest):
             driver.save_screenshot(f"./failed_to_find_the_attack_path_{ClusterManager.get_current_timestamp()}.png")
 
     def click_on_attach_path(self, index, wait, driver, interaction_manager):
+        cluster_manager = ClusterManager(driver, wait)
         try:
             descriptions = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[data-test-id='description']")))
             description_element = descriptions[index]
@@ -86,6 +86,19 @@ class AttachPath(BaseTest):
             # element_text = self.validate_attach_path_graph(driver, interaction_manager) -- need to fix this
             element_text = self.check_attach_path_kind(driver)
             if element_text == "CVE":
+                severity_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//td[contains(@class, 'cdk-column-severity') and .//span[contains(@class, 'critical-severity-color') and normalize-space()='Critical']]")))
+                severity_button.click()
+                time.sleep(1)
+                cluster_manager.click_tab_on_sidebar(tab_name="Runtime Analysis")
+                time.sleep(1)
+                
+                # click on the bottom ">" in the saide panel
+                cluster_manager.click_overlay_button()
+                time.sleep(1)
+                workload_name = interaction_manager.get_text("//td[contains(@class, 'mat-mdc-cell') and normalize-space(text())='alpine-deployment']")
+                print(workload_name)    
+                cluster_manager.press_esc_key(driver)
+                time.sleep(1)
                 self.create_ignore_rule(driver) 
                 time.sleep(3)
                 self._interaction_manager.click("armo-attack-chain-graph-node[data-test-id='node-Initial Access']", by=By.CSS_SELECTOR)
