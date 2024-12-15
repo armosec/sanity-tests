@@ -30,7 +30,7 @@ class AttachPath(BaseTest):
             self.navigate_to_attach_path()
             self.risk_acceptance_page()
         finally:
-            self.perform_cleanup()
+            # self.perform_cleanup() TEST
             logger.info("Attach path test completed")
 
     def navigate_to_attach_path(self):
