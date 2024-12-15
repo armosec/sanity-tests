@@ -21,7 +21,7 @@ class AttachPath(BaseTest):
         self.login(login_url)
         try:
             logger.info("Running Attach Path test")
-            interaction_manager.click("attack-path-left-menu-item", by=By.ID) # Click on the Attack Path menu item
+            # interaction_manager.click("attack-path-left-menu-item", by=By.ID) # Click on the Attack Path menu item
             connect_cluster.click_get_started()
             connect_cluster.connect_cluster_helm()
             connect_cluster.verify_installation()
