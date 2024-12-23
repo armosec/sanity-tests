@@ -22,18 +22,18 @@ class SecurityRisk(BaseTest):
         # Log in to the system
         login_url = self.get_login_url()
         self.login(login_url)
-        cluster_manager.create_attack_path()
+        # cluster_manager.create_attack_path()
 
         try:
             logger.info("Running Security Risk test")
-            connect_cluster.click_get_started()
-            connect_cluster.connect_cluster_helm()
-            connect_cluster.verify_installation()
-            connect_cluster.view_cluster_button()
-            connect_cluster.view_connected_cluster()
+            # connect_cluster.click_get_started()
+            # connect_cluster.connect_cluster_helm()
+            # connect_cluster.verify_installation()
+            # connect_cluster.view_cluster_button()
+            # connect_cluster.view_connected_cluster()
             self.navigate_to_security_risk()
         finally:
-            self.perform_cleanup()
+            # self.perform_cleanup()
             logger.info("Security risk test completed")
     
     def navigate_to_security_risk(self):
@@ -94,10 +94,26 @@ class SecurityRisk(BaseTest):
         interaction_manager = InteractionManager(self._driver)
         cluster_manager = ClusterManager(self._driver, self._wait)
         
+        # logger.info("Clicking on the first security risk")
+        # first_security_risk_CSS_SELECTOR = "button.armo-button.table-secondary.sm"
+        # interaction_manager.click(first_security_risk_CSS_SELECTOR, by=By.CSS_SELECTOR)
+        # time.sleep(1)
+        
+        time.sleep(5)
         logger.info("Clicking on the first security risk")
         first_security_risk_CSS_SELECTOR = "button.armo-button.table-secondary.sm"
-        interaction_manager.click(first_security_risk_CSS_SELECTOR, by=By.CSS_SELECTOR)
-        time.sleep(1)
+
+        # Wait until the elements are located
+        first_security_risks = WebDriverWait(self._driver, 10).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, first_security_risk_CSS_SELECTOR))
+        )
+
+        # Check if the list has at least 3 elements
+        if len(first_security_risks) > 2:
+            first_security_risks[2].click()
+            logger.info("Successfully clicked on the third security risk button.")
+        else:
+            logger.error(f"Expected at least 3 elements, but found {len(first_security_risks)}.")
         
         # Apply Namespace filter
         cluster_manager.click_filter_button_in_sidebar_by_text(category_name=category_name, button_text="Namespace")

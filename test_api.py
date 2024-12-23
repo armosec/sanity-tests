@@ -48,7 +48,7 @@ class ApiTester:
         
         response_time = end_time - start_time
         print(f"Login API response time: {response_time:.2f} seconds")
-        # print(f"Login response status code: {response.status_code}")
+        print(f"Login response status code: {response.status_code}")
         if response.status_code != 200:
             print(f"Login failed with status code {response.status_code}")
             return False, response_time
