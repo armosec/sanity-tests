@@ -3,73 +3,331 @@ name: Run API Tests
 on:
   workflow_dispatch:
   schedule:
-    - cron: "17,42 * * * *"  # Runs at the 17th and 42nd minute of every hour
+  - cron: "17,42 * * * *"  # Runs at the 17th and 42nd minute of every hour
+  # push:
+    # branches:
+    # - main
 
 jobs:
-  run-api-tests:
-    name: Run API Tests
+  run-api-test-AKME:
+    name: Run API Test AKME
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        customer:
-          - name: AKME
-            env: prod
-            secret_name: CUSTOMER_GUID_AKME
-          - name: ARMO
-            env: prod
-            secret_name: CUSTOMER_GUID_ARMO
-          - name: Billogram
-            env: prod
-            secret_name: CUSTOMER_GUID_BILLOGRAM
-          - name: AXUAL
-            env: prod
-            secret_name: CUSTOMER_GUID_AXUAL
-          - name: Kyos
-            env: prod
-            secret_name: CUSTOMER_GUID_KYOS
-          - name: Schuberg_Philis
-            env: prod
-            secret_name: CUSTOMER_GUID_SCHUBERG_PHILIS
-          - name: Mimecast
-            env: prod
-            secret_name: CUSTOMER_GUID_MIMECAST
-          - name: BitDefender
-            env: prod
-            secret_name: CUSTOMER_GUID_BITDEFENDER
-          - name: ARMO_EEE
-            env: dev
-            secret_name: CUSTOMER_GUID_ARMO_EEE
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        timeout-minutes: 10
-        with:
-          python-version: 3.8
-          cache: pip
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements_api.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_api.txt
 
-      - name: Run API test for ${{ matrix.customer.name }}
-        env:
-          EMAIL: ${{ secrets.ST_EMAIL }}
-          CUSTOMER: ${{ secrets.ST_CUSTOMER }}
-          PASSWORD: ${{ secrets.ST_PASSWORD }}
-          CUSTOMER_GUID: ${{ secrets[ matrix.customer.secret_name ] }}
-        run: |
-          python test_api.py --env ${{ matrix.customer.env }} --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name ${{ matrix.customer.name }}
+    - name: Run API test with AKME
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_AKME }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name AKME
 
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: "Update logs with new data for ${{ matrix.customer.name }}"
-          author_name: bvolovat
-          author_email: borisv@armosec.io
-          commit: --signoff
-          pull: '--ff-only'
-          add: ./logs/api_test_log_${{ matrix.customer.name }}.csv
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for AKME"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_AKME.csv
+
+  run-api-test-ARMO:
+    name: Run API Test ARMO
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_api.txt
+
+    - name: Run API test with ARMO
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_ARMO }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name ARMO
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for ARMO"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_ARMO.csv
+
+  run-api-test-Billogram:
+    name: Run API Test Billogram
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_api.txt
+
+    - name: Run API test with Billogram
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_BILLOGRAM }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name Billogram
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for Billogram"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_Billogram.csv
+
+  run-api-test-AXUAL:
+    name: Run API Test AXUAL
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_api.txt
+
+    - name: Run API test with AXUAL
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_AXUAL }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name AXUAL
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for AXUAL"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_AXUAL.csv
+
+  run-api-test-Kyos:
+    name: Run API Test Kyos
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_api.txt
+
+    - name: Run API test with Kyos
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_KYOS }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name Kyos
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for Kyos"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_Kyos.csv  
+
+  run-api-test-Schuberg-Philis:
+    name: Run API Test Schuberg-Philis
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_api.txt
+
+    - name: Run API test with Schuberg-Philis
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_SCHUBERG_PHILIS }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name Schuberg_Philis
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for Schuberg_Philis"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_Schuberg_Philis.csv 
+
+  run-api-test-Mimecast:
+    name: Run API Test Mimecast
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_api.txt
+
+    - name: Run API test with Mimecast
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_MIMECAST }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name Mimecast
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for Mimecast"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_Mimecast.csv 
+
+  run-api-test-BitDefender:
+    name: Run API Test BitDefender
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_api.txt
+        
+    - name: Run API test with BitDefender
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_BITDEFENDER }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name BitDefender
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for BitDefender"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_BitDefender.csv 
+
+    - name: Run API test with ARMO-EEE
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_DEV_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_DEV_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_ARMO_EEE }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name ARMO-EEE
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for ARMO-EEE"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_BitDefender.csv 
