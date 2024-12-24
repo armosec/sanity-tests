@@ -14,31 +14,31 @@ jobs:
         customer:
           - name: AKME
             env: prod
-            guid: ${{ secrets.CUSTOMER_GUID_AKME }}
+            secret_name: CUSTOMER_GUID_AKME
           - name: ARMO
             env: prod
-            guid: ${{ secrets.CUSTOMER_GUID_ARMO }}
+            secret_name: CUSTOMER_GUID_ARMO
           - name: Billogram
             env: prod
-            guid: ${{ secrets.CUSTOMER_GUID_BILLOGRAM }}
+            secret_name: CUSTOMER_GUID_BILLOGRAM
           - name: AXUAL
             env: prod
-            guid: ${{ secrets.CUSTOMER_GUID_AXUAL }}
+            secret_name: CUSTOMER_GUID_AXUAL
           - name: Kyos
             env: prod
-            guid: ${{ secrets.CUSTOMER_GUID_KYOS }}
+            secret_name: CUSTOMER_GUID_KYOS
           - name: Schuberg_Philis
             env: prod
-            guid: ${{ secrets.CUSTOMER_GUID_SCHUBERG_PHILIS }}
+            secret_name: CUSTOMER_GUID_SCHUBERG_PHILIS
           - name: Mimecast
             env: prod
-            guid: ${{ secrets.CUSTOMER_GUID_MIMECAST }}
+            secret_name: CUSTOMER_GUID_MIMECAST
           - name: BitDefender
             env: prod
-            guid: ${{ secrets.CUSTOMER_GUID_BITDEFENDER }}
+            secret_name: CUSTOMER_GUID_BITDEFENDER
           - name: ARMO_EEE
             env: dev
-            guid: ${{ secrets.CUSTOMER_GUID_ARMO_EEE }}
+            secret_name: CUSTOMER_GUID_ARMO_EEE
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -60,7 +60,7 @@ jobs:
           EMAIL: ${{ secrets.ST_EMAIL }}
           CUSTOMER: ${{ secrets.ST_CUSTOMER }}
           PASSWORD: ${{ secrets.ST_PASSWORD }}
-          CUSTOMER_GUID: ${{ matrix.customer.guid }}
+          CUSTOMER_GUID: ${{ secrets[ matrix.customer.secret_name ] }}
         run: |
           python test_api.py --env ${{ matrix.customer.env }} --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name ${{ matrix.customer.name }}
 
