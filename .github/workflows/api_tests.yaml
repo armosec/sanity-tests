@@ -36,9 +36,9 @@ jobs:
           - name: BitDefender
             env: prod
             guid: ${{ secrets.CUSTOMER_GUID_BITDEFENDER }}
-          - name: NewDevCustomer
+          - name: ARMO_EEE
             env: dev
-            guid: ${{ secrets.CUSTOMER_GUID_DEV }}
+            guid: ${{ secrets.CUSTOMER_GUID_ARMO_EEE }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
