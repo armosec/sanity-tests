@@ -349,4 +349,4 @@ jobs:
         author_email: borisv@armosec.io
         commit: --signoff
         pull: '--ff-only'
-        add: ./logs/api_test_log_BitDefender.csv 
+        add: ./logs/api_test_log_ARMO_EEE.csv 
