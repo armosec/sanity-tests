@@ -84,19 +84,6 @@ class ApiTester:
         }
         return self.test_api("/api/v1/vulnerability_v2/vulnerability/list", payload, "cve_view_no_filter")
     
-    def cve_view_overtime(self):
-        date = datetime.now(timezone.utc)
-        iso_format_with_z = date.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-        dt_minus30 = date - timedelta(days=30)        
-        iso_format_with_z_minus = dt_minus30.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
-
-        payload = {
-            "since": iso_format_with_z_minus,
-            "until": iso_format_with_z,
-            "innerFilters": []
-        }
-        return self.test_api("/api/v1/vulnerability_v2/vulnerability/overtime", payload, "cve_view_overtime")
-
     def cve_view_severity(self):
         payload = {
             "countFields": True,
