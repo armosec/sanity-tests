@@ -244,6 +244,7 @@ if __name__ == "__main__":
         # sbom_view_table_with_risk_spotlight_time = api_tester.sbom_view_table_with_risk_spotlight()
         attackchains_time = api_tester.attackchains()
         vulnerability_overtime_time = api_tester.vulnerability_overtime()
+        cve_view_severity_time = api_tester.cve_view_severity()
 
         log_data = {
             'timestamp': api_tester.get_current_timestamp("special"),
@@ -257,7 +258,10 @@ if __name__ == "__main__":
             'sbom_view_table_no_filter': 0,
             'sbom_view_table_with_risk_spotlight': 0,
             'attackchains': f"{float(attackchains_time):.2f}",
-            'vulnerability_overtime': f"{float(vulnerability_overtime_time):.2f}"
+            'vulnerability_overtime': f"{float(vulnerability_overtime_time):.2f}",
+            'cve_view_severity': f"{float(cve_view_severity_time):.2f}",
+
+            
         }
 
         log_file = f"./logs/api_test_log_{args.log_name}.csv"
