@@ -216,6 +216,54 @@ class ApiTester:
         }
         return self.test_api("/api/v1/vulnerability_v2/vulnerability/overtime", payload, "vulnerability_overtime")
 
+    def save_to_csv(self, log_data, file_name):
+        all_keys = [
+            'timestamp',
+            'login_time',
+            'cve_view_no_filter',
+            'cve_view_with_risk_spotlight',
+            'workload_view_table_no_filter',
+            'workload_view_table_with_risk_spotlight',
+            'images_view_table_no_filter',
+            'images_view_table_with_risk_spotlight',
+            'sbom_view_table_no_filter',
+            'sbom_view_table_with_risk_spotlight',
+            'attackchains',
+            'vulnerability_overtime',
+            'cve_view_with_severity'
+        ]
+
+        file_exists = os.path.isfile(file_name)
+        
+        if file_exists:
+            # Align existing rows with the new column structure
+            with open(file_name, 'r') as f:
+                lines = [line.strip() for line in f]
+            header = lines[0].split(',')
+            missing_columns = len(all_keys) - len(header)
+
+            if missing_columns > 0:
+                # Add missing columns to the header
+                updated_header = header + all_keys[len(header):]
+                updated_lines = [','.join(updated_header)]
+
+                # Add `0` for missing columns to existing rows
+                for line in lines[1:]:
+                    row = line.split(',')
+                    updated_row = row + ['0'] * missing_columns
+                    updated_lines.append(','.join(updated_row))
+
+                # Write updated lines back to the file
+                with open(file_name, 'w') as f:
+                    f.write('\n'.join(updated_lines) + '\n')
+
+        # Write new log entry
+        with open(file_name, 'a') as f:
+            if not file_exists:
+                f.write(','.join(all_keys) + '\n')  # Write header for new file
+            f.write(','.join(str(log_data.get(key, '0')) for key in all_keys) + '\n')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run API tests with provided credentials.')
     parser.add_argument('--env', choices=['dev', 'prod'], default='prod', help='Environment to run the API tests (default: prod)')
@@ -265,15 +313,10 @@ if __name__ == "__main__":
             'attackchains': f"{float(attackchains_time):.2f}",
             'vulnerability_overtime': f"{float(vulnerability_overtime_time):.2f}",
             'cve_view_with_severity': f"{float(cve_view_with_severity_time):.2f}",
-
             
         }
 
-        log_file = f"./logs/api_test_log_{args.log_name}.csv"
-        os.makedirs(os.path.dirname(log_file), exist_ok=True)
-        file_exists = os.path.isfile(log_file)
+    log_file = f"./logs/api_test_log_{args.log_name}.csv"
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
-        with open(log_file, "a") as f:
-            if not file_exists:
-                f.write(','.join(log_data.keys()) + '\n')
-            f.write(','.join(str(log_data[key]) for key in log_data) + '\n')
+    api_tester.save_to_csv(log_data, log_file)
