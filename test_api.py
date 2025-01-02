@@ -84,13 +84,18 @@ class ApiTester:
         }
         return self.test_api("/api/v1/vulnerability_v2/vulnerability/list", payload, "cve_view_no_filter")
     
-    def cve_view_severity(self):
+    def cve_view_with_severity(self):
         payload = {
-            "countFields": True,
-            "fields":[{"severity": ""}],
-            "innerFilters": [{"severity": ""}]
+            "pageSize": 50,
+            "pageNum": 1,
+            "orderBy": "cvssInfo.baseScore:desc,name:desc",
+            "innerFilters": [
+                {
+                    "severity": "Critical,High,Medium,Low"
+                }
+            ]
         }
-        return self.test_api("/api/v1/vulnerability_v2/vulnerability/vulnerability", payload, "cve_view_severity")
+        return self.test_api("/api/v1/vulnerability_v2/vulnerability/list", payload, "cve_view_with_severity")
 
     def cve_view_with_risk_spotlight(self):
         payload = {
@@ -244,7 +249,7 @@ if __name__ == "__main__":
         # sbom_view_table_with_risk_spotlight_time = api_tester.sbom_view_table_with_risk_spotlight()
         attackchains_time = api_tester.attackchains()
         vulnerability_overtime_time = api_tester.vulnerability_overtime()
-        cve_view_severity_time = api_tester.cve_view_severity()
+        cve_view_with_severity_time = api_tester.cve_view_with_severity()
 
         log_data = {
             'timestamp': api_tester.get_current_timestamp("special"),
@@ -259,7 +264,7 @@ if __name__ == "__main__":
             'sbom_view_table_with_risk_spotlight': 0,
             'attackchains': f"{float(attackchains_time):.2f}",
             'vulnerability_overtime': f"{float(vulnerability_overtime_time):.2f}",
-            'cve_view_severity': f"{float(cve_view_severity_time):.2f}",
+            'cve_view_with_severity': f"{float(cve_view_with_severity_time):.2f}",
 
             
         }
