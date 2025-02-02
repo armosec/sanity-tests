@@ -46,7 +46,7 @@ jobs:
               --data '{"summary": "Production Incident","sms": "true", "email": "true", "call": "false", "requester_email": "borisv@armosec.io", "description": "SSO login test failed ! "}'
 
         - name: upload screenshots
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           if: always()
           with:
             name: screenshots
