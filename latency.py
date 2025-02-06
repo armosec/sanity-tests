@@ -51,12 +51,12 @@ class LatencyTest:
         mail_input = self._interaction_manager.wait_until_interactable(
             '//*[@id="frontegg-login-box-container-default"]/div[1]/input'
         )
-        mail_input.send_keys(os.environ['email_latency'])
+        mail_input.send_keys("test.platform454@gmail.com")
         mail_input.send_keys(Keys.ENTER)
         password_input = self._interaction_manager.wait_until_interactable(
             '/html/body/frontegg-app/div[2]/div[2]/input'
         )
-        password_input.send_keys(os.environ['login_pass_latency'])
+        password_input.send_keys("Platformtest1!")
         password_input.send_keys(Keys.ENTER)
         _logger.info("Logged in to Armo")
 
@@ -69,13 +69,12 @@ class LatencyTest:
         # Click on the failed resource button.
         self._interaction_manager.click('//*[@id="framework-control-table-failed-0"]/div/armo-router-link/a/armo-button/button', click_delay=1)
         # Click on the fix button in the rules list.
-        # self._interaction_manager.click("//button[contains(@class, 'armo-button') and contains(@class, 'primary') and contains(@class, 'sm') and span[text()='Fix']]", click_delay=1)
-        self._interaction_manager.click('//*[@id="framework-control-table-failed-2"]/div/armo-router-link/a/armo-button', click_delay=1)
-                                         
+        self._interaction_manager.click("//button[contains(@class, 'armo-button') and contains(@class, 'primary') and contains(@class, 'sm') and span[text()='Fix']]", click_delay=1)
+                                        
         # Switch to the last window.
         # self._interaction_manager.switch_to_window(-1)
         time.sleep(2)
-        SBS_panel =self._interaction_manager.wait_until_exists("//td[contains(@class, 'pl-5 w-100 position-relative')]/pre[text()='apiVersion: v1']", timeout=5)
+        SBS_panel =self._interaction_manager.wait_until_exists('//*[@id="s-0-yaml-row-0"]', timeout=5)
         _logger.info(f"side bt side is displayed: {SBS_panel.is_displayed()}")
         _logger.info("Navigated to compliance completed")
 
