@@ -2,8 +2,12 @@ import os
 import time
 import datetime
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from dataclasses import dataclass
-from interaction_manager import InteractionManager, InteractionManagerConfig
+from selenium.webdriver.support.ui import WebDriverWait
+from interaction_manager import InteractionManagerConfig
+from interaction_manager import InteractionManager
 import logging
 
 ARMO_PLATFORM_URL = "https://cloud.armosec.io"
@@ -47,18 +51,34 @@ class LatencyTest:
 
     def _login(self) -> None:
         _logger.info("Logging in to Armo")
-        self._interaction_manager.navigate(ARMO_PLATFORM_URL)
-        mail_input = self._interaction_manager.wait_until_interactable(
-            '//*[@id="frontegg-login-box-container-default"]/div[1]/input'
+        driver = self._interaction_manager._driver
+        driver.get(ARMO_PLATFORM_URL)   
+
+        # Wait for initial page load
+        time.sleep(5)
+
+        shadow_host = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "frontegg-login-box-container-default")))
+
+        # Get the shadow root
+        shadow_root = self._interaction_manager.driver.execute_script("return arguments[0].shadowRoot", shadow_host)
+
+        # Find the email input field inside the shadow DOM
+        email_input = shadow_root.find_element(By.CSS_SELECTOR, "input[name='identifier']")
+        email_input.send_keys(os.environ['email_latency'])
+        email_input.send_keys(Keys.ENTER)
+        time.sleep(2)
+        driver.save_screenshot("email.png")
+        #Wait for the password field to appear
+        WebDriverWait(driver, 10).until(
+            lambda d: shadow_root.find_element(By.CSS_SELECTOR, "input[name='password']")
         )
-        mail_input.send_keys("test.platform454@gmail.com")
-        mail_input.send_keys(Keys.ENTER)
-        password_input = self._interaction_manager.wait_until_interactable(
-            '/html/body/frontegg-app/div[2]/div[2]/input'
-        )
-        password_input.send_keys("Platformtest1!")
+
+        #Find the password input field inside the shadow DOM
+        password_input = shadow_root.find_element(By.CSS_SELECTOR, "input[name='password']")
+        password_input.send_keys(os.environ['login_pass_latency'])
         password_input.send_keys(Keys.ENTER)
-        _logger.info("Logged in to Armo")
+        print("Login successful!")
 
     def _navigate_to_compliance(self) -> None:
         _logger.info("Navigating to compliance")
