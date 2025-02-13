@@ -55,7 +55,7 @@ class LatencyTest:
         driver.get(ARMO_PLATFORM_URL)   
 
         # Wait for initial page load
-        time.sleep(5)
+        time.sleep(3)
 
         shadow_host = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.ID, "frontegg-login-box-container-default")))
@@ -64,7 +64,9 @@ class LatencyTest:
         shadow_root = self._interaction_manager.driver.execute_script("return arguments[0].shadowRoot", shadow_host)
 
         # Find the email input field inside the shadow DOM
+        WebDriverWait(driver, 15).until(lambda d: shadow_root.find_element(By.CSS_SELECTOR, "input[name='identifier']"))
         email_input = shadow_root.find_element(By.CSS_SELECTOR, "input[name='identifier']")
+
         email_input.send_keys(os.environ['email_latency'])
         email_input.send_keys(Keys.ENTER)
         time.sleep(2)
