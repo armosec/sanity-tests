@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
 from interaction_manager import InteractionManagerConfig, InteractionManager
 
 # Constants
@@ -48,12 +49,23 @@ class LatencyTest:
             raise RuntimeError("Failed to take screenshot")
         _logger.info(f"Screenshot saved to: {screenshot_name}")
 
-    def get_shadow_root(self, driver):
-        """Fetch the shadow root dynamically to prevent detachment issues."""
-        shadow_host = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "frontegg-login-box-container-default"))
-        )
-        return driver.execute_script("return arguments[0].shadowRoot", shadow_host)
+    def get_shadow_root(self, driver, max_retries=3):
+        """Fetch the shadow root dynamically with retries to avoid stale references."""
+        for attempt in range(max_retries):
+            try:
+                _logger.info(f"Attempt {attempt+1}: Getting shadow root")
+                shadow_host = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.ID, "frontegg-login-box-container-default"))
+                )
+                return driver.execute_script("return arguments[0].shadowRoot", shadow_host)
+            except StaleElementReferenceException:
+                _logger.warning("StaleElementReferenceException: Retrying shadow root fetch...")
+                time.sleep(1)
+            except TimeoutException:
+                _logger.error("TimeoutException: Shadow root host not found!")
+                raise
+
+        raise RuntimeError("Failed to get shadow root after multiple attempts")
 
     def _login(self) -> None:
         """Handles logging into the Armo platform using shadow DOM elements."""
@@ -67,14 +79,26 @@ class LatencyTest:
         # Retrieve shadow root dynamically
         shadow_root = self.get_shadow_root(driver)
 
-        #Step 1: Find and Input Email
-        email_input = WebDriverWait(driver, 15).until(
-            lambda d: self.get_shadow_root(driver).find_element(By.CSS_SELECTOR, "input[name='identifier']")
-        )
-        email_input.send_keys(os.environ['email_latency'])
-        email_input.send_keys(Keys.ENTER)
+        # Step 1: Find and Input Email
+        for attempt in range(3):
+            try:
+                shadow_root = self.get_shadow_root(driver)  # Always fetch fresh reference
+                email_input = WebDriverWait(driver, 15).until(
+                    lambda d: self.get_shadow_root(driver).find_element(By.CSS_SELECTOR, "input[name='identifier']")
+                )
+                email_input.send_keys(os.environ['email_latency'])
+                email_input.send_keys(Keys.ENTER)
+                break
+            except StaleElementReferenceException:
+                _logger.warning("StaleElementReferenceException: Retrying email input...")
+                time.sleep(1)
+            except TimeoutException:
+                _logger.error("TimeoutException: Email field not found")
+                self._take_screen_shot("email_field_not_found")
+                raise
+
         time.sleep(2)
-        # driver.save_screenshot("email.png")  # Debugging
+        driver.save_screenshot("email.png")  # Debugging
 
         # Step 2: Wait for Password Field
         WebDriverWait(driver, 10).until(
@@ -82,9 +106,20 @@ class LatencyTest:
         )
 
         # Step 3: Find and Input Password
-        password_input = self.get_shadow_root(driver).find_element(By.CSS_SELECTOR, "input[name='password']")
-        password_input.send_keys(os.environ['login_pass_latency'])
-        password_input.send_keys(Keys.ENTER)
+        for attempt in range(3):
+            try:
+                shadow_root = self.get_shadow_root(driver)  # Fetch fresh reference
+                password_input = shadow_root.find_element(By.CSS_SELECTOR, "input[name='password']")
+                password_input.send_keys(os.environ['login_pass_latency'])
+                password_input.send_keys(Keys.ENTER)
+                break
+            except StaleElementReferenceException:
+                _logger.warning("StaleElementReferenceException: Retrying password input...")
+                time.sleep(1)
+            except TimeoutException:
+                _logger.error("TimeoutException: Password field not found")
+                self._take_screen_shot("password_field_not_found")
+                raise
         
         _logger.info("Login successful!")
 
@@ -95,7 +130,7 @@ class LatencyTest:
         self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
         self._interaction_manager.click('//*[@id="framework-control-table-failed-0"]/div/armo-router-link/a/armo-button/button', click_delay=1)
         self._interaction_manager.click("//button[contains(@class, 'armo-button') and contains(@class, 'primary') and contains(@class, 'sm') and span[text()='Fix']]", click_delay=1)
-                                        
+                                            
         time.sleep(2)
         SBS_panel = self._interaction_manager.wait_until_exists('//*[@id="s-0-yaml-row-0"]', timeout=5)
         _logger.info(f"Side-by-side panel displayed: {SBS_panel.is_displayed()}")
