@@ -52,26 +52,41 @@ class LatencyTest:
             lambda d: d.execute_script("return document.readyState") == "complete"
         )
 
-    def get_shadow_root(self, driver, max_retries=3):
+    def get_shadow_root(self, driver, max_retries=5):
         """Fetch the shadow root dynamically with retries to avoid stale references."""
         for attempt in range(max_retries):
             try:
-                _logger.info(f"Attempt {attempt+1}: Getting shadow root")
+                _logger.info(f"Attempt {attempt+1}: Waiting for page to load before getting shadow root")
+                WebDriverWait(driver, 15).until(lambda d: d.execute_script("return document.readyState") == "complete")
+
+                _logger.info(f"Attempt {attempt+1}: Finding shadow host element")
                 shadow_host = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.ID, "frontegg-login-box-container-default"))
                 )
-                shadow_root = driver.execute_script("return arguments[0].shadowRoot", shadow_host)
+                
+                if shadow_host:
+                    _logger.info(f"Attempt {attempt+1}: Executing script to retrieve shadow root")
+                    shadow_root = driver.execute_script("return arguments[0].shadowRoot", shadow_host)
 
-                # Ensure the shadow root contains elements before returning
-                if shadow_root and shadow_root.find_elements(By.CSS_SELECTOR, "input[name='identifier']"):
-                    return shadow_root
+                    # Verify shadow root has content before returning
+                    if shadow_root and shadow_root.find_elements(By.CSS_SELECTOR, "input[name='identifier']"):
+                        _logger.info("Successfully retrieved shadow root!")
+                        return shadow_root
 
             except (StaleElementReferenceException, TimeoutException, WebDriverException) as e:
                 _logger.warning(f"Retrying shadow root fetch... Attempt {attempt + 1}/{max_retries}: {str(e)}")
-                self._take_screen_shot("shadow_root_error")
-                time.sleep(1)
+                self._take_screen_shot(f"shadow_root_error_attempt_{attempt+1}")
+                time.sleep(2)
+
+        # **Final Check Before Failing**
+        shadow_host_check = driver.find_elements(By.ID, "frontegg-login-box-container-default")
+        if not shadow_host_check:
+            _logger.error("Shadow host element does not exist on the page!")
+        else:
+            _logger.error("Shadow root could not be retrieved, but shadow host is present!")
 
         raise RuntimeError("Failed to get shadow root after multiple attempts")
+
 
     def _login(self) -> None:
         """Handles logging into the Armo platform using shadow DOM elements."""
