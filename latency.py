@@ -57,64 +57,102 @@ class LatencyTest:
         for attempt in range(max_retries):
             try:
                 _logger.info(f"Attempt {attempt+1}: Getting shadow root")
-                shadow_host = WebDriverWait(driver, 15).until(
+                
+                # Wait for the page to be fully loaded
+                self.wait_for_page_load(driver)
+                
+                # Add explicit wait for the container
+                WebDriverWait(driver, 15).until(
                     EC.presence_of_element_located((By.ID, "frontegg-login-box-container-default"))
                 )
+                
+                # Add a small delay to ensure JavaScript initialization
+                time.sleep(2)
+                
+                shadow_host = driver.find_element(By.ID, "frontegg-login-box-container-default")
+                
+                # Execute JavaScript to check if shadowRoot exists
+                has_shadow_root = driver.execute_script("""
+                    return arguments[0].shadowRoot !== null && arguments[0].shadowRoot !== undefined
+                """, shadow_host)
+                
+                if not has_shadow_root:
+                    _logger.warning("Shadow root not yet available")
+                    time.sleep(2)
+                    continue
+                    
                 shadow_root = driver.execute_script("return arguments[0].shadowRoot", shadow_host)
-
-                if shadow_root and len(shadow_root.find_elements(By.CSS_SELECTOR, "input[name='identifier']")) > 0:
+                
+                # Verify that we can find the email input field
+                if shadow_root and shadow_root.find_elements(By.CSS_SELECTOR, "input[name='identifier']"):
                     _logger.info("Successfully retrieved shadow root!")
                     return shadow_root
-                else:
-                    _logger.warning("Shadow root is empty or not yet loaded, retrying...")
-
+                
+                _logger.warning("Shadow root found but email input not present, retrying...")
+                
             except (StaleElementReferenceException, TimeoutException) as e:
-                _logger.warning(f"Retrying shadow root fetch... Attempt {attempt + 1}/{max_retries}: {str(e)}")
-                time.sleep(1)
-
+                _logger.warning(f"Error getting shadow root (Attempt {attempt + 1}/{max_retries}): {str(e)}")
+            
+            time.sleep(2)
+        
+        # Take a screenshot before raising the error
+        driver.save_screenshot("shadow_root_error.png")
         raise RuntimeError("Failed to get shadow root after multiple attempts")
 
     def _login(self) -> None:
         _logger.info("Logging in to Armo")
-        driver = self._interaction_manager._driver
-        driver.get(ARMO_PLATFORM_URL)   
-
+        driver = self._interaction_manager.driver
+        
+        # First navigate to the page
+        driver.get(ARMO_PLATFORM_URL)
+        
+        # Wait for page load
         self.wait_for_page_load(driver)
-
-        shadow_root = self.get_shadow_root(driver)
-
-        for attempt in range(3):
-            try:
-                shadow_root = self.get_shadow_root(driver)
-                email_input = WebDriverWait(driver, 15).until(
-                    lambda d: shadow_root.find_element(By.CSS_SELECTOR, "input[name='identifier']")
-                )
-                email_input.send_keys(os.environ['email_latency'])
-                email_input.send_keys(Keys.ENTER)
-                break
-            except (StaleElementReferenceException, TimeoutException):
-                _logger.warning(f"Retrying email input... Attempt {attempt + 1}/3")
-                time.sleep(1)
-
-        time.sleep(2)
-        driver.save_screenshot("email.png")
-
-        WebDriverWait(driver, 10).until(
-            lambda d: self.get_shadow_root(driver).find_element(By.CSS_SELECTOR, "input[name='password']")
-        )
-
-        for attempt in range(3):
-            try:
-                shadow_root = self.get_shadow_root(driver)
-                password_input = shadow_root.find_element(By.CSS_SELECTOR, "input[name='password']")
-                password_input.send_keys(os.environ['login_pass_latency'])
-                password_input.send_keys(Keys.ENTER)
-                break
-            except (StaleElementReferenceException, TimeoutException):
-                _logger.warning(f"Retrying password input... Attempt {attempt + 1}/3")
-                time.sleep(1)
-
-        _logger.info("Login successful!")
+        
+        # Now clear storage and cookies
+        try:
+            driver.delete_all_cookies()
+            driver.execute_script("window.localStorage.clear();")
+            driver.execute_script("window.sessionStorage.clear();")
+        except Exception as e:
+            _logger.warning(f"Failed to clear storage: {e}")
+            # Continue anyway as this is not critical
+        
+        # Add more explicit waits
+        time.sleep(3)  # Give extra time for JavaScript initialization
+        
+        try:
+            shadow_root = self.get_shadow_root(driver)
+            
+            # Handle email input
+            email_input = WebDriverWait(driver, 15).until(
+                lambda d: shadow_root.find_element(By.CSS_SELECTOR, "input[name='identifier']")
+            )
+            email_input.clear()
+            email_input.send_keys(os.environ['email_latency'])
+            email_input.send_keys(Keys.ENTER)
+            
+            # Wait for password field
+            time.sleep(2)
+            shadow_root = self.get_shadow_root(driver)  # Get fresh shadow root
+            
+            password_input = WebDriverWait(driver, 15).until(
+                lambda d: shadow_root.find_element(By.CSS_SELECTOR, "input[name='password']")
+            )
+            password_input.clear()
+            password_input.send_keys(os.environ['login_pass_latency'])
+            password_input.send_keys(Keys.ENTER)
+            
+            # Wait for login to complete
+            WebDriverWait(driver, 20).until(
+                lambda d: "login" not in d.current_url.lower()
+            )
+            
+            _logger.info("Login successful!")
+            
+        except Exception as e:
+            driver.save_screenshot("login_error.png")
+            raise Exception(f"Login failed: {str(e)}")
 
     def _navigate_to_compliance(self) -> None:
         _logger.info("Navigating to compliance")
