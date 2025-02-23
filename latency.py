@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException, WebDriverException
 from interaction_manager import InteractionManagerConfig, InteractionManager
 
 # Constants
@@ -30,9 +30,6 @@ class LatencyDetails:
     def __str__(self) -> str:
         return f"Latency: {self.latency}, Latency without login: {self.latency_without_login}"
 
-    def __repr__(self) -> str:
-        return self.__str__()
-
 class LatencyTest:
     def __init__(self) -> None:
         _config = InteractionManagerConfig.from_env()
@@ -44,7 +41,7 @@ class LatencyTest:
         timestamp = time.strftime("%Y%m%d-%H%M%S")
         screenshot_name = f"{timestamp}_{description}.png"
         result = self._interaction_manager.driver.save_screenshot(screenshot_name)
-        if result is False:
+        if not result:
             _logger.error("Failed to take screenshot")  
             raise RuntimeError("Failed to take screenshot")
         _logger.info(f"Screenshot saved to: {screenshot_name}")
@@ -63,11 +60,17 @@ class LatencyTest:
                 shadow_host = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.ID, "frontegg-login-box-container-default"))
                 )
-                return driver.execute_script("return arguments[0].shadowRoot", shadow_host)
-            except (StaleElementReferenceException, TimeoutException):
-                _logger.warning(f"Retrying shadow root fetch... Attempt {attempt + 1}/{max_retries}")
+                shadow_root = driver.execute_script("return arguments[0].shadowRoot", shadow_host)
+
+                # Ensure the shadow root contains elements before returning
+                if shadow_root and shadow_root.find_elements(By.CSS_SELECTOR, "input[name='identifier']"):
+                    return shadow_root
+
+            except (StaleElementReferenceException, TimeoutException, WebDriverException) as e:
+                _logger.warning(f"Retrying shadow root fetch... Attempt {attempt + 1}/{max_retries}: {str(e)}")
+                self._take_screen_shot("shadow_root_error")
                 time.sleep(1)
-        
+
         raise RuntimeError("Failed to get shadow root after multiple attempts")
 
     def _login(self) -> None:
@@ -76,42 +79,43 @@ class LatencyTest:
         driver = self._interaction_manager._driver
         driver.get(ARMO_PLATFORM_URL)   
 
-        # ✅ Ensure the page is fully loaded
+        #  Ensure the page is fully loaded
         self.wait_for_page_load(driver)
 
-        # ✅ Retrieve shadow root dynamically
-        shadow_root = self.get_shadow_root(driver)
-
-        # ✅ Step 1: Find and Input Email
+        #  Step 1: Find and Input Email
         for attempt in range(3):
             try:
+                shadow_root = self.get_shadow_root(driver)  # Always fetch fresh shadow root
                 email_input = WebDriverWait(driver, 15).until(
                     lambda d: self.get_shadow_root(driver).find_element(By.CSS_SELECTOR, "input[name='identifier']")
                 )
                 email_input.send_keys(os.environ['email_latency'])
                 email_input.send_keys(Keys.ENTER)
                 break
-            except (StaleElementReferenceException, TimeoutException):
-                _logger.warning(f"Retrying email input... Attempt {attempt + 1}/3")
+            except (StaleElementReferenceException, TimeoutException, WebDriverException) as e:
+                _logger.warning(f"Retrying email input... Attempt {attempt + 1}/3: {str(e)}")
+                self._take_screen_shot("email_input_error")
                 time.sleep(1)
 
         time.sleep(2)
         driver.save_screenshot("email.png")  # Debugging
 
-        # ✅ Step 2: Wait for Password Field
+        #  Step 2: Wait for Password Field
         WebDriverWait(driver, 10).until(
             lambda d: self.get_shadow_root(driver).find_element(By.CSS_SELECTOR, "input[name='password']")
         )
 
-        # ✅ Step 3: Find and Input Password
+        #  Step 3: Find and Input Password
         for attempt in range(3):
             try:
-                password_input = self.get_shadow_root(driver).find_element(By.CSS_SELECTOR, "input[name='password']")
+                shadow_root = self.get_shadow_root(driver)  # Fetch fresh shadow root again
+                password_input = shadow_root.find_element(By.CSS_SELECTOR, "input[name='password']")
                 password_input.send_keys(os.environ['login_pass_latency'])
                 password_input.send_keys(Keys.ENTER)
                 break
-            except (StaleElementReferenceException, TimeoutException):
-                _logger.warning(f"Retrying password input... Attempt {attempt + 1}/3")
+            except (StaleElementReferenceException, TimeoutException, WebDriverException) as e:
+                _logger.warning(f"Retrying password input... Attempt {attempt + 1}/3: {str(e)}")
+                self._take_screen_shot("password_input_error")
                 time.sleep(1)
 
         _logger.info("Login successful!")
