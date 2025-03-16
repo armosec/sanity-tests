@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException
 
 def main(SSO_MAIL, SSO_PASSWORD):
     URL = 'https://auth.armosec.io/oauth/account/login'
@@ -60,11 +61,17 @@ def main(SSO_MAIL, SSO_PASSWORD):
 
     #Click "Yes" Button if Present**
     try:
-        yes_button = WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((By.ID, "idSIButton9"))
-        )
-        yes_button.click()
-        print("Clicked on 'Yes' button to stay signed in.")
+        for _ in range(3):  # Retry up to 3 times
+            try:
+                yes_button = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.ID, "idSIButton9"))
+                )
+                yes_button.click()
+                print("Clicked on 'Yes' button to stay signed in.")
+                break  # Exit loop if successful
+            except StaleElementReferenceException:
+                print("Stale element encountered. Retrying...")
+                time.sleep(1)  # Short delay before retrying
     except TimeoutException:
         print("No 'Yes' button found. Skipping.")
 
