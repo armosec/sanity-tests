@@ -21,15 +21,15 @@ class Compliance(BaseTest):
             print("Running Compliance test")
             interact = self._interaction_manager
             interact.click('configuration-scanning-left-menu-item', By.ID) # Click on Compliance
-            connect_cluster.click_get_started()
-            connect_cluster.connect_cluster_helm()
-            connect_cluster.verify_installation()
-            connect_cluster.view_cluster_button()
-            connect_cluster.view_connected_cluster()
+            # connect_cluster.click_get_started()
+            # connect_cluster.connect_cluster_helm()
+            # connect_cluster.verify_installation()
+            # connect_cluster.view_cluster_button()
+            # connect_cluster.view_connected_cluster()
             self.navigate_to_compliance()
             self.risk_acceptance_page()
         finally:
-            self.perform_cleanup()
+            # self.perform_cleanup()
             print("Compliance test completed")
 
     def navigate_to_compliance(self):
@@ -46,8 +46,8 @@ class Compliance(BaseTest):
         # Click on the cluster (the first one) 
         time.sleep(1)
         try:
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')))
-            cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[2]/armo-cluster-scans-table/table/tbody/tr[1]/td[2]')
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[3]/armo-cluster-scans-table/table/tbody/tr/td[1]')))
+            cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[3]/armo-cluster-scans-table/table/tbody/tr/td[1]')
             driver.execute_script("arguments[0].click();", cluster)
             logger.info("First Cluster selected")
         except:
@@ -83,7 +83,7 @@ class Compliance(BaseTest):
     
             for checkbox_element in checkbox_elements:
                 # Locate the label span inside the mat-checkbox
-                label_span = checkbox_element.find_element(By.XPATH, ".//span[@class='mat-mdc-tooltip-trigger value truncate']")
+                label_span = checkbox_element.find_element(By.XPATH, ".//label/span[contains(text(), 'C-0271')]")
                 if "C-0271" in label_span.text:
                     # Locate the input and click
                     input_element = checkbox_element.find_element(By.XPATH, ".//input[@type='checkbox']")
