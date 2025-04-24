@@ -58,8 +58,9 @@ def main():
         'vulnerabilities': Vulnerabilities,
         'compliance': Compliance,
         'attach-path': AttachPath,
-        'security-risk': SecurityRisk,
-        'runtime-security': RuntimeIncident,
+        # 'runtime-security': RuntimeIncident,
+        'security-risk': SecurityRisk
+
         # Add additional mappings here
     }
 
