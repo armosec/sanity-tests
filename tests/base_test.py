@@ -53,7 +53,8 @@ class BaseTest(ABC):
         
     def get_login_url(self):
         environment_urls = {
-            "development": "https://cloud-predev.armosec.io/",
+            "predev": "https://cloud-predev.armosec.io/",
+            "dev": "https://cloud-dev.armosec.io/",
             "staging": "https://cloud-stage.armosec.io/",
             "production": "https://cloud.armosec.io/"
         }
