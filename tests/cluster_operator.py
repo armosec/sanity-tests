@@ -11,6 +11,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from .interaction_manager import InteractionManager
+from .login_manager import LoginManager
 
 logger = logging.getLogger(__name__)
 # FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
@@ -23,22 +24,25 @@ class ClusterManager:
         # self.wait = WebDriverWait(self._driver, timeout=60, poll_frequency=0.001)
         self._wait = wait
         self._interaction_manager = InteractionManager(driver)
+        self._login_manager = LoginManager(driver, wait)
 
+    # def login(self, email_onboarding, login_pass_onboarding, url):
+    #     driver = self._driver
+    #     wait = self.wait
+    #     driver.get(url)
+    #     wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="frontegg-login-box-container-default"]/div[1]/input')))
+    #     mail_input = driver.find_element(by=By.XPATH, value='//*[@id="frontegg-login-box-container-default"]/div[1]/input')
+    #     mail_input.send_keys(email_onboarding)
+    #     mail_input.send_keys(Keys.ENTER)
+    #     wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/frontegg-app/div[2]/div[2]/input')))
+    #     password_input = driver.find_element(by=By.XPATH, value='/html/body/frontegg-app/div[2]/div[2]/input')
+    #     password_input.send_keys(login_pass_onboarding)
+    #     password_input.send_keys(Keys.ENTER)
+    
     def login(self, email_onboarding, login_pass_onboarding, url):
-        driver = self._driver
-        wait = self.wait
-        driver.get(url)
-        wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="frontegg-login-box-container-default"]/div[1]/input')))
-        mail_input = driver.find_element(by=By.XPATH, value='//*[@id="frontegg-login-box-container-default"]/div[1]/input')
-        mail_input.send_keys(email_onboarding)
-        mail_input.send_keys(Keys.ENTER)
-        wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/frontegg-app/div[2]/div[2]/input')))
-        password_input = driver.find_element(by=By.XPATH, value='/html/body/frontegg-app/div[2]/div[2]/input')
-        password_input.send_keys(login_pass_onboarding)
-        password_input.send_keys(Keys.ENTER)
-
+        self._login_manager.login(email_onboarding, login_pass_onboarding, url)  
         try:
-            wait_for_element = WebDriverWait(driver, 5, 0.001)
+            wait_for_element = WebDriverWait(self._driver, 5, 0.001)
             element = wait_for_element.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")))
         except:
             print("Onboarding role page is not displayed - not a sign-up user")
@@ -294,7 +298,7 @@ class ClusterManager:
                 
             else:
                 category_name = "Network configuration"
-                network_selector = "td.mat-cell.cdk-cell.cdk-column-namespace.mat-column-namespace"
+                network_selector = "td.mat-mdc-cell.cdk-column-namespace"
                 self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, network_selector)))
                 logger.info(f"Waited for network configuration element to appear.")
                 
@@ -346,7 +350,7 @@ class ClusterManager:
             self._driver.save_screenshot(f"./failed_to_click_checkbox_{label_name.replace(' ', '_')}.png")
 
 
-    def click_on_filter_ckackbox_sidebar(self, span_text: str):
+    def click_on_filter_checkbox_sidebar(self, span_text: str):
         """
         Clicks a specific <span> element within the second cdk-overlay based on the span's text content.
 
@@ -365,7 +369,7 @@ class ClusterManager:
             second_overlay = overlay_panes[1]
 
             # Locate all span elements within the second cdk-overlay-pane
-            spans = second_overlay.find_elements(By.CSS_SELECTOR, "span.mat-tooltip-trigger.value.truncate")
+            spans = second_overlay.find_elements(By.CSS_SELECTOR, "span.mat-mdc-tooltip-trigger.value.truncate")
 
             # Iterate through all spans and click the one with the matching text
             for span in spans:
@@ -398,7 +402,7 @@ class ClusterManager:
             
             elif category_name == "Network configuration":
                     wait = WebDriverWait(self._driver, 30)  # Wait for up to 30 seconds
-                    namespace_element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "td.mat-cell.cdk-cell.cdk-column-namespace.mat-column-namespace")))
+                    namespace_element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "td.mat-mdc-cell.cdk-column-namespace")))
                     namespace = namespace_element.text.strip()
                     logger.info(f"Extracted namespace: {namespace}")
                     return namespace
@@ -454,7 +458,7 @@ class ClusterManager:
                 
             elif category_name == "Network configuration":
                 try:
-                    network_selector = "td.mat-cell.cdk-cell.cdk-column-namespace.mat-column-namespace"
+                    network_selector = "td.mat-mdc-cell.cdk-column-namespace"
                     namespace_element = self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, network_selector)))
                     namespace_element.click()
                     logger.info("Clicked on the namespace element in the Network configuration category.")
@@ -532,6 +536,42 @@ class ClusterManager:
             logger.error(f"Error fetching value for label '{label_name}': {str(e)}")
             self._driver.save_screenshot(f"./failed_to_fetch_{label_name}_value_{ClusterManager.get_current_timestamp()}.png")
             return None
+        
+    def verify_application_profiles_completed(self):
+        
+        command = (
+            "kubectl get applicationprofile -n attack-suite "
+            "-o jsonpath='{range .items[*]}{.metadata.name}{\"\\t\"}{.metadata.annotations.kubescape\\.io/status}{\"\\n\"}{end}'"
+        )
+
+        try:
+            result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+            output = result.stdout.strip()
+
+            if not output:
+                logger.error("No output returned from kubectl command.")
+                return False
+
+            all_completed = True
+            for line in output.splitlines():
+                name, status = line.strip().split('\t')
+                if status.strip().lower() != "completed":
+                    logger.warning(f"{name} is not completed (status: '{status}')")
+                    all_completed = False
+
+            if all_completed:
+                logger.info("All application profiles are completed.")
+            else:
+                logger.error("Some application profiles are not completed.")
+
+            return all_completed
+
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Command failed: {e.stderr}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error: {str(e)}")
+            return False
 
 
 class ConnectCluster:
@@ -629,17 +669,17 @@ class Cleanup:
 
     def choose_delete_option(self):
         time.sleep(0.5)
-        self._interaction_manager.click("//button[@mat-menu-item and contains(@class, 'mat-mdc-menu-item') and span[text()='Delete']]", By.XPATH)
+        self._interaction_manager.click("//div[contains(@class,'cdk-overlay-pane')]//span[normalize-space(text())='Delete']/ancestor::button", By.XPATH)
         logger.info("Click on delete button option.")
 
     def confirm_delete(self):
         time.sleep(0.5)
-        self._interaction_manager.click("button.armo-button.error.md", By.CSS_SELECTOR)
+        self._interaction_manager.click("mat-dialog-container button.armo-button.error.xl", By.CSS_SELECTOR)
         logger.info("Click on confirm delete button.")
 
     def wait_for_empty_table(self):
         wait = WebDriverWait(self._driver, 180, 0.001)
-        wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'td.mat-cell.text-center.ng-star-inserted'), 'No data to display'))
+        wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'td.mat-cell.ng-star-inserted > div.d-flex.justify-content-center'), 'No data to display'))
         logger.info("Cleanup done")
 
 class IgnoreRule:
@@ -738,7 +778,7 @@ class IgnoreRule:
             self._driver.save_screenshot(f"./delete_ignore_rule_button_error_{ClusterManager.get_current_timestamp()}.png")
 
         try:
-            self._interaction_manager.click('button.armo-button.error.md', By.CSS_SELECTOR)
+            self._interaction_manager.click('button.armo-button.error.xl', By.CSS_SELECTOR)
             logger.info("Ignore rule deleted.")
         except:
             logger.error("Revoke button not found.")

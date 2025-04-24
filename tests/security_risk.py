@@ -22,18 +22,18 @@ class SecurityRisk(BaseTest):
         # Log in to the system
         login_url = self.get_login_url()
         self.login(login_url)
-        # cluster_manager.create_attack_path()
+        cluster_manager.create_attack_path()
 
         try:
             logger.info("Running Security Risk test")
-            # connect_cluster.click_get_started()
-            # connect_cluster.connect_cluster_helm()
-            # connect_cluster.verify_installation()
-            # connect_cluster.view_cluster_button()
-            # connect_cluster.view_connected_cluster()
+            connect_cluster.click_get_started()
+            connect_cluster.connect_cluster_helm()
+            connect_cluster.verify_installation()
+            connect_cluster.view_cluster_button()
+            connect_cluster.view_connected_cluster()
             self.navigate_to_security_risk()
         finally:
-            # self.perform_cleanup()
+            self.perform_cleanup()
             logger.info("Security risk test completed")
     
     def navigate_to_security_risk(self):
@@ -45,7 +45,11 @@ class SecurityRisk(BaseTest):
             logger.info("Comparing values on the main page")
             self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
             
-            # Process the 'Workloads' risk category
+            logger.info("Reset pods in the 'default' namespace...") 
+            # ClusterManager.run_shell_command(self,"kubectl delete pods -n default --all")
+            # logger.info("Waiting for the pods to restart...")
+            # time.sleep(7)
+
             self.process_risk_category("Workloads", "default") 
             time.sleep(1)
             self.process_risk_category("Data", "None")
@@ -53,6 +57,7 @@ class SecurityRisk(BaseTest):
             self.process_risk_category("Network configuration", "default")
             time.sleep(1)
             self.process_risk_category("Attack path", "default")
+            
 
         except Exception as e:
             logger.error(f"Error navigating in security risk page: {e}")
@@ -85,7 +90,8 @@ class SecurityRisk(BaseTest):
         self.process_first_security_risk(category_name, namespace , before_risk)
         
         # Close the filter
-        cluster_manager.click_close_icon_in_filter_button(category_name)
+        if not category_name == "Attack path":
+            cluster_manager.click_close_icon_in_filter_button(category_name)
     
     def process_first_security_risk(self,category_name, namespace, before_risk):
         """
@@ -105,20 +111,22 @@ class SecurityRisk(BaseTest):
 
         # Wait until the elements are located
         first_security_risks = WebDriverWait(self._driver, 10).until(
-            EC.presence_of_all_elements_located((By.CSS_SELECTOR, first_security_risk_CSS_SELECTOR))
-        )
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, first_security_risk_CSS_SELECTOR)))
 
         # Check if the list has at least 3 elements
         if len(first_security_risks) > 2:
+            self._driver.execute_script("arguments[0].scrollIntoView(true);", first_security_risks[2])
+            time.sleep(0.5)
             first_security_risks[2].click()
             logger.info("Successfully clicked on the third security risk button.")
         else:
             logger.error(f"Expected at least 3 elements, but found {len(first_security_risks)}.")
         
+        time.sleep(2)
         # Apply Namespace filter
         cluster_manager.click_filter_button_in_sidebar_by_text(category_name=category_name, button_text="Namespace")
-        time.sleep(1)
-        cluster_manager.click_on_filter_ckackbox_sidebar(namespace)
+        time.sleep(2)
+        cluster_manager.click_on_filter_checkbox_sidebar(namespace)
         time.sleep(1)
         cluster_manager.press_esc_key(self._driver)
         time.sleep(1)
@@ -127,8 +135,10 @@ class SecurityRisk(BaseTest):
             logger.info(f"Namespace {namespace} is verified") 
         else:
             logger.error(f"Namespace {namespace} is not verified")
+            
         time.sleep(1)
         cluster_manager.click_button_in_namespace_row(category_name,namespace)
+        
         time.sleep(1)
         if category_name == "Data" or category_name == "Workloads":
             if AttachPath.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
@@ -139,7 +149,7 @@ class SecurityRisk(BaseTest):
         if category_name == "Attack path":
             try:
                 element = WebDriverWait(self._driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "td.mat-cell.cdk-cell.cdk-column-name.mat-column-name")))
+                EC.presence_of_element_located((By.CSS_SELECTOR, "td.cdk-column-baseScore .severity")))
                 logger.info("Attack path page loaded")
             except TimeoutException:
                 logger.error("Attack path page not loaded")
@@ -152,33 +162,41 @@ class SecurityRisk(BaseTest):
     
         try:
             element = WebDriverWait(self._driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, "td.mat-cell.cdk-cell.cdk-column-name.mat-column-name")))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "td.cdk-column-severity .severity")))
             logger.info("Risk Acceptance page loaded")
         except TimeoutException:
             logger.error("Risk Acceptance page not loaded")
             self._driver.save_screenshot(f"./failed_to_load_risk_acceptance_page_{ClusterManager.get_current_timestamp()}.png")
                     
-        self._driver.back()
-        logger.info("Navigated back to the Risk Acceptance page")
-        time.sleep(2)
-        after_risk, _ = self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
-        
-        if int(before_risk[0]) == int(after_risk) + 1:
-            logger.info("The risk has been accepted- and the counters are correct")
+        # print("TEST-1")
+        if category_name == "Attack path":
+            self.risk_acceptance_page()
+            self.click_security_risks_menu()
         else:
-            logger.error(f"The counters are incorrect: before_risk: {before_risk}, after_risk: {after_risk}") 
-                       
-        self.risk_acceptance_page()
-        self._driver.back()
-        logger.info("Navigated back to the Risk Acceptance page")
-        time.sleep(2)
-        
-        after__delete_risk, _ = self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
-        
-        if int(after__delete_risk[0]) == int(after_risk) + 1:
-            logger.info("The risk has been accepted- and the counters are correct")
-        else:
-            logger.error(f"The counters are incorrect: before_delete_risk: {before_risk}, after_delete_risk: {after_risk}") 
+            self._driver.back()
+            logger.info("Navigated back to the Risk Acceptance page-1")
+       
+            time.sleep(2)
+            
+            after_risk, _ = self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
+            
+            if int(before_risk[0]) == int(after_risk) + 1:
+                logger.info("The risk has been accepted- and the counters are correct")
+            else:
+                logger.error(f"The counters are incorrect: before_risk: {before_risk}, after_risk: {after_risk}") 
+            # print("TEST-2")
+            self.risk_acceptance_page()
+            # print("TEST-3")
+            self._driver.back()
+            logger.info("Navigated back to the Risk Acceptance page-2")
+            time.sleep(2)
+            
+            after__delete_risk, _ = self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
+            
+            if int(after__delete_risk[0]) == int(after_risk) + 1:
+                logger.info("The risk has been accepted- and the counters are correct")
+            else:
+                logger.error(f"The counters are incorrect: before_delete_risk: {before_risk}, after_delete_risk: {after_risk}") 
         
     
     def compare_value(self, css_selector1: str, css_selector2: str):
@@ -216,7 +234,7 @@ class SecurityRisk(BaseTest):
     def risk_acceptance_page(self):
         risk_acceptance = RiskAcceptancePage(self._driver)
         risk_acceptance.navigate_to_page()
-        risk_acceptance.click_severity_element("td.mat-cell.cdk-cell.cdk-column-severity.mat-column-severity.ng-star-inserted")
+        risk_acceptance.click_severity_element("armo-severity span.severity.medium-severity-color")
         time.sleep(1)
         risk_acceptance.click_edit_button("//button[contains(text(), 'Edit')]")
         time.sleep(2.5)

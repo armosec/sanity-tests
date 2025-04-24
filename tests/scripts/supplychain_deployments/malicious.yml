@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supplychain-attack
+  labels:
+    app: supplychain-attack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: supplychain-attack
+  template:
+    metadata:
+      labels:
+        app: supplychain-attack
+    spec:
+      containers:
+      - name: alpine
+        image: alpine:latest
+        command: ["/bin/sh", "-c", "--"]
+        args: ["sleep 30; while true; do wget sodiumlaurethsulfatedesyroyer.com; sleep 2; done"]
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        securityContext:
+          runAsUser: 0  # Run as root user
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        - name: supplychain-attack-data
+          mountPath: /data
+      volumes:
+      - name: supplychain-attack-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: supplychain-attack-service
+spec:
+  selector:
+    app: supplychain-attack
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP

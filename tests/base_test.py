@@ -2,9 +2,12 @@ from selenium import webdriver
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 from .interaction_manager import InteractionManager
 from .cluster_operator import Cleanup, ClusterManager
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from .login_manager import LoginManager
 
 @dataclass
 class TestConfig:
@@ -28,11 +31,25 @@ class BaseTest(ABC):
         pass
 
     def login(self, url: str):
-        self._driver.get(url)
-        email_element = self._interaction_manager.focus_and_send_text('//*[@id="frontegg-login-box-container-default"]/div[1]/input', self._email)
-        email_element.send_keys(Keys.ENTER)
-        password_element = self._interaction_manager.focus_and_send_text('/html/body/frontegg-app/div[2]/div[2]/input', self._password)
-        password_element.send_keys(Keys.ENTER)
+        """
+        Log in to the application using the LoginManager
+        
+        Args:
+            url: The URL to navigate to for login
+        """
+        login_manager = LoginManager(self._driver, self._wait)
+        login_manager.login(self._email, self._password, url)
+        
+        # Check for onboarding if needed
+        try:
+            onboarding_wait = WebDriverWait(self._driver, 5, 0.001)
+            element = onboarding_wait.until(EC.visibility_of_element_located(
+                (By.XPATH, "//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")
+            ))
+            print("Onboarding role page is displayed - sign-up user (first login)")
+            self._handle_onboarding()
+        except:
+            print("No onboarding page detected - existing user")
         
     def get_login_url(self):
         environment_urls = {

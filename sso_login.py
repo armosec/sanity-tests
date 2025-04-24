@@ -13,7 +13,7 @@ def main(SSO_MAIL, SSO_PASSWORD):
     URL = 'https://auth.armosec.io/oauth/account/login'
     
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")
     driver = webdriver.Chrome(options=chrome_options)  
     driver.get(URL)
     
@@ -29,7 +29,7 @@ def main(SSO_MAIL, SSO_PASSWORD):
             return None  
 
     shadow_root = get_shadow_root()
-    
+        
     if shadow_root:
         # Frontegg login with Shadow DOM
         email_input = WebDriverWait(driver, 10).until(

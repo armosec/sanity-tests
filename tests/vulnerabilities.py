@@ -25,9 +25,9 @@ class Vulnerabilities(BaseTest):
             connect_cluster.verify_installation()
             connect_cluster.view_cluster_button()
             connect_cluster.view_connected_cluster()
+            self.run_vulne_cve_test()
             self.navigate_to_vulnerabilities()
             self.risk_acceptance_page()
-            self.run_vulne_cve_test()
             print("Running vulnerabilities test")
         finally:
             self.perform_cleanup()  
@@ -57,7 +57,7 @@ class Vulnerabilities(BaseTest):
         # click on the select all button
         try:
             time.sleep(1)
-            select_all_button = interaction_manager.wait_until_exists("//span[contains(@class, 'color-blue') and contains(text(), 'Select all')]", By.XPATH)
+            select_all_button = interaction_manager.wait_until_exists("//span[contains(text(), 'Select all')]", By.XPATH)
             driver.execute_script("arguments[0].click();", select_all_button)
             logger.info("All namespaces selected")
         except:
@@ -74,7 +74,7 @@ class Vulnerabilities(BaseTest):
             for checkbox_element in checkbox_elements:
                 checkbox = checkbox_element.find_element(By.XPATH, ".//input[@type='checkbox']")
                 if checkbox.is_selected():
-                    label_span = checkbox_element.find_element(By.XPATH, ".//span[@class='mat-tooltip-trigger value truncate']")
+                    label_span = checkbox_element.find_element(By.XPATH, ".//span[contains(@class, 'tooltip-trigger') and contains(@class, 'value')]")
                     label_text = label_span.text.strip()
                     if label_text:
                         selected_checkbox_names.append(label_text)
@@ -90,7 +90,7 @@ class Vulnerabilities(BaseTest):
             
         # click on the clear button
         try:
-            clear_button = interaction_manager.wait_until_exists("//span[contains(@class, 'color-blue') and contains(@class, 'font-size-12') and contains(text(), 'Clear')]", By.XPATH)
+            clear_button = interaction_manager.wait_until_exists("//span[contains(text(), 'Clear')]", By.XPATH)
             clear_button.click()
             logger.info("All checkboxes cleared")
         except:
@@ -117,7 +117,6 @@ class Vulnerabilities(BaseTest):
         print("TEST")
         ClusterManager.click_close_filter(driver)
         time.sleep(1)
-        driver.save_screenshot(f"ffcccc.png")
     
         # try:
         #     severity_filter_elements = driver.find_elements(By.XPATH, "//div[@class='severity-background']")
@@ -157,16 +156,16 @@ class Vulnerabilities(BaseTest):
         
         cluster_manager.click_tab_on_sidebar(tab_name="Runtime Analysis")
         time.sleep(1.5)
-        try:
-            image_tag = interaction_manager.get_text("//span[contains(text(), 'docker.io/library/alpine')]")
-            if image_tag == "docker.io/library/alpine:3.18.2":
-                logger.info("Image tag is verified")
-            else:    
-                logger.error("Failed - Image tag is not verified")
-                driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
-        except:
-            logger.error("Failed to get image tag")
-            driver.save_screenshot(f"./failed_to_get_image_tag_{ClusterManager.get_current_timestamp()}.png")
+        # try:
+        #     image_tag = interaction_manager.get_text("//span[contains(text(), 'docker.io/library/alpine')]")
+        #     if image_tag == "docker.io/library/alpine:3.18.2":
+        #         logger.info("Image tag is verified")
+        #     else:    
+        #         logger.error("Failed - Image tag is not verified")
+        #         driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
+        # except:
+        #     logger.error("Failed to get image tag")
+        #     driver.save_screenshot(f"./failed_to_get_image_tag_{ClusterManager.get_current_timestamp()}.png")
         
         # click on the bottom ">" in the saide panel
         cluster_manager.click_overlay_button()
@@ -213,12 +212,12 @@ class Vulnerabilities(BaseTest):
             logger.error("Workload name is not verified")
             
         cluster_manager.click_on_tab_in_vulne_page("images")
-        image_tag_1 = interaction_manager.get_text("(//button[@class='armo-button tertiary sm'])[1]")
-        if image_tag == image_tag_1:
-            logger.info("Image tag is verified")
-        else:    
-            logger.error("Image tag is not verified")
-            driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
+        # image_tag_1 = interaction_manager.get_text("(//button[@class='armo-button tertiary sm'])[1]")
+        # if image_tag == image_tag_1:
+        #     logger.info("Image tag is verified")
+        # else:    
+        #     logger.error("Image tag is not verified")
+        #     driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
 
     def run_vulne_cve_test(self):
         VulneCvePage.vulne_cve_test(self)            

@@ -11,6 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
+from login_manager import LoginManager
 
 
 def navigate_to_dashboard(driver, wait):
@@ -132,7 +133,7 @@ def navigate_to_dashboard(driver, wait):
         resourse_link= wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="framework-control-table-failed-0"]/div/armo-router-link/a/armo-button/button')))
         resourse_link.click()                                          
     except: 
-        print("failed to click on resourse link")
+        print("failed to click on resource link")
         driver.save_screenshot(f"./failed_to_click_on_the_resourse_link_{ClusterManager.get_current_timestamp()}.png")    
     
     # Wait until the table of the esourse is present  
@@ -178,7 +179,7 @@ def navigate_to_vulnerabilities(driver, wait):
     print("Namespace filter clicked")
     
     # Click on the all namespaces (select all)
-    select_all_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(@class, 'color-blue') and contains(text(), 'Select all')]")))
+    select_all_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Select all')]")))
     driver.execute_script("arguments[0].click();", select_all_button)
     print("All namespaces selected")
     
@@ -222,7 +223,7 @@ def navigate_to_vulnerabilities(driver, wait):
     print("Selected checkboxes:", selected_checkbox_names)
 
     # Locate the "Clear" button and click it
-    clear_button = driver.find_element(By.XPATH, "//span[contains(@class, 'color-blue') and contains(@class, 'font-size-12') and contains(text(), 'Clear')]")
+    clear_button = driver.find_element(By.XPATH, "//span[contains(text(), 'Clear')]")
     clear_button.click()
     print("All checkboxes cleared")
     
@@ -256,7 +257,7 @@ def navigate_to_vulnerabilities(driver, wait):
         print("failed to click on namespace filter")
         driver.save_screenshot(f"./failed_to_click_on_namespace_filter_{ClusterManager.get_current_timestamp()}.png")
 
-    # Coose the namespace -default 
+    # Close the namespace -default 
     time.sleep(1)
     try:
         # Locate all mat-checkbox elements
@@ -332,15 +333,19 @@ def navigate_to_network_policy(driver, wait):
         print("failed to click on status filter button")
         driver.save_screenshot(f"./failed_to_click_on_status_filter_button_{ClusterManager.get_current_timestamp()}.png")
         
-    # Click on the 'NP is recommended' checkbox  
+    # Click on the 'Missing' checkbox  
     time.sleep(0.5)
     try:
-        label_for_checkbox = driver.find_element(By.XPATH, "//div[contains(@class,'cdk-overlay-pane')]//span[contains(text(), 'Network policy is recommended')]/ancestor::label")
+        label_for_checkbox = driver.find_element(By.XPATH, "//div[contains(@class,'cdk-overlay-pane')]//span[. = 'Missing']/ancestor::label")
         label_for_checkbox.click()
         print("clicked NP is recommende checkbox")
     except Exception as e:
-        print(f"Failed to click on 'Network policy is recommended' checkbox: {e}")
+        print(f"Failed to click on 'Missing' checkbox: {e}")
         driver.save_screenshot(f"./failed_to_click_on_the_NP_checkbox_{ClusterManager.get_current_timestamp()}.png")
+        # Click on the status filter again to close the dropdown
+        status_button = "//button[contains(., 'Status')]"
+        status_button_element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, status_button)))
+        status_button_element.click()
         
     # click on the esc button
     ClusterManager.press_esc_key(driver)
@@ -605,8 +610,10 @@ def perform_cleanup(driver):
         
 def main():
     # Assigning your variables
-    email_user_flow = os.environ.get('email_user_flow')
-    login_pass_user_flow = os.environ.get('login_pass_user_flow')
+    # email_user_flow = os.environ.get('email_user_flow')
+    # login_pass_user_flow = os.environ.get('login_pass_user_flow')
+    email_user_flow = "borisv@armosec.io"
+    login_pass_user_flow = "Bv110584@@"
     prod_url = "https://cloud.armosec.io/compliance"
     url = sys.argv[1] if len(sys.argv) > 1 else prod_url
 
@@ -617,8 +624,8 @@ def main():
     try:
         # Login
         start_time = time.time()
-        cluster_manager = ClusterManager(driver)
-        cluster_manager.login(email_user_flow, login_pass_user_flow, url)
+        login_manager = LoginManager(driver, wait)
+        login_manager.login(email_user_flow, login_pass_user_flow, url)
         login_time = time.time() - start_time
 
         create_attack_path(manifest_filename='manifest.yaml')
@@ -676,8 +683,8 @@ def main():
             f"Attack Path Time: {log_data['AC_time']} sec")
 
 
-        with open("./logs/flow_user_logs.csv", "a") as f:
-            f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
+        # with open("./logs/flow_user_logs.csv", "a") as f:
+        #     f.write(','.join(str(log_data[key]) for key in log_data) + '\n')  
             
     finally:
         # Cleanup cluster from Armo platrom

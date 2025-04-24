@@ -1,0 +1,783 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name localhost;
+        
+        location / {
+            proxy_pass http://127.0.0.1:5000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: secure-python-app
+  labels:
+    app: secure-python-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: secure-python-app
+  template:
+    metadata:
+      labels:
+        kubescape.io/max-sniffing-time: "5m"
+        app: secure-python-app
+    spec:
+      containers:
+      - name: secure-python-app
+        image: python:3.9-slim
+        volumeMounts:
+        - name: app-code
+          mountPath: /app
+        - name: templates
+          mountPath: /app/templates
+        env:
+        - name: MYSQL_HOST
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: host
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: username
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: password
+        - name: MYSQL_DB
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: database
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          cd /app
+          pip install flask mysql-connector-python requests
+          python app.py
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+      volumes:
+      - name: app-code
+        configMap:
+          name: app-code
+      - name: templates
+        configMap:
+          name: templates
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-code
+  labels:
+    app: secure-python-app
+data:
+  app.py: |
+    from flask import Flask, render_template, request, session, redirect, url_for, abort, send_file
+    import mysql.connector
+    import os
+    import requests
+    from pathlib import Path
+    import mimetypes
+
+    app = Flask(__name__)
+    app.secret_key = os.urandom(24)  # For session management
+
+    class Database:
+        def __init__(self):
+            self.conn = mysql.connector.connect(
+                host=os.environ.get('MYSQL_HOST'),
+                user=os.environ.get('MYSQL_USER'),
+                password=os.environ.get('MYSQL_PASSWORD'),
+                database=os.environ.get('MYSQL_DB')
+            )
+            self.cursor = self.conn.cursor(dictionary=True)
+        
+        def login(self, username, password):
+            # Direct string interpolation for SQL vulnerability demonstration
+            query = f"SELECT id, username FROM users WHERE username = '{username}' AND password = '{password}'"
+            
+            try:
+                self.cursor.execute(query)
+                result = self.cursor.fetchone()
+                return result
+            except mysql.connector.Error as err:
+                # Log the SQL error
+                raise Exception(f"MySQL Error: {err}\nQuery: {query}")
+
+    # Routes
+    @app.route('/', methods=['GET', 'POST'])
+    def index():
+        error = ''
+        success = ''
+        
+        try:
+            if request.method == 'POST':
+                username = request.form['username']
+                password = request.form['password']
+                
+                db = Database()
+                user = db.login(username, password)
+                
+                if user:
+                    session['user_id'] = user['id']
+                    session['username'] = user['username']
+                    success = f"Welcome back, {user['username']}!"
+                else:
+                    error = "Invalid credentials. Please try again."
+        except Exception as e:
+            error = f"Error: {str(e)}"
+        
+        return render_template('index.html', error=error, success=success)
+
+    @app.route('/eula.php')
+    def eula():
+        # Check if the EULA path parameter is provided
+        if 'eulaPath' not in request.args:
+            abort(400, 'Missing EULA file parameter. Please specify a eulaPath.')
+        
+        # Get the EULA file path from the query parameter
+        eula_file = request.args.get('eulaPath')
+        full_path = eula_file
+        
+        # Check if the file exists and is readable
+        if not Path(full_path).exists() or not os.access(full_path, os.R_OK):
+            abort(404, 'The requested EULA file could not be found or is not readable.')
+        
+        # Determine the file mime type
+        file_extension = Path(full_path).suffix.lower()[1:]  # Remove the dot
+        
+        # Set the content type based on file extension
+        if file_extension == 'txt':
+            content_type = 'text/plain'
+        elif file_extension in ['html', 'htm']:
+            content_type = 'text/html'
+        elif file_extension == 'pdf':
+            content_type = 'application/pdf'
+        elif file_extension == 'doc':
+            content_type = 'application/msword'
+        elif file_extension == 'docx':
+            content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        else:
+            content_type = 'text/plain'
+        
+        # Return the file with the correct content type
+        return send_file(full_path, mimetype=content_type)
+
+    @app.route('/helper.php')
+    def helper():
+        # Check if the fetch parameter is provided
+        if 'fetch' not in request.args:
+            abort(400, 'Missing URL parameter. Please specify a fetch parameter.')
+        
+        # Get the URL from the query parameter
+        url = request.args.get('fetch')
+        
+        try:
+            # Make the request to the URL
+            response = requests.get(
+                url, 
+                allow_redirects=True, 
+                timeout=30, 
+                verify=False,  # SSL verification disabled
+                headers={'User-Agent': 'Helper/1.0'}
+            )
+            
+            # If the fetch was successful, output the content with the same content type
+            if 200 <= response.status_code < 300:
+                # Get the content type from the response
+                content_type = response.headers.get('Content-Type', 'text/plain')
+                
+                # Return the response with the same content type
+                return response.content, 200, {'Content-Type': content_type}
+            else:
+                # Return an error for non-successful HTTP codes
+                return f'<h1>Error {response.status_code}</h1><p>The remote server returned an error code.</p>', response.status_code
+                
+        except requests.RequestException as e:
+            # Handle any request errors
+            return f'<h1>Error 500: Internal Server Error</h1><p>Failed to fetch the URL: {str(e)}</p>', 500
+
+    if __name__ == '__main__':
+        app.run(host='0.0.0.0', port=5000, debug=False)
+  eula.txt: |
+    By using this application, you agree to the following terms and conditions:
+    1. This software is provided "as is" without warranty of any kind.
+    2. You agree not to use this software for any malicious or illegal purposes.
+    3. We may collect usage data to improve the service and detect security threats.
+    4. You are responsible for maintaining the confidentiality of your account credentials.
+    5. We reserve the right to terminate access for violations of these terms.
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: templates
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Secure Login</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-gradient-to-r from-blue-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Welcome Back</h1>
+                <p class="text-gray-600 mt-2">Please sign in to continue</p>
+            </div>
+
+            {% if error %}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <span class="block sm:inline">{{ error }}</span>
+                </div>
+            {% endif %}
+
+            {% if success %}
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <span class="block sm:inline">{{ success|safe }}</span>
+                </div>
+            {% endif %}
+
+            <form method="POST" class="space-y-6">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text"
+                           name="username"
+                           id="username"
+                           autocomplete="off"
+                           required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password"
+                           name="password"
+                           autocomplete="off"
+                           id="password"
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                        Sign In
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Need help?</span>
+                    </div>
+                </div>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Contact your administrator or click here to reset your password
+                </p>
+                <p class="mt-2 text-center text-sm text-gray-600" style="font-size: 8px;">
+                    By using this application, you agree to the following <a href="{{ url_for('eula') }}?eulaPath=eula.txt">terms and conditions</a>.
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: secure-python-app
+  labels:
+    app: secure-python-app
+spec:
+  ports:
+  - port: 8889
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: secure-python-app
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+stringData:
+  host: "mysql"
+  username: "root"
+  password: "rootpassword"
+  database: "vulnerableapp"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-init
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      username VARCHAR(50) NOT NULL UNIQUE,
+      password VARCHAR(255) NOT NULL
+    );
+
+    -- Adding some test users (with plain text passwords for SQLi demo)
+    INSERT INTO users (username, password) VALUES
+    ('admin', 'admin123'),
+    ('john', 'password123'),
+    ('jane', 'letmein')
+    ON DUPLICATE KEY UPDATE username=username;
+
+    -- Granting privileges to the user
+    GRANT ALL PRIVILEGES ON vulnerable TO 'root'@'%';
+    FLUSH PRIVILEGES;
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        kubescape.io/max-sniffing-time: "5m"
+        app: mysql
+    spec:
+      serviceAccountName: mysql-sa
+      containers:
+      - name: mysql
+        image: mysql:latest
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "rootpassword"
+        - name: MYSQL_DATABASE
+          value: "vulnerableapp"
+        volumeMounts:
+        - name: db-init
+          mountPath: /docker-entrypoint-initdb.d
+        - name: mysql-config
+          mountPath: /etc/mysql/conf.d/
+      volumes:
+      - name: db-init
+        configMap:
+          name: db-init
+      - name: mysql-config
+        configMap:
+          name: mysql-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  ports:
+  - port: 3306
+    targetPort: 3306
+  selector:
+    app: mysql
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+data:
+  my.cnf: |
+    [mysqld]
+    secure_file_priv=
+---
+# Create a dedicated service account for MySQL
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mysql-sa
+---
+# Create a Role with the required permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mysql-pod-secret-access
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/exec"]
+  verbs: ["get", "list", "create"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+
+---
+# Bind the Role to the service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mysql-pod-secret-access-binding
+subjects:
+- kind: ServiceAccount
+  name: mysql-sa
+roleRef:
+  kind: Role
+  name: mysql-pod-secret-access
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-druid
+  labels:
+    app: apache-druid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apache-druid
+  template:
+    metadata:
+      labels:
+        app: apache-druid
+        kubescape.io/max-sniffing-time: "5m"
+    spec:
+      containers:
+      - name: apache-druid
+        image: vulhub/apache-druid:0.20.0
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            # Download and extract a newer OpenJDK version that supports ExitOnOutOfMemoryError
+            echo "Installing newer JDK..."
+            mkdir -p /opt/jdk
+            cd /opt
+
+            # Install wget if not available
+            which wget || apt-get install -y wget || { echo "Failed to install wget"; exit 1; }
+
+            # Download a newer OpenJDK version (8u131 which supports ExitOnOutOfMemoryError)
+            echo "Downloading OpenJDK..."
+            wget -q https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10/OpenJDK8U-jdk_x64_linux_hotspot_8u292b10.tar.gz
+
+            # Extract it
+            echo "Extracting OpenJDK..."
+            tar -xzf OpenJDK8U-jdk_x64_linux_hotspot_8u292b10.tar.gz -C /opt/jdk
+
+            # Set up environment for this script session
+            echo "Setting up Java environment..."
+            export JAVA_HOME=/opt/jdk/jdk8u292-b10
+            export PATH=$JAVA_HOME/bin:$PATH
+
+            # Create symlinks to ensure binaries are in standard locations
+            ln -sf $JAVA_HOME/bin/javac /usr/bin/javac
+            ln -sf $JAVA_HOME/bin/java /usr/bin/java
+
+            # Verify java is installed and working
+            echo "Verifying java installation..."
+            java -version
+
+            # Now continue with your shadow file reading logic
+            echo "Creating Java file to read /etc/shadow..."
+            mkdir -p /tmp/shadow_reader
+            cat > /tmp/shadow_reader/ReadShadow.java << 'EOF'
+            import java.io.BufferedReader;
+            import java.io.File;
+            import java.io.FileReader;
+            import java.io.IOException;
+            import java.text.SimpleDateFormat;
+            import java.util.Date;
+            import java.util.HashMap;
+            import java.util.Map;
+
+            public class ReadShadow {
+                public static void main(String[] args) {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
+                    System.out.println("Starting shadow file read loop - 20 iterations");
+
+                    // First, mimic the directory listing functionality seen in the call stack
+                    // This reflects the behavior in org.apache.commons.io.FileUtils.listFiles
+                    try {
+                        File etcDir = new File("/etc");
+                        System.out.println("Listing files in /etc (similar to exploit behavior):");
+                        File[] files = etcDir.listFiles();
+                        if (files != null) {
+                            for (int i = 0; i < Math.min(5, files.length); i++) {
+                                System.out.println(" - " + files[i].getName());
+                            }
+                            System.out.println("... (and " + (files.length - 5) + " more)");
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Error listing directory: " + e.getMessage());
+                    }
+
+                    // Now proceed with the file reading loop
+                    for (int i = 1; i <= 20; i++) {
+                        String timestamp = dateFormat.format(new Date());
+                        System.out.println("\n[" + timestamp + "] Iteration " + i + " of 20");
+                        System.out.println("-----------------------------------------------------");
+
+                        try {
+                            Map<String, Object> result = new HashMap<>();
+                            readShadowFile(result);
+
+                            System.out.println("Contents of /etc/shadow:");
+                            System.out.println(result.get("content"));
+                        } catch (Exception e) {
+                            System.err.println("Error reading /etc/shadow: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+
+                        // Sleep for 1 second between reads
+                        if (i < 20) {
+                            try {
+                                System.out.println("Sleeping for 1 second...");
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                System.err.println("Sleep interrupted: " + e.getMessage());
+                            }
+                        }
+                    }
+
+                    System.out.println("\nCompleted 20 iterations of reading /etc/shadow");
+                }
+
+                private static void readShadowFile(Map<String, Object> result) throws IOException {
+                    // Create a File object - matches exactly what happens in the exploit
+                    File file = new File("/etc/shadow");
+
+                    // Create a FileReader with the File - matches FileReader.<init>(File)
+                    FileReader fr = new FileReader(file);
+
+                    // Create a BufferedReader - matches the exploit pattern
+                    BufferedReader br = new BufferedReader(fr);
+
+                    StringBuilder content = new StringBuilder();
+                    String line;
+
+                    // Read all lines - matches the exploit behavior
+                    while ((line = br.readLine()) != null) {
+                        content.append(line).append("\n");
+                    }
+
+                    // Close readers - matches what the exploit does
+                    br.close();
+                    fr.close();
+
+                    // Store the content
+                    result.put("content", content.toString());
+                    result.put("timestamp", System.currentTimeMillis());
+                }
+            }
+            EOF
+
+            # Compile and run the Java program
+            javac /tmp/shadow_reader/ReadShadow.java
+            java -cp /tmp/shadow_reader ReadShadow > /tmp/shadow_contents.log 2>&1
+
+            # Now start Druid
+            echo "Starting Druid..."
+            exec /opt/druid/bin/start-nano-quickstart
+        ports:
+        - containerPort: 8888
+        resources:
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+        env:
+        - name: DRUID_XMX
+          value: "3g"
+        - name: DRUID_XMS
+          value: "1g"
+        - name: DRUID_MAXNEWSIZE
+          value: "250m"
+        - name: DRUID_NEWSIZE
+          value: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apache-druid-service
+spec:
+  selector:
+    app: apache-druid
+  ports:
+  - port: 8888
+    targetPort: 8888
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ping-app
+  labels:
+    app: ping-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ping-app
+  template:
+    metadata:
+      labels:
+        app: ping-app
+        kubescape.io/max-sniffing-time: "5m"
+    spec:
+      containers:
+      - name: ping-app
+        image: docker.io/amitschendel/ping-app:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        command:
+        - bash
+        - -c
+        - |
+          apt-get update && apt-get install -y python3 python3-pip && python3 -m pip install boto3 && \
+          python3 -c "import boto3; import json; import time; s3 = boto3.client('s3')" && \
+          docker-php-entrypoint apache2-foreground
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ping-app
+  labels:
+    app: ping-app
+spec:
+  selector:
+    app: ping-app
+  ports:
+  - protocol: TCP
+    port: 8890
+    targetPort: 80
+  type: LoadBalancer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ping-app-role
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ping-app-role-binding
+subjects:
+- kind: ServiceAccount
+  name: "default"
+roleRef:
+  kind: Role
+  name: ping-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: changedetection
+  labels:
+    app: changedetection
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: changedetection
+  template:
+    metadata:
+      labels:
+        app: changedetection
+        kubescape.io/max-sniffing-time: "3m"
+    spec:
+      containers:
+      - name: changedetection
+        image: ghcr.io/dgtlmoon/changedetection.io:0.45.20
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "Creating Python script to read /etc/shadow..."
+            cat > /tmp/read_shadow.py <<EOF
+            import time
+          
+            try:
+                for i in range(1, 15):
+                    print(f"Iteration {i} of 15")
+                    f = open("/etc/shadow", "r")
+                    content = f.read()
+                    time.sleep(1)
+                    f.close()
+                    print("Contents of /etc/shadow:\\n", content)
+            except Exception as e:
+                print("Error reading /etc/shadow:", e)
+            
+            time.sleep(5)
+            EOF
+
+            echo "Running read_shadow.py..."
+            python3 /tmp/read_shadow.py
+            python3 /tmp/read_shadow.py
+            python3 /tmp/read_shadow.py
+
+            echo "Starting Changedetection.io..."
+            exec python3 -u changedetection.py
+        ports:
+        - containerPort: 5000
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: changedetection-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: changedetection
+  ports:
+    - protocol: TCP
+      port: 8899
+      targetPort: 5000
+---

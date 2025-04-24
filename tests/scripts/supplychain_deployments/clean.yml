@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supplychain-attack
+  labels:
+    app: supplychain-attack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: supplychain-attack
+  template:
+    metadata:
+      labels:
+        app: supplychain-attack
+    spec:
+      containers:
+      - name: alpine
+        image: alpine:3.19
+        command: ["/bin/sh", "-c", "--"]
+        args: ["while true; do sleep 30; done;"]
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+        volumeMounts:
+        - name: supplychain-attack-data
+          mountPath: /data
+      volumes:
+      - name: supplychain-attack-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: supplychain-attack-service
+spec:
+  selector:
+    app: supplychain-attack
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP

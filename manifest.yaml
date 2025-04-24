@@ -11,6 +11,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: alpine-deployment
+  labels:
+    env: alpine-test 
 spec:
   replicas: 1
   selector:

@@ -99,11 +99,8 @@ class VulneCvePage(BaseTest):
             print(workload_name,    workload_name_1) 
 
         time.sleep(1)
-        # driver.save_screenshot(f"./test-1_{ClusterManager.get_current_timestamp()}.png")
         cluster_manager.click_on_tab_in_vulne_page("workloads",index=1)
-        print("TEST-2")
         time.sleep(1)
-        # driver.save_screenshot(f"./test-2_{ClusterManager.get_current_timestamp()}.png")
       
 
         

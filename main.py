@@ -10,6 +10,7 @@ from tests.vulnerabilities import Vulnerabilities
 from tests.compliance import Compliance
 from tests.attach_path import AttachPath
 from tests.security_risk import SecurityRisk
+from tests.runtime_incidents import RuntimeIncident
 from tests.base_test import TestConfig
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -30,7 +31,7 @@ class TestsRunner:
                 except Exception as exc:
                     _logger.error(f"Test generated an exception: {exc}")
 
-    def run_test(self, test_class, email, password, environment):
+    def run_test(self, test_class,email, password, environment):
         driver = initialize_driver()
         interaction_manager = InteractionManager(driver)
         test_config = TestConfig(
@@ -58,6 +59,7 @@ def main():
         'compliance': Compliance,
         'attach-path': AttachPath,
         'security-risk': SecurityRisk,
+        'runtime-security': RuntimeIncident,
         # Add additional mappings here
     }
 

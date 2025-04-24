@@ -11,13 +11,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from login_manager import LoginManager
 
 
 
 def initialize_driver():
     chrome_options = Options()
     # Uncomment for headless mode if needed
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")
     chrome_options.add_argument("--start-maximized")
     chrome_options.add_argument("--disable-infobars")
     chrome_options.add_argument("--disable-extensions")
@@ -29,31 +30,36 @@ class ClusterManager:
     def __init__(self,driver):
         self.driver = driver
         self.wait = WebDriverWait(self.driver, timeout=60, poll_frequency=0.001)
+        self._login_manager = LoginManager(driver, self.wait)
 
-    def login(self, email_onboarding, login_pass_onboarding, url):
-        driver = self.driver
-        wait = self.wait
-        driver.get(url)
-        wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="frontegg-login-box-container-default"]/div[1]/input')))
-        mail_input = driver.find_element(by=By.XPATH, value='//*[@id="frontegg-login-box-container-default"]/div[1]/input')
-        mail_input.send_keys(email_onboarding)
-        mail_input.send_keys(Keys.ENTER)
-        wait.until(EC.visibility_of_element_located((By.XPATH, '/html/body/frontegg-app/div[2]/div[2]/input')))
-        password_input = driver.find_element(by=By.XPATH, value='/html/body/frontegg-app/div[2]/div[2]/input')
-        password_input.send_keys(login_pass_onboarding)
-        password_input.send_keys(Keys.ENTER)
-
-
+    def login(self, email, password, url):
+        """
+        Logs in to the Armo platform using the shared LoginManager
+        
+        Args:
+            email (str): Email address for login
+            password (str): Password for login
+            url (str): URL to navigate to
+            
+        Returns:
+            float: The time taken for login in seconds
+        """
+        print(f"Logging in to {url}")
+        login_manager = LoginManager(self.driver)
+        login_time = login_manager.login(email, password, url)
+        print(f"Login completed in {login_time:.2f} seconds")
+        
         # check if onboarding-role page is displayed
         try:
-            wait_for_element = WebDriverWait(driver, 5, 0.001)
+            wait_for_element = WebDriverWait(self.driver, 5, 0.001)
             element = wait_for_element.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")))
-        except:
+        except TimeoutException:
             print("Onboarding role page is not displayed - not a sign-up user")
         else:
             print("Onboarding role page is displayed - sign-up user (first login)")
-            ClusterManager.handle_role_page(self)
-        
+            self.handle_role_page()
+            
+        return login_time
         
     def handle_role_page(self):
         driver = self.driver
@@ -221,9 +227,9 @@ class ConnectCluster:
             self.driver.save_screenshot(f"./view_cluster_button_error_{ClusterManager.get_current_timestamp()}.png")
 
 
-    def view_connected_cluster(self,custom_wait_time=5, max_attempts=2):
+    def view_connected_cluster(self,custom_wait_time=5, max_attempts=3):
         try:
-            time.sleep(2)
+            time.sleep(3)
             wait = WebDriverWait(self.driver, timeout=custom_wait_time, poll_frequency=0.001)
             wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "img[src='/assets/images/cluster-status/connected.svg']")))
             print("View cluster connected found.")
@@ -276,19 +282,19 @@ class Cleanup:
 
     def choose_delete_option(self):
         time.sleep(0.5)
-        delete_button = self.driver.find_element(By.XPATH, "//button[@mat-menu-item and contains(@class, 'mat-mdc-menu-item') and span[text()='Delete']]")
+        delete_button = self.driver.find_element(By.XPATH, "//div[contains(@class,'cdk-overlay-pane')]//span[normalize-space(text())='Delete']/ancestor::button")
         delete_button.click()
         print("Click on delete button option.")
 
     def confirm_delete(self):
         time.sleep(0.5)
-        confirm_delete_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.armo-button.error.md")))
+        confirm_delete_button = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "mat-dialog-container button.armo-button.error.xl")))
         confirm_delete_button.click()
         print("Click on confirm delete button.")
 
     def wait_for_empty_table(self):
         wait = WebDriverWait(self.driver, 180, 0.001)
-        wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'td.mat-cell.text-center.ng-star-inserted'), 'No data to display'))
+        wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'td.mat-cell.ng-star-inserted > div.d-flex.justify-content-center'), 'No data to display'))
         print("Cleanup done")
 
 class IgnoreRule:
@@ -369,7 +375,7 @@ class IgnoreRule:
 
         # Click on the revoke button
         try:
-            revoke_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.error.md')))
+            revoke_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button.armo-button.error.xl')))
             revoke_button.click()
             print("Ignore rule deleted.")
         except:
