@@ -6,7 +6,8 @@ on:
       ENVIRONMENT:
         description: 'Environment to run the tests'
         options:
-        - development
+        - predev
+        - dev
         - staging
         - production
         type: choice
