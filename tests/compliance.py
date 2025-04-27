@@ -46,9 +46,8 @@ class Compliance(BaseTest):
         # Click on the cluster (the first one) 
         time.sleep(1)
         try:
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[3]/armo-cluster-scans-table/table/tbody/tr/td[1]')))
-            cluster = driver.find_element(By.XPATH, '/html/body/armo-root/div/div/div/armo-config-scanning-page/div[3]/armo-cluster-scans-table/table/tbody/tr/td[1]')
-            driver.execute_script("arguments[0].click();", cluster)
+            cluster_connected = WebDriverWait(self._driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "td.mat-column-isConnected")))
+            cluster_connected.click()
             logger.info("First Cluster selected")
         except:
             logger.error("failed to click on the cluster")
