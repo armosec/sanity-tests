@@ -618,8 +618,8 @@ class ConnectCluster:
         time.sleep(30)
         try:
             wait = WebDriverWait(self._driver, timeout=180, poll_frequency=0.5)
-            wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space(text())='View cluster']")))
-            self._interaction_manager.click("//button[normalize-space(text())='View cluster']", By.XPATH)
+            cluster_connected_button= wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space(text())='View cluster']")))
+            cluster_connected_button.click()
             logger.info("Click on view cluster button.")
         except TimeoutException as e:
             logger.error("View cluster button was not found or clickable.")
