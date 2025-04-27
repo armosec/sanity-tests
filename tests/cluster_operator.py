@@ -723,12 +723,24 @@ class IgnoreRule:
             self._driver.save_screenshot(f"./Accepting_Risk_button_error_rfrom _attach_path_{ClusterManager.get_current_timestamp()}.png")
 
 
-    def get_ignore_rule_field(self, index):
-        time.sleep(3)
-        css_selector = ".mat-mdc-tooltip-trigger.field-value.truncate.ng-star-inserted"
+    def get_ignore_rule_field(self, index, timeout=10):
+        css_selector = "div.mat-mdc-menu-trigger.field.pointer.ng-star-inserted"
+        save_button_xpath = "//button[contains(text(), 'Save')]"
+        
+        # Wait until the Save button is clickable
+        WebDriverWait(self._driver, timeout).until(
+            EC.element_to_be_clickable((By.XPATH, save_button_xpath))
+        )
+        print("Save button is clickable - page fully loaded!")
+
+        # Now it's safe to collect the fields
         all_fields = self._driver.find_elements(By.CSS_SELECTOR, css_selector)
+        print(f"Found {len(all_fields)} fields.")
+
+        if index >= len(all_fields):
+            raise IndexError(f"Requested index {index}, but only {len(all_fields)} fields were found.")
+
         field_text = all_fields[index].text.strip()
-        # logger.info(f"The RESOURCE is: '{field_text}'")
         return field_text
     
     def save_ignore_rule(self):
