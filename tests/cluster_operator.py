@@ -614,10 +614,10 @@ class ConnectCluster:
             self._driver.save_screenshot(f"./verify_button_erro_{ClusterManager.get_current_timestamp()}.png")
 
     def view_cluster_button(self):
-        logger.info("Waiting for connect clustert - 30 sec.")
-        time.sleep(30)
+        logger.info("Waiting for connect clustert - 1 min.")
+        time.sleep(60)
         try:
-            wait = WebDriverWait(self._driver, timeout=60, poll_frequency=0.001)
+            wait = WebDriverWait(self._driver, timeout=180, poll_frequency=0.001)
             wait.until(EC.visibility_of_element_located((By.XPATH, "//button[normalize-space(text())='View cluster']")))
             self._interaction_manager.click("//button[normalize-space(text())='View cluster']", By.XPATH)
         except TimeoutException as e:
