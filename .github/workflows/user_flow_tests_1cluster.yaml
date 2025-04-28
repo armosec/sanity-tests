@@ -52,6 +52,8 @@ jobs:
     - name: Set credentials output
       id: set-credentials
       run: |
+        echo "test_email=${{ secrets.COMMON_EMAIL }}" >> $GITHUB_ENV
+        echo "test_password=${{ secrets.COMMON_PASSWORD }}" >> $GITHUB_ENV
         echo "test_email=${{ secrets.COMMON_EMAIL }}" >> $GITHUB_OUTPUT
         echo "test_password=${{ secrets.COMMON_PASSWORD }}" >> $GITHUB_OUTPUT
 
