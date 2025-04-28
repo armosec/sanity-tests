@@ -26,6 +26,8 @@ class Vulnerabilities(BaseTest):
             connect_cluster.view_cluster_button()
             connect_cluster.view_connected_cluster()
             cluster_manager.create_attack_path() 
+            print("wait for 30 seconds")
+            time.sleep(30)
             self.run_vulne_cve_test()
             self.navigate_to_vulnerabilities()
             self.risk_acceptance_page()
