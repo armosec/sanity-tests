@@ -165,19 +165,19 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Install doctl
-      run: |
-        sudo snap install doctl --classic
+    # - name: Install doctl
+    #   run: |
+    #     sudo snap install doctl --classic
 
-    - name: Authenticate doctl and set kubeconfig
-      run: |
-        doctl auth init --access-token ${{ secrets.DIGITALOCEAN_TOKEN }}
-        doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER_ID }}
+    # - name: Authenticate doctl and set kubeconfig
+    #   run: |
+    #     doctl auth init --access-token ${{ secrets.DIGITALOCEAN_TOKEN }}
+    #     doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER_ID }}
 
-    - name: Install kubectl
-      run: |
-        sudo snap install kubectl --classic
-        kubectl version --client --output=yaml
+    # - name: Install kubectl
+    #   run: |
+    #     sudo snap install kubectl --classic
+    #     kubectl version --client --output=yaml
 
     - name: Set up Python
       uses: actions/setup-python@v4
