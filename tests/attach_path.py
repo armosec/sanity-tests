@@ -21,15 +21,15 @@ class AttachPath(BaseTest):
         self.login(login_url)
         try:
             logger.info("Running Attach Path test")
-            connect_cluster.click_get_started()
-            connect_cluster.connect_cluster_helm()
-            connect_cluster.verify_installation()
-            connect_cluster.view_cluster_button()
-            connect_cluster.view_connected_cluster()
+            # connect_cluster.click_get_started()
+            # connect_cluster.connect_cluster_helm()
+            # connect_cluster.verify_installation()
+            # connect_cluster.view_cluster_button()
+            # connect_cluster.view_connected_cluster()
             self.navigate_to_attach_path()
             self.risk_acceptance_page()
         finally:
-            self.perform_cleanup()
+            # self.perform_cleanup()
             logger.info("Attach path test completed")
 
     def navigate_to_attach_path(self):

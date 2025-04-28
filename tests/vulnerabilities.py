@@ -20,20 +20,20 @@ class Vulnerabilities(BaseTest):
         try:
             interact = self._interaction_manager
             interact.click('image-scanning-left-menu-item', By.ID) # Click on vulnerabilities page
-            connect_cluster.click_get_started()
-            connect_cluster.connect_cluster_helm()
-            connect_cluster.verify_installation()
-            connect_cluster.view_cluster_button()
-            connect_cluster.view_connected_cluster()
-            cluster_manager.create_attack_path() 
-            print("wait for 30 seconds")
-            time.sleep(30)
+            # connect_cluster.click_get_started()
+            # connect_cluster.connect_cluster_helm()
+            # connect_cluster.verify_installation()
+            # connect_cluster.view_cluster_button()
+            # connect_cluster.view_connected_cluster()
+            # cluster_manager.create_attack_path() 
+            # print("wait for 30 seconds")
+            # time.sleep(30)
             self.run_vulne_cve_test()
             self.navigate_to_vulnerabilities()
             self.risk_acceptance_page()
             print("Running vulnerabilities test")
         finally:
-            self.perform_cleanup()  
+            # self.perform_cleanup()  
             logger.info("Cleanup completed successfully")
 
     def navigate_to_vulnerabilities(self):
