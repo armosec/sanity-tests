@@ -16,7 +16,7 @@ class AttachPath(BaseTest):
         connect_cluster = ConnectCluster(self._driver, self._wait)
         connect_maneger = ClusterManager(self._driver, self._wait)
         interaction_manager = InteractionManager(self._driver)
-        connect_maneger.create_attack_path()
+        # connect_maneger.create_attack_path()
         login_url = self.get_login_url()
         self.login(login_url)
         try:
@@ -77,8 +77,9 @@ class AttachPath(BaseTest):
             logger.error("Attack path is NOT displayed.")
             driver.save_screenshot(f"./failed_to_find_the_attack_path_{ClusterManager.get_current_timestamp()}.png")
 
-    def click_on_attach_path(self, index, wait, driver, interaction_manager):
+    def click_on_attach_path(self, index, wait, driver):
         cluster_manager = ClusterManager(driver, wait)
+        interaction_manager = InteractionManager(driver)
         try:
             descriptions = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[data-test-id='description']")))
             description_element = descriptions[index]
@@ -97,8 +98,9 @@ class AttachPath(BaseTest):
                 # click on the bottom ">" in the saide panel
                 cluster_manager.click_overlay_button()
                 time.sleep(1)
-                workload_name = interaction_manager.get_text("//td[contains(@class, 'mat-mdc-cell') and normalize-space(text())='alpine-deployment']")
-                print(workload_name)    
+                workload_name = interaction_manager.get_text("(//td[contains(@class, 'mat-column-value')])[1]", by=By.XPATH)
+                logger.info(f"Workload name: {workload_name}")
+ 
                 cluster_manager.press_esc_key(driver)
                 time.sleep(1)
                 self.create_ignore_rule(driver) 
