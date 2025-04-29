@@ -26,15 +26,15 @@ class VulneCvePage(BaseTest):
             driver.save_screenshot(f"./failed_to_click_on_vulnerabilities_{ClusterManager.get_current_timestamp()}.png")
         
         time.sleep(1)    
-        cluster_manager.click_filter_button("Namespace")
+        cluster_manager.click_filter_button("Namespace") 
         time.sleep(1)
-        cluster_manager.click_checkbox_by_name("default")
+        cluster_manager.click_checkbox_by_name("attack-suite")  #default
         time.sleep(1)
         ClusterManager.click_close_filter(driver)
         time.sleep(1)
         cluster_manager.click_filter_button("Workload")
         time.sleep(1)
-        cluster_manager.click_checkbox_by_name("alpine-deployment")        
+        cluster_manager.click_checkbox_by_name("ping-app")   #alpine-deployment
         time.sleep(1)
         ClusterManager.click_close_filter(driver,index=1)
         time.sleep(1)   
@@ -51,11 +51,11 @@ class VulneCvePage(BaseTest):
         ClusterManager.click_close_filter(driver,index=2)       
         time.sleep(1)
         
-        ignore_rule = IgnoreRule(driver)
-        ignore_rule.click_ignore_button()
-        logger.info("Clicked on the 'Accept Risk' button")
-        time.sleep(1)
-        ignore_rule.save_ignore_rule()
+        # ignore_rule = IgnoreRule(driver)
+        # ignore_rule.click_ignore_button()
+        # logger.info("Clicked on the 'Accept Risk' button")
+        # time.sleep(1)
+        # ignore_rule.save_ignore_rule()
         
         time.sleep(2)
         # Click on the first row
@@ -75,8 +75,8 @@ class VulneCvePage(BaseTest):
 
 
         cve_severity = interaction_manager.get_text("//span[contains(@class, 'medium-severity-color') and normalize-space(text())='Medium']")
-        print(cve_severity)
-        
+        logger.info(f"Severity: {cve_severity}")
+     
         button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//armo-button[contains(@class, 'link-button') and .//button[contains(@class, 'armo-button') and contains(@class, 'tertiary') and contains(@class, 'sm')]]")))
         button.click()
         time.sleep(1)
@@ -86,11 +86,11 @@ class VulneCvePage(BaseTest):
         # click on the bottom ">" in the saide panel
         cluster_manager.click_overlay_button()
         time.sleep(1)
-        workload_name = interaction_manager.get_text("//td[contains(@class, 'mat-mdc-cell') and normalize-space(text())='alpine-deployment']")
+        workload_name = interaction_manager.get_text("//span[text()='Workload']/ancestor::td/following-sibling::td")
         cluster_manager.press_esc_key(driver)
 
         cluster_manager.click_on_tab_in_vulne_page("images")
-        workload_name_1 = interaction_manager.get_text("//td[contains(@class, 'mat-mdc-cell') and .//span[normalize-space(text())='alpine-container']]")
+        workload_name_1 = interaction_manager.get_text("//td[contains(@class, 'cdk-column-containers')]//span[@uicustomtooltip]")
 
         if workload_name == workload_name_1:
             print("Workload name is the same")

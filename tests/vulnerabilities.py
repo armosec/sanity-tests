@@ -117,18 +117,19 @@ class Vulnerabilities(BaseTest):
         time.sleep(1)
         cluster_manager.click_checkbox_by_name("default")
         time.sleep(1)
-        print("TEST")
         ClusterManager.click_close_filter(driver)
         time.sleep(1)
-    
-        # try:
-        #     severity_filter_elements = driver.find_elements(By.XPATH, "//div[@class='severity-background']")
-        #     severity_filter_elements[1].click()
-        #     logger.info("Clicked on the medium severity filter")
-        # except Exception as e:
-        #     logger.error(f"Failed to click on the medium severity filter: {str(e)}")
-        #     driver.save_screenshot(f"./failed_to_click_on_medium_severity_filter_{ClusterManager.get_current_timestamp()}.png")
+ 
+        # click on the medium severity filter in the first row
+        try:
+            severity_filter_elements = driver.find_elements(By.XPATH, "//div[@class='severity-background']")
+            severity_filter_elements[1].click()
+            logger.info("Clicked on the medium severity filter")
+        except Exception as e:
+            logger.error(f"Failed to click on the medium severity filter: {str(e)}")
+            driver.save_screenshot(f"./failed_to_click_on_medium_severity_filter_{ClusterManager.get_current_timestamp()}.png")
         time.sleep(1)
+        
         try:
             rows = WebDriverWait(self._driver, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "tr[role='row']")))
@@ -139,36 +140,30 @@ class Vulnerabilities(BaseTest):
             logger.error("Failed to find any rows in the table")
             driver.save_screenshot(f"./failed_to_find_rows_in_table_{ClusterManager.get_current_timestamp()}.png")
             
-        cluster_manager.click_filter_button("Severity")
-        time.sleep(1)
-        cluster_manager.click_checkbox_by_name("High")
-        
-        ClusterManager.click_close_filter(driver)
-        time.sleep(1)
         num_of_high_cve = interaction_manager.count_rows()
         logger.info(f"Number of high CVEs: {num_of_high_cve}")
         # driver.save_screenshot(f"./number_of_high_cves_{ClusterManager.get_current_timestamp()}.png")
 
         try:
             time.sleep(1)
-            interaction_manager.click("(//button[@class='armo-button tertiary sm'])[2]", By.XPATH)
-            logger.info("Clicked on the first row in the table")
-        except TimeoutException:
-            logger.error("Failed to click on rows in the table")
-            driver.save_screenshot(f"./failed_to_clicl_rows_in_table_{ClusterManager.get_current_timestamp()}.png")
-        
+            interaction_manager.click("(//td[contains(@class, 'cdk-column-name') and contains(@class, 'mat-column-name')]//button[contains(@class, 'armo-button') and contains(@class, 'tertiary') and contains(@class, 'sm')])[1]", By.XPATH) 
+            logger.info("Successfully clicked on the firs CVE.")
+        except Exception as e:
+                logger.error(f"Failed to click on the first CVE: {e}")
+                driver.save_screenshot("./failed_to_click_cve.png")
+                    
         cluster_manager.click_tab_on_sidebar(tab_name="Runtime Analysis")
         time.sleep(1.5)
-        # try:
-        #     image_tag = interaction_manager.get_text("//span[contains(text(), 'docker.io/library/alpine')]")
-        #     if image_tag == "docker.io/library/alpine:3.18.2":
-        #         logger.info("Image tag is verified")
-        #     else:    
-        #         logger.error("Failed - Image tag is not verified")
-        #         driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
-        # except:
-        #     logger.error("Failed to get image tag")
-        #     driver.save_screenshot(f"./failed_to_get_image_tag_{ClusterManager.get_current_timestamp()}.png")
+        try:
+            image_tag = interaction_manager.get_text("//span[contains(text(), 'docker.io/library/alpine')]")
+            if image_tag == "docker.io/library/alpine:3.18.2":
+                logger.info("Image tag is verified")
+            else:    
+                logger.error("Failed - Image tag is not verified")
+                driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
+        except:
+            logger.error("Failed to get image tag")
+            driver.save_screenshot(f"./failed_to_get_image_tag_{ClusterManager.get_current_timestamp()}.png")
         
         # click on the bottom ">" in the saide panel
         cluster_manager.click_overlay_button()
@@ -202,9 +197,10 @@ class Vulnerabilities(BaseTest):
                         f"Expected: {num_of_high_cve - 2}")
                          
             driver.save_screenshot(f"./failed_risk_acceptance_{ClusterManager.get_current_timestamp()}.png")
+            
         # ignore_rule.igor_rule_icon_check()
         # return container_name
-        
+
         cluster_manager.click_on_tab_in_vulne_page("details")
         time.sleep(1)
         
@@ -215,12 +211,12 @@ class Vulnerabilities(BaseTest):
             logger.error("Workload name is not verified")
             
         cluster_manager.click_on_tab_in_vulne_page("images")
-        # image_tag_1 = interaction_manager.get_text("(//button[@class='armo-button tertiary sm'])[1]")
-        # if image_tag == image_tag_1:
-        #     logger.info("Image tag is verified")
-        # else:    
-        #     logger.error("Image tag is not verified")
-        #     driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
+        image_tag_1 = interaction_manager.get_text("(//button[@class='armo-button tertiary sm'])[1]")
+        if image_tag == image_tag_1:
+            logger.info("Image tag is verified")
+        else:    
+            logger.error("Image tag is not verified")
+            driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
 
     def run_vulne_cve_test(self):
         VulneCvePage.vulne_cve_test(self)            

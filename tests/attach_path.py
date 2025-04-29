@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from .cluster_operator import ClusterManager, IgnoreRule, RiskAcceptancePage , ConnectCluster
+from .cluster_operator import ClusterManager, IgnoreRule, RiskAcceptancePage, ConnectCluster
 from .interaction_manager import InteractionManager
 
 logger = logging.getLogger(__name__)
@@ -77,9 +77,8 @@ class AttachPath(BaseTest):
             logger.error("Attack path is NOT displayed.")
             driver.save_screenshot(f"./failed_to_find_the_attack_path_{ClusterManager.get_current_timestamp()}.png")
 
-    def click_on_attach_path(self, index, wait, driver):
+    def click_on_attach_path(self, index, wait, driver, interaction_manager):
         cluster_manager = ClusterManager(driver, wait)
-        interaction_manager = InteractionManager(driver)
         try:
             descriptions = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[data-test-id='description']")))
             description_element = descriptions[index]
@@ -100,31 +99,31 @@ class AttachPath(BaseTest):
                 time.sleep(1)
                 workload_name = interaction_manager.get_text("(//td[contains(@class, 'mat-column-value')])[1]", by=By.XPATH)
                 logger.info(f"Workload name: {workload_name}")
- 
+
                 cluster_manager.press_esc_key(driver)
                 time.sleep(1)
                 self.create_ignore_rule(driver) 
                 time.sleep(3)
-                self._interaction_manager.click("armo-attack-chain-graph-node[data-test-id='node-Initial Access']", by=By.CSS_SELECTOR)
+                interaction_manager.click("armo-attack-chain-graph-node[data-test-id='node-Initial Access']", by=By.CSS_SELECTOR)
                 logger.info("Clicked on 'Initial Access' node.")
                 time.sleep(2)
                 try:
-                    self._interaction_manager.click("armo-fix-button[data-test-id='fix-button'] button", by=By.CSS_SELECTOR)
+                    interaction_manager.click("armo-fix-button[data-test-id='fix-button'] button", by=By.CSS_SELECTOR)
                     logger.info("Clicked on 'Fix' button.")
                 except Exception as e:
                     logger.error(f"Failed to click on 'Fix' button: {str(e)}")
-                    self._driver.save_screenshot(f"./failed_to_click_fix_button_{ClusterManager.get_current_timestamp()}.png")
+                    driver.save_screenshot(f"./failed_to_click_fix_button_{ClusterManager.get_current_timestamp()}.png")
                 
-                if self.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
+                if self.compare_yaml_code_elements(driver, "div.row-container.yaml-code-row"):
                     logger.info("SBS yamls - The number of rows is equal.")
                 else:
                     logger.error("SBS yamls - The number of rows is NOT equal.")
                 time.sleep(2)
                 ClusterManager.press_esc_key(driver)
             else:
-                self._interaction_manager.click("armo-fix-button[data-test-id='fix-button'] button", by=By.CSS_SELECTOR)
+                interaction_manager.click("armo-fix-button[data-test-id='fix-button'] button", by=By.CSS_SELECTOR)
                 logger.info("Clicked on 'Fix' button.")
-                if self.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
+                if self.compare_yaml_code_elements(driver, "div.row-container.yaml-code-row"):
                     logger.info("SBS yamls - The number of rows is equal .")
                 else:
                     logger.error("SBS yamls - The number of rows is NOT equal.")
@@ -133,7 +132,7 @@ class AttachPath(BaseTest):
             
         except Exception as e:
             logger.error(f"Failed to click on description {index}: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_click_description_{index + 1}_{ClusterManager.get_current_timestamp()}.png")
+            driver.save_screenshot(f"./failed_to_click_description_{index + 1}_{ClusterManager.get_current_timestamp()}.png")
 
         
     def validate_attach_path_graph(self, driver, interaction_manager):
@@ -147,11 +146,11 @@ class AttachPath(BaseTest):
                 return element_text  
             else:
                 logger.error("Graph validation failed.")
-                self._driver.save_screenshot(f"./failed_graph_validation_{ClusterManager.get_current_timestamp()}.png")
+                driver.save_screenshot(f"./failed_graph_validation_{ClusterManager.get_current_timestamp()}.png")
                 return None
         else:
             logger.error("Attach path table not found.")
-            self._driver.save_screenshot(f"./failed_to_find_attach_path_table_{ClusterManager.get_current_timestamp()}.png")
+            driver.save_screenshot(f"./failed_to_find_attach_path_table_{ClusterManager.get_current_timestamp()}.png")
             return None  # Return None if no table is found
 
 
@@ -198,7 +197,7 @@ class AttachPath(BaseTest):
             )
         except TimeoutException:
             logger.error("SVG element not found on the page.")
-            self._driver.save_screenshot(f"./svg_element_not_found_{ClusterManager.get_current_timestamp()}.png")
+            driver.save_screenshot(f"./svg_element_not_found_{ClusterManager.get_current_timestamp()}.png")
             return None
 
         paths = svg_element.find_elements(By.CSS_SELECTOR, "path")

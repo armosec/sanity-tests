@@ -117,21 +117,20 @@ class ClusterManager:
 
     def click_filter_button(self, filter_name):
         try:
-            # Define the XPath to locate the button based on the filter name
-            filter_button_xpath = f"//span[text()='{filter_name}']/ancestor::button"
-            
-            # Wait for the button to be clickable
-            filter_button = WebDriverWait(self._driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, filter_button_xpath)))
-            
-            # Click the button
-            filter_button.click()
-            logger.info(f"Successfully clicked on the '{filter_name}' filter.")
-            
+            logger.info(f"Trying to click on the '{filter_name}' filter button...")
+            xpath = f"//button[.//span[normalize-space(text())='{filter_name}']]"
+
+            button = WebDriverWait(self._driver, 15).until(
+                EC.element_to_be_clickable((By.XPATH, xpath))
+            )
+            button.click()
+            logger.info(f"Successfully clicked the '{filter_name}' filter button.")
         except Exception as e:
             logger.error(f"Failed to click on the '{filter_name}' filter: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_click_{filter_name}_filter_{ClusterManager.get_current_timestamp()}.png")
-            
+            self._driver.save_screenshot(
+                f"./failed_to_click_{filter_name}_filter_{ClusterManager.get_current_timestamp()}.png")
+
+    
     def click_close_icon_in_filter_button(self, filter_type: str):
         """
         Closes the filter of the specified type by clicking the close icon within the button.
@@ -213,7 +212,7 @@ class ClusterManager:
 
             # Click the tab
             tab_element.click()
-            print(f"Successfully clicked on the third tab with name: {tab_name}")
+            logger.info(f"Clicked on the third tab with name: {tab_name}")
 
         except TimeoutException:
             print(f"Timeout: The third tab with name '{tab_name}' could not be found.")
@@ -746,6 +745,7 @@ class IgnoreRule:
     
     def save_ignore_rule(self):
         try:
+            time.sleep(0.5)
             self._interaction_manager.click("button.armo-button.primary.xl", By.CSS_SELECTOR)
             logger.info("Click on save ignore rule.")
         except:
@@ -791,6 +791,7 @@ class IgnoreRule:
             self._driver.save_screenshot(f"./delete_ignore_rule_button_error_{ClusterManager.get_current_timestamp()}.png")
 
         try:
+            time.sleep(0.5)
             self._interaction_manager.click('button.armo-button.error.xl', By.CSS_SELECTOR)
             logger.info("Ignore rule deleted.")
         except:

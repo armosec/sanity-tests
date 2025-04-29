@@ -45,7 +45,7 @@ class SecurityRisk(BaseTest):
             logger.info("Comparing values on the main page")
             self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
             
-            logger.info("Reset pods in the 'default' namespace...") 
+            # logger.info("Reset pods in the 'default' namespace...") 
             # ClusterManager.run_shell_command(self,"kubectl delete pods -n default --all")
             # logger.info("Waiting for the pods to restart...")
             # time.sleep(7)
@@ -117,8 +117,12 @@ class SecurityRisk(BaseTest):
         if len(first_security_risks) > 2:
             self._driver.execute_script("arguments[0].scrollIntoView(true);", first_security_risks[2])
             time.sleep(0.5)
-            first_security_risks[2].click()
-            logger.info("Successfully clicked on the third security risk button.")
+            if category_name == "Workloads" or category_name == "Attack path":
+                first_security_risks[3].click()
+                logger.info("Successfully clicked on the second security risk button.")
+            else:
+                first_security_risks[2].click()
+                logger.info("Successfully clicked on the first security risk button.")
         else:
             logger.error(f"Expected at least 3 elements, but found {len(first_security_risks)}.")
         
@@ -234,7 +238,7 @@ class SecurityRisk(BaseTest):
     def risk_acceptance_page(self):
         risk_acceptance = RiskAcceptancePage(self._driver)
         risk_acceptance.navigate_to_page()
-        risk_acceptance.click_severity_element("armo-severity span.severity.medium-severity-color")
+        risk_acceptance.click_severity_element("td.mat-mdc-cell.cdk-column-severity")
         time.sleep(1)
         risk_acceptance.click_edit_button("//button[contains(text(), 'Edit')]")
         time.sleep(2.5)
