@@ -782,8 +782,9 @@ class IgnoreRule:
         else:
             logger.error("The icon does NOT change to ignored.")
 
-    def delete_ignore_rule(self):
+    def perform_delete_ignore_rule(self):
         try:
+            time.sleep(1)
             self._interaction_manager.click('button.armo-button.error-secondary.xl', By.CSS_SELECTOR)
             logger.info("Click on delete ignore rule button.")
         except:
@@ -868,7 +869,7 @@ class RiskAcceptancePage:
     def delete_ignore_rule(self):
         try:
             ignore_rule = IgnoreRule(self._driver)
-            ignore_rule.delete_ignore_rule()
+            ignore_rule.perform_delete_ignore_rule()
             time.sleep(4)
         except Exception as e:
             logger.error(f"Failed to delete ignore rule: {e}")
