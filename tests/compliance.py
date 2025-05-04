@@ -71,7 +71,7 @@ class Compliance(BaseTest):
             input_element.send_keys("271")
             logger.info("271 for C-0271 control set")
         except: 
-            print("failed to set 271 for C-00271 control")
+            logger.error("failed to set 271 for C-00271 control")
             driver.save_screenshot(f"./failed_to_set_271_for_C-00271_control_{ClusterManager.get_current_timestamp()}.png")
         
         # Click on the checkbox for the control C-0271
@@ -88,7 +88,7 @@ class Compliance(BaseTest):
                     input_element = checkbox_element.find_element(By.XPATH, ".//input[@type='checkbox']")
                     driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", input_element)
                     input_element.click()
-                    print("Clicked the checkbox.")
+                    logger.info("Clicked the checkbox.")
                     break
         except Exception as e:
             logger.error("Failed to click the checkbox.", str(e))

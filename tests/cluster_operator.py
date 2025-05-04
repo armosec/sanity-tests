@@ -45,9 +45,9 @@ class ClusterManager:
             wait_for_element = WebDriverWait(self._driver, 5, 0.001)
             element = wait_for_element.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='label font-semi-bold font-size-18 my-3' and contains(text(), 'What do you do?')]")))
         except:
-            print("Onboarding role page is not displayed - not a sign-up user")
+            logger.info("Onboarding role page is not displayed - not a sign-up user")
         else:
-            print("Onboarding role page is displayed - sign-up user (first login)")
+            logger.info("Onboarding role page is displayed - sign-up user (first login)")
             self.handle_role_page()
         
     def handle_role_page(self):
@@ -215,10 +215,10 @@ class ClusterManager:
             logger.info(f"Clicked on the third tab with name: {tab_name}")
 
         except TimeoutException:
-            print(f"Timeout: The third tab with name '{tab_name}' could not be found.")
+            logger.error(f"Timeout: The third tab with name '{tab_name}' could not be found.")
             self._driver.save_screenshot(f"./failed_to_click_third_tab_{tab_name}_timeout.png")
         except Exception as e:
-            print(f"Failed to click the third tab with name '{tab_name}'. Error: {str(e)}")
+            logger.error(f"Failed to click the third tab with name '{tab_name}'. Error: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_third_tab_{tab_name}_error.png")
 
 
@@ -343,9 +343,9 @@ class ClusterManager:
 
             # Click the checkbox using JavaScript to bypass potential overlay issues
             self._driver.execute_script("arguments[0].click();", checkbox_input)
-            print(f"Successfully clicked the checkbox labeled '{label_name}'.")
+            logger.info(f"Successfully clicked the checkbox labeled '{label_name}'.")
         except Exception as e:
-            print(f"Failed to click the checkbox labeled '{label_name}': {e}")
+            logger.error(f"Failed to click the checkbox labeled '{label_name}': {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_checkbox_{label_name.replace(' ', '_')}.png")
 
 
@@ -385,7 +385,7 @@ class ClusterManager:
             
             
     def get_namespace_from_element(self, category_name: str):
-        print("Category name: ", category_name)
+        logger.info(f"Category name: {category_name}")
         try:
             if category_name == "Workloads" or category_name == "Data":
                 wait = WebDriverWait(self._driver, 30)  # Wait for up to 30 seconds
@@ -731,11 +731,11 @@ class IgnoreRule:
         WebDriverWait(self._driver, timeout).until(
             EC.element_to_be_clickable((By.XPATH, save_button_xpath))
         )
-        print("Save button is clickable - page fully loaded!")
+        logger.info("Save button is clickable - page fully loaded!")
 
         # Now it's safe to collect the fields
         all_fields = self._driver.find_elements(By.CSS_SELECTOR, css_selector)
-        print(f"Found {len(all_fields)} fields.")
+        logger.info(f"Found {len(all_fields)} fields.")
 
         if index >= len(all_fields):
             raise IndexError(f"Requested index {index}, but only {len(all_fields)} fields were found.")

@@ -65,9 +65,9 @@ class VulneCvePage(BaseTest):
             # Check if there are any elements found and click the first one
             if cve_cells:
                 cve_cells[0].click()
-                print("Clicked on the first matching CVE cell.")
+                logger.info("Clicked on the first matching CVE cell.")
             else:
-                print("No matching CVE cells found.")
+                logger.error("No matching CVE cells found.")
         except TimeoutException:
             logger.error("Failed to click on the first row")
         
@@ -93,10 +93,10 @@ class VulneCvePage(BaseTest):
         workload_name_1 = interaction_manager.get_text("//td[contains(@class, 'cdk-column-containers')]//span[@uicustomtooltip]")
 
         if workload_name == workload_name_1:
-            print("Workload name is the same")
+            logger.info(f"Workload name: {workload_name},the workload name are the same")
         else:    
-            print("Workload name is different")
-            print(workload_name,    workload_name_1) 
+            logger.error(f"Workload are different")
+            logger.error(f"Workload name: {workload_name_1},and workload name: {workload_name},the workload name are different")
 
         time.sleep(1)
         cluster_manager.click_on_tab_in_vulne_page("workloads",index=1)

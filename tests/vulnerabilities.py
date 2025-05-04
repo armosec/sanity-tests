@@ -225,7 +225,7 @@ class Vulnerabilities(BaseTest):
         risk_acceptance = RiskAcceptancePage(self._driver)
         time.sleep(3)
         risk_acceptance.navigate_to_page()
-        print("Navigated to risk acceptance page")
+        logger.info("Navigated to risk acceptance page")
         time.sleep(1)
         risk_acceptance.switch_tab("Vulnerabilities")
         risk_acceptance.click_severity_element("td.mat-mdc-cell span.high-severity-color")

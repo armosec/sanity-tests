@@ -172,7 +172,6 @@ class SecurityRisk(BaseTest):
             logger.error("Risk Acceptance page not loaded")
             self._driver.save_screenshot(f"./failed_to_load_risk_acceptance_page_{ClusterManager.get_current_timestamp()}.png")
                     
-        # print("TEST-1")
         if category_name == "Attack path":
             self.risk_acceptance_page()
             self.click_security_risks_menu()
@@ -188,9 +187,9 @@ class SecurityRisk(BaseTest):
                 logger.info("The risk has been accepted- and the counters are correct")
             else:
                 logger.error(f"The counters are incorrect: before_risk: {before_risk}, after_risk: {after_risk}") 
-            # print("TEST-2")
+
             self.risk_acceptance_page()
-            # print("TEST-3")
+
             self._driver.back()
             logger.info("Navigated back to the Risk Acceptance page-2")
             time.sleep(2)
