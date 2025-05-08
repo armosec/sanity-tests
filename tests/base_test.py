@@ -16,6 +16,7 @@ class TestConfig:
     email: str
     password: str
     environment: str
+    create_cluster: bool = False
     
 class BaseTest(ABC):
     def __init__(self, config: TestConfig) -> None:
