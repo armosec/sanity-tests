@@ -16,20 +16,27 @@ class AttachPath(BaseTest):
         connect_cluster = ConnectCluster(self._driver, self._wait)
         connect_maneger = ClusterManager(self._driver, self._wait)
         interaction_manager = InteractionManager(self._driver)
-        # connect_maneger.create_attack_path()
+        if self._create_cluster:
+            logger.info("Creating attack path for test cluster")
+            connect_maneger.create_attack_path()
+            
         login_url = self.get_login_url()
         self.login(login_url)
         try:
             logger.info("Running Attach Path test")
-            # connect_cluster.click_get_started()
-            # connect_cluster.connect_cluster_helm()
-            # connect_cluster.verify_installation()
-            # connect_cluster.view_cluster_button()
-            # connect_cluster.view_connected_cluster()
+            if self._create_cluster:
+                connect_cluster.click_get_started()
+                connect_cluster.connect_cluster_helm()
+                connect_cluster.verify_installation()
+                connect_cluster.view_cluster_button()
+                connect_cluster.view_connected_cluster()
+                
             self.navigate_to_attach_path()
             self.risk_acceptance_page()
         finally:
-            # self.perform_cleanup()
+            # Only perform cleanup if we created a cluster
+            if self._create_cluster:
+                self.perform_cleanup()
             logger.info("Attach path test completed")
 
     def navigate_to_attach_path(self):
@@ -49,8 +56,10 @@ class AttachPath(BaseTest):
             wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, f"[data-test-id='{data_test_id}']")))
             logger.info("Attack path is displayed.")
 
-            logger.info("waiting for the attack path to load - 30 seconds")
-            time.sleep(30)
+            if self._create_cluster:
+                logger.info("waiting for the attack path to load - 30 seconds")
+                time.sleep(30)
+                
             # Obtain descriptions
             descriptions = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[data-test-id='description']")))
 

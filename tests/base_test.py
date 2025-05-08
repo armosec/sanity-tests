@@ -25,6 +25,7 @@ class BaseTest(ABC):
         self._password = config.password
         self._environment = config.environment
         self._wait = WebDriverWait(self._driver, 60, 0.001)
+        self._create_cluster = getattr(config, 'create_cluster', False)  # Default to False if not provided
     
     @abstractmethod
     def run(self):

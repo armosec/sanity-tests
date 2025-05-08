@@ -26,14 +26,19 @@ class SecurityRisk(BaseTest):
 
         try:
             logger.info("Running Security Risk test")
-            # connect_cluster.click_get_started()
-            # connect_cluster.connect_cluster_helm()
-            # connect_cluster.verify_installation()
-            # connect_cluster.view_cluster_button()
-            # connect_cluster.view_connected_cluster()
+            # Only perform cluster setup if create_cluster is True
+            if self._create_cluster:
+                connect_cluster.click_get_started()
+                connect_cluster.connect_cluster_helm()
+                connect_cluster.verify_installation()
+                connect_cluster.view_cluster_button()
+                connect_cluster.view_connected_cluster()
+                
             self.navigate_to_security_risk()
         finally:
-            # self.perform_cleanup()
+            # Only perform cleanup if we created a cluster
+            if self._create_cluster:
+                self.perform_cleanup()
             logger.info("Security risk test completed")
     
     def navigate_to_security_risk(self):

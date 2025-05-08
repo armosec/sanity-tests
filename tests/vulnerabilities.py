@@ -19,22 +19,28 @@ class Vulnerabilities(BaseTest):
         self.login(login_url)
         try:
             interact = self._interaction_manager
-            interact.click('image-scanning-left-menu-item', By.ID) # Click on vulnerabilities page
-            # connect_cluster.click_get_started()
-            # connect_cluster.connect_cluster_helm()
-            # connect_cluster.verify_installation()
-            # connect_cluster.view_cluster_button()
-            # connect_cluster.view_connected_cluster()
-            # cluster_manager.create_attack_path() 
-            # print("wait for 30 seconds")
-            # time.sleep(30)
+            interact.click('image-scanning-left-menu-item', By.ID)  # Click on vulnerabilities page
+            
+            # Only perform cluster setup if create_cluster is True
+            if self._create_cluster:
+                connect_cluster.click_get_started()
+                connect_cluster.connect_cluster_helm()
+                connect_cluster.verify_installation()
+                connect_cluster.view_cluster_button()
+                connect_cluster.view_connected_cluster()
+                cluster_manager.create_attack_path()
+                print("Wait for 30 seconds")
+                time.sleep(30)
+                
             self.run_vulne_cve_test()
             self.navigate_to_vulnerabilities()
             self.risk_acceptance_page()
             print("Running vulnerabilities test")
         finally:
-            # self.perform_cleanup()  
-            logger.info("Cleanup completed successfully")
+            # Only perform cleanup if we created a cluster
+            if self._create_cluster:
+                self.perform_cleanup()
+            logger.info("Test completed successfully")
 
     def navigate_to_vulnerabilities(self):
         driver = self._driver
@@ -183,7 +189,8 @@ class Vulnerabilities(BaseTest):
         if workload_name_from_ignore_rule_modal == workload_name:
             logger.info("Workload name is verified")
         else:    
-            logger.error("Workload name is not verified")       
+            logger.error("Workload name is not verified")
+            logger.error(f"workload name : {workload_name_from_ignore_rule_modal},and workload name: {workload_name},the workload name are different")       
             
         time.sleep(1)
         ignore_rule.save_ignore_rule() 
@@ -209,6 +216,7 @@ class Vulnerabilities(BaseTest):
             logger.info("Workload name is verified")
         else:    
             logger.error("Workload name is not verified")
+            logger.error(f"workload name : {deployment_name},and workload name: {workload_name_from_ignore_rule_modal},the workload name are different")
             
         cluster_manager.click_on_tab_in_vulne_page("images")
         image_tag_1 = interaction_manager.get_text("(//button[@class='armo-button tertiary sm'])[1]")

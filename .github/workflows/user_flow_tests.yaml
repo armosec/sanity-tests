@@ -84,7 +84,7 @@ jobs:
 
     - name: Run Vulnerabilities Test
       run: |
-        python main.py ${{ env.ENVIRONMENT }} vulnerabilities $TEST_EMAIL $TEST_PASSWORD
+        python main.py ${{ env.ENVIRONMENT }} vulnerabilities $TEST_EMAIL $TEST_PASSWORD true
 
     - name: upload screenshots
       uses: actions/upload-artifact@v4
@@ -131,7 +131,7 @@ jobs:
 
     - name: Run Compliance Test
       run: |
-        python main.py ${{ env.ENVIRONMENT }} compliance $TEST_EMAIL $TEST_PASSWORD
+        python main.py ${{ env.ENVIRONMENT }} compliance $TEST_EMAIL $TEST_PASSWORD true
 
     - name: upload screenshots
       uses: actions/upload-artifact@v4
@@ -178,8 +178,8 @@ jobs:
 
     - name: Run Attach path Test
       run: |
-        python main.py ${{ env.ENVIRONMENT }} attach-path $TEST_EMAIL $TEST_PASSWORD
-
+        python main.py ${{ env.ENVIRONMENT }} attach-path $TEST_EMAIL $TEST_PASSWORD true
+ 
     - name: upload screenshots
       uses: actions/upload-artifact@v4
       if: always()
@@ -225,7 +225,7 @@ jobs:
 
     - name: Run security risk Test
       run: |
-        python main.py ${{ env.ENVIRONMENT }} security-risk $TEST_EMAIL $TEST_PASSWORD
+        python main.py ${{ env.ENVIRONMENT }} security-risk $TEST_EMAIL $TEST_PASSWORD true
 
     - name: upload screenshots
       uses: actions/upload-artifact@v4
