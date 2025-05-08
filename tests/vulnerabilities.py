@@ -128,6 +128,9 @@ class Vulnerabilities(BaseTest):
  
         # click on the medium severity filter in the first row
         try:
+            wait = WebDriverWait(driver, 10)
+            wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='severity-background']"))) # Wait for the element to be clickable
+            # Find the element using XPath
             severity_filter_elements = driver.find_elements(By.XPATH, "//div[@class='severity-background']")
             severity_filter_elements[1].click()
             logger.info("Clicked on the medium severity filter")

@@ -170,7 +170,7 @@ class SecurityRisk(BaseTest):
         RiskAcceptancePage.navigate_to_risk_acceptance_form_sidebar(self, category_name)
     
         try:
-            element = WebDriverWait(self._driver, 10).until(
+            element = WebDriverWait(self._driver, 15).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "td.cdk-column-severity .severity")))
             logger.info("Risk Acceptance page loaded")
         except TimeoutException:

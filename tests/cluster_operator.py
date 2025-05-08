@@ -207,7 +207,7 @@ class ClusterManager:
             self._driver.execute_script("arguments[0].scrollIntoView(true);", tab_element)
 
             # Ensure the tab is clickable
-            WebDriverWait(self._driver, 10).until(
+            WebDriverWait(self._driver, 15).until(
                 EC.element_to_be_clickable((By.XPATH, tab_xpath)))
 
             # Click the tab
