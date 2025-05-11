@@ -22,7 +22,8 @@ class SecurityRisk(BaseTest):
         # Log in to the system
         login_url = self.get_login_url()
         self.login(login_url)
-        cluster_manager.create_attack_path()
+        if self._create_cluster:
+            cluster_manager.create_attack_path()
 
         try:
             logger.info("Running Security Risk test")
@@ -111,7 +112,7 @@ class SecurityRisk(BaseTest):
         # time.sleep(1)
         
         time.sleep(5)
-        logger.info("Clicking on the first security risk")
+        # logger.info("Clicking on the first security risk")
         first_security_risk_CSS_SELECTOR = "button.armo-button.table-secondary.sm"
 
         # Wait until the elements are located
@@ -120,7 +121,13 @@ class SecurityRisk(BaseTest):
 
         # Check if the list has at least 3 elements
         if len(first_security_risks) > 2:
-            self._driver.execute_script("arguments[0].scrollIntoView(true);", first_security_risks[2])
+            if category_name == "Workloads":
+                self._driver.execute_script("arguments[0].scrollIntoView(true);", first_security_risks[3])
+                logger.info("Successfully scrolled to the second security risk button.")
+            else:
+                self._driver.execute_script("arguments[0].scrollIntoView(true);", first_security_risks[2])
+                logger.info("Successfully scrolled to the first security risk button.")        
+        
             time.sleep(0.5)
             if category_name == "Workloads" or category_name == "Attack path":
                 first_security_risks[3].click()
@@ -139,6 +146,9 @@ class SecurityRisk(BaseTest):
         time.sleep(1)
         cluster_manager.press_esc_key(self._driver)
         time.sleep(1)
+        cluster_manager.press_space_key(self._driver)
+        time.sleep(1)
+
         # Verify namespace
         if cluster_manager.get_namespace_from_element(category_name) == namespace:
             logger.info(f"Namespace {namespace} is verified") 

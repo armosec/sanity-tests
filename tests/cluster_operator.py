@@ -78,6 +78,14 @@ class ClusterManager:
         except Exception as e:
             logger.error("Failed to press the ESC key.", str(e))
             
+    @staticmethod        
+    def press_space_key(driver):
+        try:
+            ActionChains(driver).send_keys(Keys.SPACE).perform()
+            logger.info("Space key pressed.")
+        except Exception as e:
+            logger.error(f"Failed to press space key: {str(e)}")
+                
 
     def click_close_filter(driver, index=0):
         try:
@@ -218,8 +226,8 @@ class ClusterManager:
         except Exception as e:
             logger.error(f"Failed to click the tab with name '{tab_name}'. Error: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_tab_{tab_name}_error.png")
-
-
+            
+            
     def click_overlay_button(self):
         try:
             # XPath to find all buttons inside the overlay
@@ -349,38 +357,29 @@ class ClusterManager:
 
     def click_on_filter_checkbox_sidebar(self, span_text: str):
         """
-        Clicks a specific <span> element within the second cdk-overlay based on the span's text content.
-
-        :param span_text: The visible text of the span to click.
+        Clicks the checkbox input inside any cdk-overlay-pane where the span contains the specified text.
+        Uses a unified XPath for robustness.
         """
         try:
-            # Locate all cdk-overlay-pane elements
-            overlay_panes = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
+            # Wait for overlay panes to be present
+            WebDriverWait(self._driver, 5).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.cdk-overlay-pane")))
 
-            # Ensure we have at least two cdk-overlay-pane elements (since we need the second one)
-            if len(overlay_panes) < 2:
-                logger.error("Less than two cdk-overlay-pane elements found.")
-                return
+            # Unified XPath: find the checkbox input whose <mat-checkbox> contains a matching span
+            checkbox_xpath = f"//div[contains(@class, 'cdk-overlay-pane')]//mat-checkbox[.//span[contains(text(), '{span_text}')]]//input[@type='checkbox']"
 
-            # Get the second overlay pane (index 1)
-            second_overlay = overlay_panes[1]
+            checkbox_input = WebDriverWait(self._driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, checkbox_xpath)))
 
-            # Locate all span elements within the second cdk-overlay-pane
-            spans = second_overlay.find_elements(By.CSS_SELECTOR, "span.mat-mdc-tooltip-trigger.value.truncate")
+            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", checkbox_input)
+            self._driver.execute_script("arguments[0].click();", checkbox_input)
 
-            # Iterate through all spans and click the one with the matching text
-            for span in spans:
-                if span_text in span.text:
-                    self._wait.until(EC.element_to_be_clickable(span)).click()
-                    logger.info(f"Clicked on the span with text: '{span_text}' in the second cdk-overlay.")
-                    return
-
-            logger.error(f"Span with text '{span_text}' not found in the second cdk-overlay.")
+            logger.info(f"Successfully clicked checkbox with label text: '{span_text}'")
 
         except Exception as e:
-            logger.error(f"Failed to click on the span with text '{span_text}' in the second cdk-overlay: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_click_span_in_second_cdk_overlay_{ClusterManager.get_current_timestamp()}.png")
-            
+            logger.error(f"Failed to click checkbox for span text '{span_text}': {str(e)}")
+            self._driver.save_screenshot(f"./failed_click_checkbox_{span_text}_{ClusterManager.get_current_timestamp()}.png")
+           
             
     def get_namespace_from_element(self, category_name: str):
         logger.info(f"Category name: {category_name}")
