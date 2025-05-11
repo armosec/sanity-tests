@@ -196,30 +196,28 @@ class ClusterManager:
             
     def click_tab_on_sidebar(self, tab_name):
         try:
-            # Define the XPath for the third tab with the specific name
+            # Define the XPath for the tab with the specific name
             tab_xpath = f"//span[@class='mdc-tab__text-label' and text()='{tab_name}']"
-
             # Wait for the tab element to be visible and present
             tab_element = WebDriverWait(self._driver, 15).until(
                 EC.visibility_of_element_located((By.XPATH, tab_xpath)))
-            
+
             # Scroll the tab element into view
             self._driver.execute_script("arguments[0].scrollIntoView(true);", tab_element)
-
             # Ensure the tab is clickable
-            WebDriverWait(self._driver, 15).until(
-                EC.element_to_be_clickable((By.XPATH, tab_xpath)))
+            WebDriverWait(self._driver, 15).until(EC.element_to_be_clickable((By.XPATH, tab_xpath)))
 
+            time.sleep(1)
             # Click the tab
             tab_element.click()
-            logger.info(f"Clicked on the third tab with name: {tab_name}")
+            logger.info(f"Clicked on the tab with name: {tab_name}")
 
         except TimeoutException:
-            logger.error(f"Timeout: The third tab with name '{tab_name}' could not be found.")
-            self._driver.save_screenshot(f"./failed_to_click_third_tab_{tab_name}_timeout.png")
+            logger.error(f"Timeout: The tab with name '{tab_name}' could not be found.")
+            self._driver.save_screenshot(f"./failed_to_click_tab_{tab_name}_timeout.png")
         except Exception as e:
-            logger.error(f"Failed to click the third tab with name '{tab_name}'. Error: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_click_third_tab_{tab_name}_error.png")
+            logger.error(f"Failed to click the tab with name '{tab_name}'. Error: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_click_tab_{tab_name}_error.png")
 
 
     def click_overlay_button(self):
@@ -727,21 +725,19 @@ class IgnoreRule:
         css_selector = "div.mat-mdc-menu-trigger.field.pointer.ng-star-inserted"
         save_button_xpath = "//button[contains(text(), 'Save')]"
         
-        # Wait until the Save button is clickable
         WebDriverWait(self._driver, timeout).until(
-            EC.element_to_be_clickable((By.XPATH, save_button_xpath))
-        )
+            EC.element_to_be_clickable((By.XPATH, save_button_xpath)))
         logger.info("Save button is clickable - page fully loaded!")
 
-        # Now it's safe to collect the fields
         all_fields = self._driver.find_elements(By.CSS_SELECTOR, css_selector)
         logger.info(f"Found {len(all_fields)} fields.")
 
         if index >= len(all_fields):
             raise IndexError(f"Requested index {index}, but only {len(all_fields)} fields were found.")
 
-        field_text = all_fields[index].text.strip()
-        return field_text
+        field_element = all_fields[index]
+        span = field_element.find_element(By.CSS_SELECTOR, "span.field-value")
+        return span.text.strip()
     
     def save_ignore_rule(self):
         try:

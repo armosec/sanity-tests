@@ -1,4 +1,5 @@
 name: user-flow-tests-1clustert
+# this workflow is for testing the user flow on a single cluster
 
 on:
   workflow_dispatch:
@@ -6,9 +7,9 @@ on:
       ENVIRONMENT:
         description: 'Environment to run the tests'
         options:
-        - predev
-        - dev
-        - staging
+        # - predev
+        # - dev
+        # - staging
         - production
         type: choice
         default: production

@@ -7,8 +7,8 @@ on:
         description: 'Environment to run the tests'
         options:
         - predev
-        - dev
-        - staging
+        # - dev
+        # - staging
         - production
         type: choice
         default: production
