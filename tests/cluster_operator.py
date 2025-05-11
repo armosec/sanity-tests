@@ -215,7 +215,7 @@ class ClusterManager:
             # Ensure the tab is clickable
             WebDriverWait(self._driver, 15).until(EC.element_to_be_clickable((By.XPATH, tab_xpath)))
 
-            time.sleep(1)
+            time.sleep(2)
             # Click the tab
             tab_element.click()
             logger.info(f"Clicked on the tab with name: {tab_name}")

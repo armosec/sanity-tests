@@ -99,7 +99,7 @@ class AttachPath(BaseTest):
             if element_text == "CVE":
                 severity_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//td[contains(@class, 'cdk-column-severity') and .//span[contains(@class, 'critical-severity-color') and normalize-space()='Critical']]")))
                 severity_button.click()
-                time.sleep(1)
+                time.sleep(3)
                 cluster_manager.click_tab_on_sidebar(tab_name="Runtime Analysis")
                 time.sleep(1)
                 
