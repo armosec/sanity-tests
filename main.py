@@ -24,16 +24,18 @@ def mark_test_failed(error_msg=None):
     if error_msg:
         _logger.error(error_msg)
 
-# Add this custom logger handler
 class ErrorTrackingHandler(logging.Handler):
     def emit(self, record):
         if record.levelno >= logging.ERROR:
             mark_test_failed()
 
-# Update your existing logging setup
+# Set up the root logger to capture errors from ALL modules
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
-_logger.addHandler(ErrorTrackingHandler())
+
+# Add the error tracking handler to the ROOT logger instead of just the main logger
+root_logger = logging.getLogger()  # This gets the root logger
+root_logger.addHandler(ErrorTrackingHandler())
 
 class TestsRunner:
     def __init__(self, tests_with_credentials):
