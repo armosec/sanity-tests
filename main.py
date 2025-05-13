@@ -14,8 +14,26 @@ from tests.runtime_incidents import RuntimeIncident
 from tests.base_test import TestConfig
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+# Add this global variable and function at the top of the file, right after the imports
+TEST_FAILED = False
+
+def mark_test_failed(error_msg=None):
+    """Mark the global test status as failed"""
+    global TEST_FAILED
+    TEST_FAILED = True
+    if error_msg:
+        _logger.error(error_msg)
+
+# Add this custom logger handler
+class ErrorTrackingHandler(logging.Handler):
+    def emit(self, record):
+        if record.levelno >= logging.ERROR:
+            mark_test_failed()
+
+# Update your existing logging setup
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
+_logger.addHandler(ErrorTrackingHandler())
 
 class TestsRunner:
     def __init__(self, tests_with_credentials):
@@ -30,6 +48,7 @@ class TestsRunner:
                     future.result()
                 except Exception as exc:
                     _logger.error(f"Test generated an exception: {exc}")
+                    mark_test_failed()  # Mark test as failed on exception
 
     def run_test(self, test_class, email, password, environment, create_cluster):
         driver = initialize_driver()
@@ -88,6 +107,13 @@ def main():
 
     test_runner = TestsRunner(tests_with_credentials)
     test_runner.run()
+    
+    # Add this check at the end of main() to exit with proper code
+    if TEST_FAILED:
+        _logger.error("Tests completed with errors")
+        sys.exit(1)  # Exit with error code
+    else:
+        _logger.info("All tests completed successfully")
 
 if __name__ == "__main__":
     main()
