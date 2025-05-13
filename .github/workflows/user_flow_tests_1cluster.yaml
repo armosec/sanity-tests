@@ -7,7 +7,7 @@ on:
       ENVIRONMENT:
         description: 'Environment to run the tests'
         options:
-        # - predev
+        - predev
         # - dev
         # - staging
         - production
