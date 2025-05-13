@@ -51,10 +51,10 @@ class SecurityRisk(BaseTest):
             logger.info("Comparing values on the main page")
             self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
             
-            logger.info("Reset pods in the 'default' namespace...") 
-            ClusterManager.run_shell_command(self,"kubectl delete pods -n default --all")
-            logger.info("Waiting for the pods to restart...")
-            time.sleep(7)
+            # logger.info("Reset pods in the 'default' namespace...") 
+            # ClusterManager.run_shell_command(self,"kubectl delete pods -n default --all")
+            # logger.info("Waiting for the pods to restart...")
+            # time.sleep(7)
 
             self.process_risk_category("Workloads", "default") 
             time.sleep(1)

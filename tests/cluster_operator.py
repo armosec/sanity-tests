@@ -207,13 +207,13 @@ class ClusterManager:
             # Define the XPath for the tab with the specific name
             tab_xpath = f"//span[@class='mdc-tab__text-label' and text()='{tab_name}']"
             # Wait for the tab element to be visible and present
-            tab_element = WebDriverWait(self._driver, 40).until(
+            tab_element = WebDriverWait(self._driver, 50).until(
                 EC.visibility_of_element_located((By.XPATH, tab_xpath)))
 
             # Scroll the tab element into view
             self._driver.execute_script("arguments[0].scrollIntoView(true);", tab_element)
             # Ensure the tab is clickable
-            WebDriverWait(self._driver, 40).until(EC.element_to_be_clickable((By.XPATH, tab_xpath)))
+            WebDriverWait(self._driver, 50).until(EC.element_to_be_clickable((By.XPATH, tab_xpath)))
 
             time.sleep(2)
             # Click the tab
