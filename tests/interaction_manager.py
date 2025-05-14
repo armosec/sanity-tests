@@ -1,4 +1,5 @@
 import logging
+import time
 from time import sleep
 from typing import Optional
 from selenium import webdriver
@@ -7,7 +8,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.common.exceptions import ElementClickInterceptedException, TimeoutException
 
 _logger = logging.getLogger(__name__)
 
@@ -59,42 +60,46 @@ class InteractionManager:
 
     def click(self, xpath: str, by=By.XPATH, click_delay: Optional[float] = None, index: int = 0) -> WebElement:
         _logger.info(f'Clicking "{xpath}" at index {index}')
-    
-        # Find all elements that match the locator
+
+        # Wait for common overlays to disappear
+        try:
+            WebDriverWait(self._driver, 5).until(
+                lambda d: not d.find_elements(By.CLASS_NAME, "cdk-overlay-backdrop") and
+                        not d.find_elements(By.CLASS_NAME, "cdk-overlay-pane")
+            )
+        except TimeoutException:
+            _logger.warning("Overlay(s) still visible. Proceeding with JS click fallback anyway.")
+
+        # Find the elements after overlays are (hopefully) gone
         elements = WebDriverWait(self._driver, self._timeout).until(
             EC.presence_of_all_elements_located((by, xpath))
         )
-    
-        # Ensure that we have enough elements to access the desired index
+
         if len(elements) <= index:
             _logger.error(f"Not enough elements found for '{xpath}'. Expected at least {index + 1} elements.")
             raise IndexError(f"Element at index {index} not found for '{xpath}'.")
-    
-        # Ensure the element at the specified index is interactable and in viewport
+
         element = self.wait_until_interactable(xpath, by)
-    
+
         if click_delay:
             sleep(click_delay)
-    
+
         try:
             elements[index].click()
         except ElementClickInterceptedException as e:
-            _logger.error(
-                f'Failed to click "{xpath}" at index {index} due to ElementClickInterceptedException. Trying to click using JavaScript.',
-                exc_info=True,
-                stack_info=True,
-                extra={"screenshot": False},
-            )
+            _logger.warning(f"Standard click blocked. Retrying with JavaScript click.")
+            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", elements[index])
+            time.sleep(0.53)
             self._driver.execute_script("arguments[0].click();", elements[index])
         except Exception as e:
             _logger.error(
-                f'Failed to click "{xpath}" at index {index}. Element might not be interactable.',
+                f'Failed to click \"{xpath}\" at index {index}.',
                 exc_info=True,
                 stack_info=True,
-                extra={"screenshot": True},  # Take a screenshot on error
+                extra={"screenshot": True}
             )
             raise e
-    
+
         return elements[index]
 
 

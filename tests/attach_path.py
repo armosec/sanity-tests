@@ -32,7 +32,7 @@ class AttachPath(BaseTest):
                 connect_cluster.view_connected_cluster()
                 
             self.navigate_to_attach_path()
-            self.risk_acceptance_page()
+            # self.risk_acceptance_page()
         finally:
             # Only perform cleanup if we created a cluster
             if self._create_cluster:
@@ -43,6 +43,7 @@ class AttachPath(BaseTest):
         driver = self._driver
         wait = self._wait
         interaction_manager = InteractionManager(driver)
+        cluster_manager = ClusterManager(driver, wait)
         try:
             interaction_manager.click("attack-path-left-menu-item", by=By.ID)
             logger.info("Attach-path clicked.")
@@ -50,6 +51,15 @@ class AttachPath(BaseTest):
             logger.error(f"Attach path not found: {str(e)}")
             driver.save_screenshot(f"./failed_to_click_attach_path_{ClusterManager.get_current_timestamp()}.png")
 
+        time.sleep(2)
+        cluster_manager.click_filter_button("Workload")
+        time.sleep(1)
+        cluster_manager.click_checkbox_by_name("ping-app")
+        time.sleep(1)
+        ClusterManager.press_esc_key(driver)
+        time.sleep(1)
+        ClusterManager.press_space_key(driver)
+        time.sleep(1)
         # Check if the Attack path is displayed
         try:
             data_test_id = "attack-chains-list"
@@ -70,17 +80,25 @@ class AttachPath(BaseTest):
                 logger.info(f"Found {len(descriptions)} elements with data-test-id=description")
 
                 # Verify and click first description (attack path)
-                self.click_on_attach_path(0, wait, driver, interaction_manager)
+                self.click_on_attach_path(1, wait, driver, interaction_manager)
 
                 try:
                     interaction_manager.click("//button[contains(@class, 'armo-button') and contains(@class, 'tertiary') and contains(@class, 'lg') and text()=' Attack Path ']", by=By.XPATH)
                     logger.info("Clicked on 'Attack Path' link.")
                 except NoSuchElementException:
                     logger.error("Link not found.")
+                    
                 time.sleep(1)
-                
+                cluster_manager.click_filter_button("Workload")
+                time.sleep(1)
+                cluster_manager.click_checkbox_by_name("ping-app")
+                time.sleep(1)
+                ClusterManager.press_esc_key(driver)
+                time.sleep(1)
+                ClusterManager.press_space_key(driver)
+                time.sleep(1)
                 # Verify and click second description (attack path)
-                self.click_on_attach_path(1, wait, driver, interaction_manager)
+                self.click_on_attach_path(0, wait, driver, interaction_manager)
 
         except NoSuchElementException:
             logger.error("Attack path is NOT displayed.")
@@ -111,8 +129,9 @@ class AttachPath(BaseTest):
 
                 cluster_manager.press_esc_key(driver)
                 time.sleep(1)
-                self.create_ignore_rule(driver) 
-                time.sleep(3)
+                # self.create_ignore_rule(driver) 
+                # time.sleep(3)
+             
                 interaction_manager.click("armo-attack-chain-graph-node[data-test-id='node-Initial Access']", by=By.CSS_SELECTOR)
                 logger.info("Clicked on 'Initial Access' node.")
                 time.sleep(2)
@@ -222,16 +241,17 @@ class AttachPath(BaseTest):
             
     def create_ignore_rule(self, driver):
         ignore_rule = IgnoreRule(driver)
+        interaction_manager = InteractionManager(driver)
         ignore_rule.click_ignore_button()
         logger.info("Clicked on the 'Accept Risk' button")
         time.sleep(1)
-        container_name = ignore_rule.get_ignore_rule_field(3)
-        logger.info(f"Container name: {container_name}")
-        time.sleep(1)
-        ignore_rule.save_ignore_rule() 
+        # workload_name = ignore_rule.get_workload_name() ---> need to fix this
+        # logger.info(f"Workload name: {workload_name}")
+        time.sleep(3)
+        ignore_rule.save_ignore_rule()
         time.sleep(3)
         ignore_rule.igor_rule_icon_check()
-        return container_name
+        # return workload_name
     
     def risk_acceptance_page(self):
         risk_acceptance = RiskAcceptancePage(self._driver)

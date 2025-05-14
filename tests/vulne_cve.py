@@ -48,7 +48,7 @@ class VulneCvePage(BaseTest):
         time.sleep(1)
         cluster_manager.click_checkbox_by_name("Medium") 
         time.sleep(1)
-        ClusterManager.click_close_filter(driver,index=2)       
+        ClusterManager.press_space_key(driver)     
         time.sleep(1)
         
         # ignore_rule = IgnoreRule(driver)
@@ -68,6 +68,7 @@ class VulneCvePage(BaseTest):
                 logger.info("Clicked on the first matching CVE cell.")
             else:
                 logger.error("No matching CVE cells found.")
+                driver.save_screenshot(f"./no_matching_cve_cells_{ClusterManager.get_current_timestamp()}.png")
         except TimeoutException:
             logger.error("Failed to click on the first row")
         
@@ -88,7 +89,7 @@ class VulneCvePage(BaseTest):
         time.sleep(1)
         workload_name = interaction_manager.get_text("//span[text()='Workload']/ancestor::td/following-sibling::td")
         cluster_manager.press_esc_key(driver)
-
+        print("TEST")
         cluster_manager.click_on_tab_in_vulne_page("images")
         workload_name_1 = interaction_manager.get_text("//td[contains(@class, 'cdk-column-containers')]//span[@uicustomtooltip]")
 

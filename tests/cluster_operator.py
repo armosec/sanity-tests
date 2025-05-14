@@ -181,25 +181,16 @@ class ClusterManager:
             
     def click_on_tab_in_vulne_page(self, partial_href, index=0):
         try:
-            # Locate all tabs with the given partial href
-            tabs = WebDriverWait(self._driver, 10).until(
-                EC.presence_of_all_elements_located((By.XPATH, f"//a[contains(@href, '{partial_href}')]"))
+            xpath = f"(//a[contains(@href, '{partial_href}')])[{index + 1}]"
+            tab = WebDriverWait(self._driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, xpath))
             )
-            
-            # Check if the specified index is within the range of available tabs
-            if index < len(tabs):
-                # Click on the tab at the specified index
-                tab = WebDriverWait(self._driver, 10).until(
-                    EC.element_to_be_clickable(tabs[index])
-                )
-                tab.click()
-                logger.info(f"Clicked on the tab with href containing '{partial_href}' at index {index}.")
-            else:
-                logger.error(f"No tab found with href containing '{partial_href}' at index {index}. Available tabs: {len(tabs)}")
-                
+            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", tab)
+            self._driver.execute_script("arguments[0].click();", tab)
+            logger.info(f"Clicked tab '{partial_href}' at index {index} using JS click.")
         except Exception as e:
-            logger.error(f"Failed to click on the tab with href containing '{partial_href}' at index {index}: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_click_tab_{partial_href}_index_{index}_{ClusterManager.get_current_timestamp()}.png")
+            logger.error(f"Failed to click on tab '{partial_href}' at index {index}: {str(e)}")
+            self._driver.save_screenshot(f"./failed_click_tab_{partial_href}_{ClusterManager.get_current_timestamp()}.png")
             
             
     def click_tab_on_sidebar(self, tab_name):
@@ -331,6 +322,7 @@ class ClusterManager:
         :param driver: The Selenium WebDriver instance.
         :param label_name: The label text associated with the checkbox to click.
         """
+        time.sleep(1)
         try:
             # Wait for the overlay containing the checkboxes to appear
             overlay_xpath = "//div[contains(@class, 'mat-mdc-menu-panel')]"
@@ -424,34 +416,29 @@ class ClusterManager:
             self._driver.save_screenshot(f"./failed_to_extract_namespace_{ClusterManager.get_current_timestamp()}.png")
             return None
 
-    def click_button_in_namespace_row(self,category_name ,expected_namespace: str):
+    def click_button_in_namespace_row(self, category_name, expected_namespace: str):
         try:
             if category_name == "Workloads" or category_name == "Data":
-                # Locate all cdk-overlay-pane elements
                 overlay_panes = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
 
-                # Ensure at least one overlay pane is present
                 if not overlay_panes:
                     logger.error("No cdk-overlay-pane elements found.")
                     return
 
-                # Get the most recent overlay pane (the last one in the list)
                 most_recent_overlay = overlay_panes[-1]
 
-                # Find all buttons within the most recent overlay
                 buttons = most_recent_overlay.find_elements(By.CSS_SELECTOR, "button.armo-button.table-secondary.sm")
 
-                # Ensure there are at least two buttons
                 if len(buttons) < 2:
                     logger.error("Less than two 'armo-button.table-secondary.sm' buttons found in the overlay.")
+                    self._driver.save_screenshot(f"./too_few_buttons_in_overlay_{ClusterManager.get_current_timestamp()}.png")
                     return
 
-                # Click the second button
-                second_button = buttons[1]
-                self._wait.until(EC.element_to_be_clickable(second_button)).click()
+                self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", buttons[1])
+                time.sleep(0.2)
+                self._driver.execute_script("arguments[0].click();", buttons[1])
+                logger.info("Clicked the second 'button.armo-button.table-secondary.sm' in the overlay.")
 
-                logger.info(f"Clicked the second 'button.armo-button.table-secondary.sm' in the overlay.")
-                
             elif category_name == "Network configuration":
                 try:
                     network_selector = "td.mat-mdc-cell.cdk-column-namespace"
@@ -461,9 +448,8 @@ class ClusterManager:
                 except Exception as e:
                     logger.error(f"Failed to click on the namespace element in the Network configuration category: {str(e)}")
                     self._driver.save_screenshot(f"./failed_to_click_on_namespace_element_{ClusterManager.get_current_timestamp()}.png")
-                    
+
                 try:
-                    # Wait for the element with text 'kind: NetworkPolicy' to be visible
                     wait = WebDriverWait(self._driver, 60)
                     pre_elements = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "td.value.added > pre")))
                     first_pre_element = pre_elements[0] 
@@ -475,7 +461,7 @@ class ClusterManager:
                 except TimeoutException as e:
                     logger.error("Timed out waiting for the element with 'kind: NetworkPolicy' to be visible.")
                     self._driver.save_screenshot(f"./failed_to_find_networkpolicy_element_{ClusterManager.get_current_timestamp()}.png")
-                    
+
             else:
                 try:
                     category_name = "Attack path"
@@ -484,8 +470,8 @@ class ClusterManager:
                     logger.info(f"Clicked the 'Fix' button in the '{category_name}' category.")
                 except Exception as e:
                     logger.error(f"Failed to click the 'Fix' button in the '{category_name}' category: {str(e)}")
-                    self._driver.save_screenshot(f"./failed_to_click_fix_button_{ClusterManager.get_current_timestamp()}.png")                
-                
+                    self._driver.save_screenshot(f"./failed_to_click_fix_button_{ClusterManager.get_current_timestamp()}.png")
+
         except Exception as e:
             logger.error(f"Failed to click the second button in the overlay: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_second_button_in_overlay.png")
@@ -707,6 +693,30 @@ class IgnoreRule:
             logger.error("failed to click on ignore rule button on sidebar")
             self._driver.save_screenshot(f"./ignore_rule_button_error_sidebar_{ClusterManager.get_current_timestamp()}.png")
             
+    def get_workload_name(self, timeout=15) -> str:
+        try:
+            # Wait until the Save button is clickable, which means modal is fully loaded
+            WebDriverWait(self._driver, timeout).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Save')]"))
+            )
+            logger.info("Save button is clickable – modal is ready.")
+
+            # Locate all field containers
+            fields = self._driver.find_elements(By.CSS_SELECTOR, "div.mat-mdc-menu-trigger.field.pointer.ng-star-inserted")
+
+            for field in fields:
+                label = field.find_element(By.XPATH, "./preceding-sibling::label[1]").text.strip().lower()
+                if "workload" in label:
+                    workload = field.find_element(By.CSS_SELECTOR, "span.field-value").text.strip()
+                    logger.info(f"Extracted workload name: {workload}")
+                    return workload
+
+            raise ValueError("Workload name field not found.")
+
+        except Exception as e:
+            logger.error(f"Failed to get workload name: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_get_workload_name_{ClusterManager.get_current_timestamp()}.png")
+            raise
             
     def click_ignore_on_from_attach_path(self):
         try:
@@ -741,7 +751,14 @@ class IgnoreRule:
     def save_ignore_rule(self):
         try:
             time.sleep(0.5)
-            self._interaction_manager.click("button.armo-button.primary.xl", By.CSS_SELECTOR)
+            save_button_xpath = "//button[contains(text(), 'Save')]"
+        
+            WebDriverWait(self._driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, save_button_xpath)))
+            logger.info("Save button is clickable - page fully loaded!")
+            
+            # self._interaction_manager.click("button.armo-button.primary.xl", By.CSS_SELECTOR)
+            self._interaction_manager.click(save_button_xpath, By.XPATH)
             logger.info("Click on save ignore rule.")
         except:
             logger.error("failed to click on save button")
@@ -853,13 +870,27 @@ class RiskAcceptancePage:
             logger.error(f"Failed to click on the severity element: {css_selector}")
             self._driver.save_screenshot(f"./failed_to_click_severity_element_{ClusterManager.get_current_timestamp()}.png")
 
-    def click_edit_button(self, xpath):
+    def click_edit_button(self, xpath: str):
         try:
-            self._interaction_manager.click(xpath, By.XPATH)
-            logger.info("Clicked the Edit button.")
+            # Optional: narrow to the most recent overlay, if needed
+            overlays = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
+            if not overlays:
+                raise Exception("No overlay pane found")
+
+            overlay = overlays[-1]
+
+            # Find the element using the provided XPath, scoped inside the overlay
+            edit_button = overlay.find_element(By.XPATH, xpath)
+
+            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", edit_button)
+            time.sleep(0.3)
+            self._driver.execute_script("arguments[0].click();", edit_button)
+
+            logger.info(f"Clicked the button at XPath: {xpath}")
         except Exception as e:
-            logger.error(f"Error clicking the Edit button: {e}")
-            self._driver.save_screenshot(f"./failed_to_click_edit_button_{ClusterManager.get_current_timestamp()}.png")
+            logger.error(f"Error clicking button at XPath '{xpath}': {str(e) or 'No error message'}")
+            self._driver.save_screenshot(f"./failed_to_click_xpath_button_{ClusterManager.get_current_timestamp()}.png")
+
 
     def delete_ignore_rule(self):
         try:

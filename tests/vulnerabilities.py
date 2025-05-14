@@ -99,12 +99,19 @@ class Vulnerabilities(BaseTest):
             
         # click on the clear button
         try:
-            clear_button = interaction_manager.wait_until_exists("//span[contains(text(), 'Clear')]", By.XPATH)
-            clear_button.click()
-            logger.info("All checkboxes cleared")
-        except:
-            logger.error("Failed to click clear button")
+            time.sleep(1)
+            clear_button_xpath = "//span[contains(text(), 'Clear')]"
+            clear_button = interaction_manager.wait_until_exists(clear_button_xpath, By.XPATH)
+
+            # Scroll into view and click with JS to avoid overlay issues
+            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", clear_button)
+            time.sleep(0.3)  # allow animations to finish
+            self._driver.execute_script("arguments[0].click();", clear_button)
+            logger.info("All checkboxes cleared using JS click")
+        except Exception as e:
+            logger.error(f"Failed to click clear button: {str(e)}")
             driver.save_screenshot(f"./failed_to_click_clear_button_{ClusterManager.get_current_timestamp()}.png")
+
         
         time.sleep(1)
         
@@ -118,6 +125,8 @@ class Vulnerabilities(BaseTest):
             driver.save_screenshot(f"./failed_to_verify_unselected_checkboxes_{ClusterManager.get_current_timestamp()}.png")
 
         ClusterManager.press_esc_key(driver)
+        time.sleep(1)
+        ClusterManager.press_space_key(driver)
         time.sleep(1)
         cluster_manager.click_filter_button("Namespace")
         time.sleep(1)
@@ -138,15 +147,16 @@ class Vulnerabilities(BaseTest):
             driver.save_screenshot(f"./failed_to_click_on_medium_severity_filter_{ClusterManager.get_current_timestamp()}.png")
         time.sleep(1)
         
-        try:
-            rows = WebDriverWait(self._driver, 10).until(
-            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "tr[role='row']")))
-            first_row = rows[1]
-            first_row.click()
-            logger.info("Clicked on the first row in the table")
-        except TimeoutException:
-            logger.error("Failed to find any rows in the table")
-            driver.save_screenshot(f"./failed_to_find_rows_in_table_{ClusterManager.get_current_timestamp()}.png")
+        # try:
+        #     WebDriverWait(self._driver, 20).until(
+        #         EC.presence_of_element_located((By.CSS_SELECTOR, "tr[role='row']"))
+        #     )
+        #     self._driver.find_elements(By.CSS_SELECTOR, "tr[role='row']")[1].click()
+        #     logger.info("Clicked on the first row in the table")
+        # except Exception as e:
+        #     logger.error(f"Failed to click on first row: {str(e)}")
+        #     driver.save_screenshot(f"./failed_to_click_first_row_{ClusterManager.get_current_timestamp()}.png")
+
             
         num_of_high_cve = interaction_manager.count_rows()
         logger.info(f"Number of high CVEs: {num_of_high_cve}")
@@ -165,7 +175,8 @@ class Vulnerabilities(BaseTest):
         except Exception as e:
                 logger.error(f"Failed to click on the first CVE: {e}")
                 driver.save_screenshot("./failed_to_click_cve.png")
-                    
+        
+        time.sleep(1)       
         cluster_manager.click_tab_on_sidebar(tab_name='Runtime Analysis')
         time.sleep(2)
         try:

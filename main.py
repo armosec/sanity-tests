@@ -49,7 +49,7 @@ class TestsRunner:
                 try:
                     future.result()
                 except Exception as exc:
-                    _logger.error(f"Test generated an exception: {exc}")
+                    _logger.error(f"Test generated an exception: {str(exc) or 'Unknown exception (empty message)'}")
                     mark_test_failed()  # Mark test as failed on exception
 
     def run_test(self, test_class, email, password, environment, create_cluster):

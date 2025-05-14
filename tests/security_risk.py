@@ -155,8 +155,11 @@ class SecurityRisk(BaseTest):
         else:
             logger.error(f"Namespace {namespace} is not verified")
             
-        time.sleep(1)
-        cluster_manager.click_button_in_namespace_row(category_name,namespace)
+        time.sleep(2)
+        # Click on the namespace row >
+        interaction_manager.click("armo-item-by-control button.armo-button.table-secondary.sm",by=By.CSS_SELECTOR)
+        # time.sleep(1)
+        # cluster_manager.click_button_in_namespace_row(category_name,namespace)
         
         time.sleep(1)
         if category_name == "Data" or category_name == "Workloads":
