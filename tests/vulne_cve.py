@@ -89,9 +89,9 @@ class VulneCvePage(BaseTest):
         time.sleep(1)
         workload_name = interaction_manager.get_text("//span[text()='Workload']/ancestor::td/following-sibling::td")
         cluster_manager.press_esc_key(driver)
-        print("TEST")
+        time.sleep(1)
         cluster_manager.click_on_tab_in_vulne_page("images")
-        workload_name_1 = interaction_manager.get_text("//td[contains(@class, 'cdk-column-containers')]//span[@uicustomtooltip]")
+        workload_name_1 = interaction_manager.get_text("//td[contains(@class, 'cdk-column-workload')]//span[@uicustomtooltip]")
 
         if workload_name == workload_name_1:
             logger.info(f"Workload name: {workload_name},the workload name are the same")
@@ -102,10 +102,3 @@ class VulneCvePage(BaseTest):
         time.sleep(1)
         cluster_manager.click_on_tab_in_vulne_page("workloads",index=1)
         time.sleep(1)
-      
-
-        
-
-        
-        
-        
