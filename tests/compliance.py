@@ -52,7 +52,7 @@ class Compliance(BaseTest):
         # Click on the cluster (the first one) 
         time.sleep(1)
         try:
-            cluster_connected = WebDriverWait(self._driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "td.mat-column-isConnected")))
+            cluster_connected = WebDriverWait(self._driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "armo-kubernetes-status-indicator armo-label > span.armo-label.green.primary")))
             cluster_connected.click()
             logger.info("First Cluster selected")
         except:

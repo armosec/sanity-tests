@@ -154,13 +154,13 @@ class SecurityRisk(BaseTest):
             logger.info(f"Namespace {namespace} is verified") 
         else:
             logger.error(f"Namespace {namespace} is not verified")
-            
+        print("TETST")
         time.sleep(2)
         # Click on the namespace row >
         interaction_manager.click("armo-item-by-control button.armo-button.table-secondary.sm",by=By.CSS_SELECTOR)
         # time.sleep(1)
         # cluster_manager.click_button_in_namespace_row(category_name,namespace)
-        
+        print("TEST2")
         time.sleep(1)
         if category_name == "Data" or category_name == "Workloads":
             if AttachPath.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):

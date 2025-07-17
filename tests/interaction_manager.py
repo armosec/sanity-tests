@@ -59,48 +59,57 @@ class InteractionManager:
         return element
 
     def click(self, xpath: str, by=By.XPATH, click_delay: Optional[float] = None, index: int = 0) -> WebElement:
-        _logger.info(f'Clicking "{xpath}" at index {index}')
-
-        # Wait for common overlays to disappear
-        try:
-            WebDriverWait(self._driver, 5).until(
-                lambda d: not d.find_elements(By.CLASS_NAME, "cdk-overlay-backdrop") and
-                        not d.find_elements(By.CLASS_NAME, "cdk-overlay-pane")
+            _logger.info(f'Clicking "{xpath}" at index {index}')
+        
+            # Find all elements that match the locator
+            elements = WebDriverWait(self._driver, self._timeout).until(
+                EC.presence_of_all_elements_located((by, xpath))
             )
-        except TimeoutException:
-            _logger.warning("Overlay(s) still visible. Proceeding with JS click fallback anyway.")
+        
+            # Ensure that we have enough elements to access the desired index
+            if len(elements) <= index:
+                _logger.error(f"Not enough elements found for '{xpath}'. Expected at least {index + 1} elements.")
+                raise IndexError(f"Element at index {index} not found for '{xpath}'.")
+        
+            # Ensure the element at the specified index is interactable and in viewport
+            element = self.wait_until_interactable(xpath, by)
+        
+            if click_delay:
+                sleep(click_delay)
+        
+            try:
+                elements[index].click()
+            except ElementClickInterceptedException as e:
+                _logger.error(
+                    f'Failed to click "{xpath}" at index {index} due to ElementClickInterceptedException. Trying to click using JavaScript.',
+                    exc_info=True,
+                    stack_info=True,
+                    extra={"screenshot": False},
+                )
+                self._driver.execute_script("arguments[0].click();", elements[index])
+            except Exception as e:
+                _logger.error(
+                    f'Failed to click "{xpath}" at index {index}. Element might not be interactable.',
+                    exc_info=True,
+                    stack_info=True,
+                    extra={"screenshot": True},  # Take a screenshot on error
+                )
+                raise e
+        
+            return elements[index]
 
-        # Find the elements after overlays are (hopefully) gone
-        elements = WebDriverWait(self._driver, self._timeout).until(
-            EC.presence_of_all_elements_located((by, xpath))
-        )
 
-        if len(elements) <= index:
-            _logger.error(f"Not enough elements found for '{xpath}'. Expected at least {index + 1} elements.")
-            raise IndexError(f"Element at index {index} not found for '{xpath}'.")
-
-        element = self.wait_until_interactable(xpath, by)
-
-        if click_delay:
-            sleep(click_delay)
-
+    def handle_overlays_headless(self):
         try:
-            elements[index].click()
-        except ElementClickInterceptedException as e:
-            _logger.warning(f"Standard click blocked. Retrying with JavaScript click.")
-            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", elements[index])
-            time.sleep(0.53)
-            self._driver.execute_script("arguments[0].click();", elements[index])
+            # Remove all cdk overlays just before any interaction
+            self._driver.execute_script("""
+                const overlays = document.querySelectorAll('.cdk-overlay-backdrop, .cdk-overlay-dark-backdrop, .cdk-overlay-pane');
+                overlays.forEach(el => el.remove());
+            """)
+            _logger.info("Forcefully removed all cdk overlays.")
+            time.sleep(0.5)  # Give DOM time to update
         except Exception as e:
-            _logger.error(
-                f'Failed to click \"{xpath}\" at index {index}.',
-                exc_info=True,
-                stack_info=True,
-                extra={"screenshot": True}
-            )
-            raise e
-
-        return elements[index]
+            _logger.warning(f"Error removing overlays: {e}")
 
 
     def focus_and_send_text(self, xpath: str, text: str, by=By.XPATH) -> WebElement:
@@ -143,16 +152,25 @@ class InteractionManager:
         # _logger.info(f'Text found: "{text}"')
         return text
     
-    def count_rows(self) -> int:
+    def count_rows(self, table_selector=None, row_selector="//tbody//tr", skip_header=True) -> int:
         try:
-            # Find all the <tr> elements within the <tbody> (replace with your actual <tbody> locator if necessary)
-            rows = self.driver.find_elements(By.XPATH, "//tbody//tr")
+            _logger.info(f"Counting rows using selector: {row_selector}")
+            
+            # Find all the <tr> elements within the <tbody>
+            rows = self._driver.find_elements(By.XPATH, row_selector)
             
             # Get the count of rows
             row_count = len(rows)
+            
+            # Skip header row if requested and if there are rows
+            if skip_header and row_count > 0:
+                row_count -= 1
+                
+            _logger.info(f"Found {row_count} rows (excluding headers: {skip_header})")
             return row_count
         except Exception as e:
             _logger.error(f"Failed to count rows. Error: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_count_rows_{int(time.time())}.png")
             return 0
 
     def switch_to_window(self, windows_index: int) -> None:

@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, ElementClickInterceptedException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from .interaction_manager import InteractionManager
@@ -210,14 +210,14 @@ class ClusterManager:
             # Click the tab
             tab_element.click()
             logger.info(f"Clicked on the tab with name: {tab_name}")
-
+            
         except TimeoutException:
             logger.error(f"Timeout: The tab with name '{tab_name}' could not be found.")
             self._driver.save_screenshot(f"./failed_to_click_tab_{tab_name}_timeout.png")
         except Exception as e:
             logger.error(f"Failed to click the tab with name '{tab_name}'. Error: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_tab_{tab_name}_error.png")
-            
+
             
     def click_overlay_button(self):
         try:
@@ -672,19 +672,40 @@ class IgnoreRule:
         self._interaction_manager = InteractionManager(driver)
 
     def click_ignore_button(self):
+        """Click the 3-dots menu button and then click the ignore button - headless-friendly version"""
+        # Allow the page to stabilize
+        time.sleep(2)
+        # 1. Set a fixed window size that works consistently
+        self._driver.set_window_size(1920, 1080)
+        accept_xpath = "//div[contains(@class, 'cdk-overlay-pane')]//button[.//span[normalize-space()='Accept Risk']]"
+
+        # 2. Handle overlays more aggressively for headless mode
+        try:
+            self._interaction_manager.handle_overlays_headless()
+            # three_dots_xpath = "(//td[contains(@class, 'cdk-column-buttons')]//button[contains(@class, 'armo-button')])[1]"
+            three_dots_xpath = '//armo-icon-button[contains(@svgsource, "more.svg#more")]//button'
+            btn = self._interaction_manager.wait_until_interactable(three_dots_xpath)
+            btn.click()
+            logger.info("Clicked the 3-dots menu button.")
+        except Exception as e:
+            logger.error(f"Failed to click 3-dots button: {e}")
+            self._driver.save_screenshot("failed_3dots.png")
+            raise
+            
+        # 3. Click the "Accept Risk" button
         time.sleep(2)
         try:
-            self._interaction_manager.click('button.armo-button.table-secondary.sm', By.CSS_SELECTOR,index=2)
-        except:
-            logger.error("failed to click on 3 dots button")
-            self._driver.save_screenshot(f"./ignore_button_error_{ClusterManager.get_current_timestamp()}.png")
-            
-        try:
-            self._interaction_manager.click('.armo-button.table-secondary.lg', By.CSS_SELECTOR)
-        except:
-            logger.error("failed to find the Accepting the Risk button")
-            self._driver.save_screenshot(f"./Accepting_Risk_button_error_{ClusterManager.get_current_timestamp()}.png")
-            
+            accept_btn = WebDriverWait(self._driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, accept_xpath))
+            )
+            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", accept_btn)
+            self._driver.execute_script("arguments[0].click();", accept_btn)
+            logger.info("Clicked Accept Risk using JS.")
+        except Exception as e:
+            logger.error(f"JS click failed: {e}")
+            self._driver.save_screenshot("accept_risk_js_fail.png")
+            raise
+        
     def click_ignore_rule_button_sidebar(self):
         try:
             self._interaction_manager.click('armo-ignore-rules-button button.armo-button.table-secondary.sm', By.CSS_SELECTOR)
@@ -696,10 +717,8 @@ class IgnoreRule:
     def get_workload_name(self, timeout=15) -> str:
         try:
             # Wait until the Save button is clickable, which means modal is fully loaded
-            WebDriverWait(self._driver, timeout).until(
-                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Save')]"))
-            )
-            logger.info("Save button is clickable – modal is ready.")
+            WebDriverWait(self._driver, timeout).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Save')]")))
+            logger.info("Save button is clickable - modal is ready.")
 
             # Locate all field containers
             fields = self._driver.find_elements(By.CSS_SELECTOR, "div.mat-mdc-menu-trigger.field.pointer.ng-star-inserted")
@@ -749,20 +768,21 @@ class IgnoreRule:
         return span.text.strip()
     
     def save_ignore_rule(self):
-        try:
-            time.sleep(0.5)
-            save_button_xpath = "//button[contains(text(), 'Save')]"
-        
-            WebDriverWait(self._driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, save_button_xpath)))
-            logger.info("Save button is clickable - page fully loaded!")
+        save_xpath = "//mat-dialog-container//button[contains(text(), 'Save')]"
             
-            # self._interaction_manager.click("button.armo-button.primary.xl", By.CSS_SELECTOR)
-            self._interaction_manager.click(save_button_xpath, By.XPATH)
-            logger.info("Click on save ignore rule.")
-        except:
-            logger.error("failed to click on save button")
-            self._driver.save_screenshot(f"./failed_to_click_on_save_button_{ClusterManager.get_current_timestamp()}.png")
+        try:
+            save_btn = WebDriverWait(self._driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, save_xpath))
+            )
+            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", save_btn)
+            time.sleep(0.5)
+            self._driver.execute_script("arguments[0].click();", save_btn)
+            logger.info("Clicked Save successfully with JS.")
+            
+        except Exception as e:
+            logger.error(f"Failed to click Save: {e}")
+            self._driver.save_screenshot("save_click_error.png")
+            raise
             
     def click_save_button_sidebar(self):
         try:
@@ -796,21 +816,37 @@ class IgnoreRule:
 
     def perform_delete_ignore_rule(self):
         try:
-            time.sleep(1)
-            self._interaction_manager.click('button.armo-button.error-secondary.xl', By.CSS_SELECTOR)
-            logger.info("Click on delete ignore rule button.")
-        except:
-            logger.error("Not found Delete ignore rule button.")
-            self._driver.save_screenshot(f"./delete_ignore_rule_button_error_{ClusterManager.get_current_timestamp()}.png")
-
-        try:
+            # Step 1: Click the trash can icon to initiate the revoke dialog
+            logger.info("Looking for the 'Delete/Revoke' icon button...")
+            delete_btn_xpath = "//armo-icon-button[contains(@svgsource, 'trash-can.svg')]//button"
+            delete_btn = WebDriverWait(self._driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, delete_btn_xpath))
+            )
+            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", delete_btn)
             time.sleep(0.5)
-            self._interaction_manager.click('button.armo-button.error.xl', By.CSS_SELECTOR)
-            logger.info("Ignore rule deleted.")
-        except:
-            logger.error("Revoke button not found.")
-            self._driver.save_screenshot(f"./revoke_button_error_{ClusterManager.get_current_timestamp()}.png")
+            self._driver.execute_script("arguments[0].click();", delete_btn)
+            logger.info("Clicked on the delete/revoke icon button.")
 
+            # Step 2: Wait for the confirmation modal and click "Yes, Revoke"
+            logger.info("Waiting for confirmation modal...")
+            confirm_btn_xpath = "//mat-dialog-container//button[contains(text(), 'Yes, Revoke')]"
+            confirm_btn = WebDriverWait(self._driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, confirm_btn_xpath))
+            )
+            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", confirm_btn)
+            time.sleep(0.5)
+            self._driver.execute_script("arguments[0].click();", confirm_btn)
+            logger.info("Clicked on 'Yes, Revoke' to confirm deletion.")
+
+            # Optional: wait until dialog disappears
+            WebDriverWait(self._driver, 10).until_not(
+                EC.presence_of_element_located((By.XPATH, confirm_btn_xpath))
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to delete/revoke ignore rule: {e}")
+            self._driver.save_screenshot("error_revoke_delete.png")
+            raise
 
 
 class RiskAcceptancePage:
@@ -889,7 +925,7 @@ class RiskAcceptancePage:
             logger.info(f"Clicked the button at XPath: {xpath}")
         except Exception as e:
             logger.error(f"Error clicking button at XPath '{xpath}': {str(e) or 'No error message'}")
-            self._driver.save_screenshot(f"./failed_to_click_xpath_button_{ClusterManager.get_current_timestamp()}.png")
+            self._driver.save_screenshot(f"./failed_to_click_edit_button_{ClusterManager.get_current_timestamp()}.png")
 
 
     def delete_ignore_rule(self):
