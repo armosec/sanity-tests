@@ -112,7 +112,7 @@ jobs:
                   -t ${{ matrix.TEST }} \
                   -b production \
                   --logger DEBUG \
-                  --delete_test_tenant ALWAYS
+                  --delete_test_tenant ALWAYS \
                   --kwargs helm_branch=release \
                   deactivate
 

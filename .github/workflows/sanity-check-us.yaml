@@ -112,7 +112,7 @@ jobs:
                   -b production-us \
                   --logger DEBUG \
                   --customer CyberArmorTests \
-                  --delete_test_tenant ALWAYS
+                  --delete_test_tenant ALWAYS \
                   --kwargs helm_branch=release \
                   deactivate
 
