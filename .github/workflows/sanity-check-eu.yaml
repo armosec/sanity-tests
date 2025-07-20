@@ -112,6 +112,7 @@ jobs:
                   -t ${{ matrix.TEST }} \
                   -b production \
                   --logger DEBUG \
+                  --customer CyberArmorTests \
                   --delete_test_tenant ALWAYS \
                   --kwargs helm_branch=release \
                   deactivate
