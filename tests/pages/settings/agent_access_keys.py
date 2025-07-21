@@ -18,7 +18,7 @@ class AgentAccessKeys(BaseTest):
         self.create_new_key()
         # self.change_default_key()
         # self.edit_key()
-        # self.delete_key()
+        self.delete_key()
         
         logger.info("Agent Access Keys test completed successfully")        
 
@@ -91,17 +91,42 @@ class AgentAccessKeys(BaseTest):
     #         logger.error(f"Failed to edit key: {str(e)}")
     #         self._driver.save_screenshot(f"./failed_to_edit_key_{ClusterManager.get_current_timestamp()}.png")
 
-    # def delete_key(self):
-    #     logger.info("Deleting agent access key")
+    def delete_key(self):
+        logger.info("Deleting agent access key")
+        wait = WebDriverWait(self._driver, 10, 0.001)
+
+        num_of_access_keys = self._interaction_manager.count_rows(skip_header=False)
+        logger.info(f"Current number of agent access keys: {num_of_access_keys}")
         
-    #     # TODO: Implement key deletion logic
-    #     try:
-    #         # Example placeholder logic:
-    #         # self._interaction_manager.click("//button[contains(@class, 'delete-key')]", By.XPATH)
-    #         # self._interaction_manager.click("//button[contains(text(), 'Confirm')]", By.XPATH)
+        try:
+            # Click on the delete button for the first row (the newly created key)
+            # Find row options buttons
+            buttons = wait.until(EC.visibility_of_all_elements_located((By.TAG_NAME, 'armo-row-options-button')))
             
-    #         logger.info("Agent access key deleted successfully")
-    #         time.sleep(1)
-    #     except Exception as e:
-    #         logger.error(f"Failed to delete key: {str(e)}")
-    #         self._driver.save_screenshot(f"./failed_to_delete_key_{ClusterManager.get_current_timestamp()}.png")
+            logger.info(f"Found {len(buttons)} row options buttons")
+
+            if not buttons:
+                raise Exception("No row options buttons found")
+            
+            # Click on the first button - this should be the newly created key
+            buttons[0].click()
+
+            # Click on the delete option
+            self._interaction_manager.click('/html/body/div[5]/div[2]/div/div/div/div[3]/armo-button')
+
+            # Confirm deletion
+            self._interaction_manager.click('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-delete-confirm-modal/div[2]/armo-button[2]')
+
+            time.sleep(1)  # Wait for the key to be deleted
+
+            # Verify the number of access keys decreased
+            num_of_access_keys_after = self._interaction_manager.count_rows(skip_header=False)
+            logger.info(f"Number of agent access keys after deletion: {num_of_access_keys_after}")
+
+            if num_of_access_keys_after != num_of_access_keys - 1:
+                raise Exception("Number of agent access keys did not decrease as expected")
+            
+            logger.info("Agent access key deleted successfully")
+        except Exception as e:
+            logger.error(f"Failed to delete key: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_delete_key_{ClusterManager.get_current_timestamp()}.png")
