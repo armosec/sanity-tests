@@ -17,7 +17,7 @@ class AgentAccessKeys(BaseTest):
         time.sleep(1)
         self.create_new_key()
         # self.change_default_key()
-        # self.edit_key()
+        self.edit_key()
         self.delete_key()
         
         logger.info("Agent Access Keys test completed successfully")        
@@ -75,21 +75,44 @@ class AgentAccessKeys(BaseTest):
     #         logger.error(f"Failed to change default key: {str(e)}")
     #         self._driver.save_screenshot(f"./failed_to_change_default_key_{ClusterManager.get_current_timestamp()}.png")
 
-    # def edit_key(self):
-    #     logger.info("Editing agent access key")
+    def edit_key(self):
+        logger.info("Editing agent access key")
+        wait = WebDriverWait(self._driver, 10, 0.001)
         
-    #     # TODO: Implement key editing logic
-    #     try:
-    #         # Example placeholder logic:
-    #         # self._interaction_manager.click("//button[contains(@class, 'edit-key')]", By.XPATH)
-    #         # self._interaction_manager.clear_and_type("key-name-input", "Updated Test Key")
-    #         # self._interaction_manager.click("save-changes-button", By.ID)
+        try:
+            # Click on the edit button for the first row (the newly created key)
+            # Find row options buttons
+            buttons = wait.until(EC.visibility_of_all_elements_located((By.TAG_NAME, 'armo-row-options-button')))
             
-    #         logger.info("Agent access key edited successfully")
-    #         time.sleep(1)
-    #     except Exception as e:
-    #         logger.error(f"Failed to edit key: {str(e)}")
-    #         self._driver.save_screenshot(f"./failed_to_edit_key_{ClusterManager.get_current_timestamp()}.png")
+            logger.info(f"Found {len(buttons)} row options buttons")
+
+            if not buttons:
+                raise Exception("No row options buttons found")
+            
+            # Click on the first button - this should be the newly created key
+            buttons[0].click()
+
+            # Click on the edit option
+            self._interaction_manager.click('/html/body/div[5]/div[2]/div/div/div/div[2]/armo-button')
+
+            # Fill in new key name
+            self._interaction_manager.focus_and_send_text('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-agent-access-token-modal/div[2]/form/div/div[2]/mat-form-field/div[1]/div/div[2]/input', ' edited')
+
+            # Click on save button
+            self._interaction_manager.click('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-agent-access-token-modal/div[3]/armo-button[2]')
+            
+            time.sleep(1)  # Wait for the key to be edited
+
+            # Verify the key was edited
+            edited_key_name = self._interaction_manager.get_text('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/armo-agent-access-tokens-table/div/table/tbody/tr[1]/td[1]/span')
+
+            if edited_key_name != 'test edited':
+                raise Exception(f"Edited key name does not match expected value. Found: {edited_key_name}, Expected: 'test edited'")
+            
+            logger.info("Agent access key edited successfully")
+        except Exception as e:
+            logger.error(f"Failed to edit key: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_edit_key_{ClusterManager.get_current_timestamp()}.png")
 
     def delete_key(self):
         logger.info("Deleting agent access key")
