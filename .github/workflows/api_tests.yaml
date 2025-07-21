@@ -351,3 +351,41 @@ jobs:
         commit: --signoff
         pull: '--ff-only'
         add: ./logs/api_test_log_ARMO_EEE.csv 
+
+  run-api-test-VGW:
+    name: Run API Test VGW
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      timeout-minutes: 10
+      with:
+        python-version: 3.8
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_api.txt
+
+    - name: Run API test with VGW
+      env:
+        EMAIL: ${{ secrets.ST_EMAIL }}
+        CUSTOMER: ${{ secrets.ST_DEV_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_DEV_PASSWORD }}
+        CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_VGW }}
+      run: |
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name VGW --env dev
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: "Update logs with new data for VGW"
+        author_name: bvolovat
+        author_email: borisv@armosec.io
+        commit: --signoff
+        pull: '--ff-only'
+        add: ./logs/api_test_log_VGW.csv
