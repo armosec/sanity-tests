@@ -17,7 +17,8 @@ class AgentAccessKeys(BaseTest):
         self.navigate_to_agent_access_keys()
         time.sleep(1)
         self.create_new_key()
-        self.copy_key()
+        # copy is not working in headless mode
+        # self.copy_key()
         # self.change_default_key()
         self.edit_key()
         self.delete_key()
