@@ -1,5 +1,6 @@
 import time
 import logging
+import pyperclip
 from ...base_test import BaseTest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,6 +17,7 @@ class AgentAccessKeys(BaseTest):
         self.navigate_to_agent_access_keys()
         time.sleep(1)
         self.create_new_key()
+        self.copy_key()
         # self.change_default_key()
         self.edit_key()
         self.delete_key()
@@ -60,6 +62,42 @@ class AgentAccessKeys(BaseTest):
         except Exception as e:
             logger.error(f"Failed to create new key: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_create_key_{ClusterManager.get_current_timestamp()}.png")
+
+    def copy_key(self):
+        logger.info("Copying agent access key")
+        wait = WebDriverWait(self._driver, 10, 0.001)
+        
+        try:
+            # Click on the copy button for the first row (the newly created key)
+            # Find row options buttons
+            buttons = wait.until(EC.visibility_of_all_elements_located((By.TAG_NAME, 'armo-row-options-button')))
+            
+            logger.info(f"Found {len(buttons)} row options buttons")
+
+            if not buttons:
+                raise Exception("No row options buttons found")
+            
+            # Click on the first button - this should be the newly created key
+            buttons[0].click()
+
+            # Click on the copy option
+            self._interaction_manager.click('/html/body/div[5]/div[2]/div/div/div/div[1]/armo-button')
+
+            # Validate that the key is copied to clipboard
+            # Get the clipboard value
+            clipboard_value = pyperclip.paste()
+
+            # Get the presented key value
+            self._interaction_manager.click('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/armo-agent-access-tokens-table/div/table/tbody/tr[1]/td[2]/div/armo-icon-button')
+            presented_key_value = self._interaction_manager.get_text('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/armo-agent-access-tokens-table/div/table/tbody/tr[1]/td[2]/div/span')
+            
+            if clipboard_value != presented_key_value:
+                raise Exception(f"Copied key value does not match presented key value. Copied: {clipboard_value}, Presented: {presented_key_value}")
+            
+            logger.info("Agent access key copied successfully")
+        except Exception as e:
+            logger.error(f"Failed to copy key: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_copy_key_{ClusterManager.get_current_timestamp()}.png")
 
     # def change_default_key(self):
     #     logger.info("Changing default agent access key")
