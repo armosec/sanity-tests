@@ -378,7 +378,7 @@ jobs:
         PASSWORD: ${{ secrets.ST_DEV_PASSWORD }}
         CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_VGW }}
       run: |
-        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name VGW --env dev
+        python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name VGW
 
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
