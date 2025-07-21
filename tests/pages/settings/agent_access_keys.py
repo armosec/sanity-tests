@@ -11,18 +11,16 @@ logger = logging.getLogger(__name__)
 
 class AgentAccessKeys(BaseTest):    
     def run(self):
-        self.run_test()
-
-    def run_test(self):
         logger.info("Starting Agent Access Keys test")
         
         self.navigate_to_agent_access_keys()
+        time.sleep(1)
         self.create_new_key()
-        self.change_default_key()
-        self.edit_key()
-        self.delete_key()
+        # self.change_default_key()
+        # self.edit_key()
+        # self.delete_key()
         
-        logger.info("Agent Access Keys test completed successfully")
+        logger.info("Agent Access Keys test completed successfully")        
 
     def navigate_to_agent_access_keys(self):
         try:
@@ -35,65 +33,75 @@ class AgentAccessKeys(BaseTest):
 
     def create_new_key(self):
         logger.info("Creating new agent access key")
+
+        # count_rows - skip_header=False so it counts all rows, there is probably an issue with the function
+        num_of_access_keys = self._interaction_manager.count_rows(skip_header=False)
+        logger.info(f"Current number of agent access keys: {num_of_access_keys}")
         
-        # TODO: Implement key creation logic
-        # Example placeholder logic:
         try:
             # Click on "Create New Key" button (update selector as needed)
-            # create_key_button = self._interaction_manager.wait_until_exists("//button[contains(text(), 'Create')]", By.XPATH)
-            # create_key_button.click()
+            self._interaction_manager.click('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/div/armo-button')
             
-            # Fill in key details
-            # self._interaction_manager.type_text("key-name-input", "Test Key")
-            # self._interaction_manager.click("save-key-button", By.ID)
-            
+            # Fill in key name
+            self._interaction_manager.focus_and_send_text('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-agent-access-token-modal/div[2]/form/div/div[2]/mat-form-field/div[1]/div/div[2]/input', 'test')
+
+            # Click on save button
+            self._interaction_manager.click('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-agent-access-token-modal/div[3]/armo-button[2]', By.XPATH)
+            time.sleep(1)  # Wait for the key to be created
+
+            # Verify the number of access keys increased
+            num_of_access_keys_after = self._interaction_manager.count_rows(skip_header=False)
+            logger.info(f"Number of agent access keys after creation: {num_of_access_keys_after}")
+
+            if num_of_access_keys_after != num_of_access_keys + 1:
+                raise Exception("Number of agent access keys did not increase as expected")
+                        
             logger.info("New agent access key created successfully")
-            time.sleep(1)
         except Exception as e:
             logger.error(f"Failed to create new key: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_create_key_{ClusterManager.get_current_timestamp()}.png")
 
-    def change_default_key(self):
-        logger.info("Changing default agent access key")
+    # def change_default_key(self):
+    #     logger.info("Changing default agent access key")
         
-        # TODO: Implement default key change logic
-        try:
-            # Example placeholder logic:
-            # self._interaction_manager.click("//button[contains(text(), 'Set as Default')]", By.XPATH)
+    #     # TODO: Implement default key change logic
+    #     try:
+    #         # Example placeholder logic:
+    #         # self._interaction_manager.click("//button[contains(text(), 'Set as Default')]", By.XPATH)
             
-            logger.info("Default key changed successfully")
-            time.sleep(1)
-        except Exception as e:
-            logger.error(f"Failed to change default key: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_change_default_key_{ClusterManager.get_current_timestamp()}.png")
+    #         logger.info("Default key changed successfully")
+    #         time.sleep(1)
+    #     except Exception as e:
+    #         logger.error(f"Failed to change default key: {str(e)}")
+    #         self._driver.save_screenshot(f"./failed_to_change_default_key_{ClusterManager.get_current_timestamp()}.png")
 
-    def edit_key(self):
-        logger.info("Editing agent access key")
+    # def edit_key(self):
+    #     logger.info("Editing agent access key")
         
-        # TODO: Implement key editing logic
-        try:
-            # Example placeholder logic:
-            # self._interaction_manager.click("//button[contains(@class, 'edit-key')]", By.XPATH)
-            # self._interaction_manager.clear_and_type("key-name-input", "Updated Test Key")
-            # self._interaction_manager.click("save-changes-button", By.ID)
+    #     # TODO: Implement key editing logic
+    #     try:
+    #         # Example placeholder logic:
+    #         # self._interaction_manager.click("//button[contains(@class, 'edit-key')]", By.XPATH)
+    #         # self._interaction_manager.clear_and_type("key-name-input", "Updated Test Key")
+    #         # self._interaction_manager.click("save-changes-button", By.ID)
             
-            logger.info("Agent access key edited successfully")
-            time.sleep(1)
-        except Exception as e:
-            logger.error(f"Failed to edit key: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_edit_key_{ClusterManager.get_current_timestamp()}.png")
+    #         logger.info("Agent access key edited successfully")
+    #         time.sleep(1)
+    #     except Exception as e:
+    #         logger.error(f"Failed to edit key: {str(e)}")
+    #         self._driver.save_screenshot(f"./failed_to_edit_key_{ClusterManager.get_current_timestamp()}.png")
 
-    def delete_key(self):
-        logger.info("Deleting agent access key")
+    # def delete_key(self):
+    #     logger.info("Deleting agent access key")
         
-        # TODO: Implement key deletion logic
-        try:
-            # Example placeholder logic:
-            # self._interaction_manager.click("//button[contains(@class, 'delete-key')]", By.XPATH)
-            # self._interaction_manager.click("//button[contains(text(), 'Confirm')]", By.XPATH)
+    #     # TODO: Implement key deletion logic
+    #     try:
+    #         # Example placeholder logic:
+    #         # self._interaction_manager.click("//button[contains(@class, 'delete-key')]", By.XPATH)
+    #         # self._interaction_manager.click("//button[contains(text(), 'Confirm')]", By.XPATH)
             
-            logger.info("Agent access key deleted successfully")
-            time.sleep(1)
-        except Exception as e:
-            logger.error(f"Failed to delete key: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_delete_key_{ClusterManager.get_current_timestamp()}.png")
+    #         logger.info("Agent access key deleted successfully")
+    #         time.sleep(1)
+    #     except Exception as e:
+    #         logger.error(f"Failed to delete key: {str(e)}")
+    #         self._driver.save_screenshot(f"./failed_to_delete_key_{ClusterManager.get_current_timestamp()}.png")

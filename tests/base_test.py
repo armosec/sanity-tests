@@ -28,6 +28,18 @@ class BaseTest(ABC):
         self._wait = WebDriverWait(self._driver, 60, 0.001)
         self._create_cluster = getattr(config, 'create_cluster', False)  # Default to False if not provided
     
+    @property
+    def config(self) -> TestConfig:
+        """Return a TestConfig object with all current attributes"""
+        return TestConfig(
+            driver=self._driver,
+            interaction_manager=self._interaction_manager,
+            email=self._email,
+            password=self._password,
+            environment=self._environment,
+            create_cluster=self._create_cluster
+        )
+    
     @abstractmethod
     def run(self):
         pass

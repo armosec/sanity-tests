@@ -32,7 +32,8 @@ class Settings(BaseTest):
                 
             print("Running settings test")
             
-            AgentAccessKeys.run_test(self)
+            agent_access_keys = AgentAccessKeys(self.config)
+            agent_access_keys.run()
         finally:
             # Only perform cleanup if we created a cluster
             if self._create_cluster:
