@@ -40,7 +40,7 @@ class Vulnerabilities(BaseTest):
             # Only perform cleanup if we created a cluster
             if self._create_cluster:
                 self.perform_cleanup()
-            logger.info("Test completed successfully")
+            logger.info("Test completed")
 
     def navigate_to_vulnerabilities(self):
         driver = self._driver

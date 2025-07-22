@@ -99,7 +99,7 @@ class InteractionManager:
             return elements[index]
 
 
-    def handle_overlays_headless(self):
+    def close_all_overlays(self):
         try:
             # Remove all cdk overlays just before any interaction
             self._driver.execute_script("""

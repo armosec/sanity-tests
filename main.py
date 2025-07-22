@@ -4,6 +4,7 @@ import os
 import sys
 import logging
 from selenium.webdriver.support.ui import WebDriverWait
+from tests.pages import Settings
 from tests.selenium_config import initialize_driver
 from tests.interaction_manager import InteractionManager
 from tests.vulnerabilities import Vulnerabilities
@@ -87,7 +88,8 @@ def main():
         'compliance': Compliance,
         'attach-path': AttachPath,
         # 'runtime-security': RuntimeIncident,
-        'security-risk': SecurityRisk
+        'security-risk': SecurityRisk,
+        'settings': Settings,
 
         # Add additional mappings here
     }

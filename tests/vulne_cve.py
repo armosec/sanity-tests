@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class VulneCvePage(BaseTest):    
     def run(self):
-        logger.info("Vulne CVE test")
+        logger.info("Starting CVEs tab test")
         self.vulne_cve_test()
 
     def vulne_cve_test(self):
