@@ -19,6 +19,29 @@ class AgentAccessKeys(BaseTest):
         self.test_key_name = f"test {readable_timestamp}"
         logger.info(f"Generated test key name: {self.test_key_name}")
         
+    def _handle_error(self, operation: str, exception: Exception):
+        """Common error handling method"""
+        logger.error(f"Failed to {operation}: {str(exception)}")
+        screenshot_name = f"./failed_{operation.replace(' ', '_')}_{ClusterManager.get_current_timestamp()}.png"
+        self._driver.save_screenshot(screenshot_name)
+        
+    def _find_row_options_buttons(self) -> list:
+        """Find and return row options buttons with proper waiting"""
+        wait = WebDriverWait(self._driver, 10, 0.001)
+        buttons = wait.until(EC.visibility_of_all_elements_located((By.TAG_NAME, 'armo-row-options-button')))
+        logger.info(f"Found {len(buttons)} row options buttons")
+        
+        if not buttons:
+            raise Exception("No row options buttons found")
+        return buttons
+    
+    def _get_table_action_options(self) -> list:
+        """Get table action options (edit, delete, etc.)"""
+        options = self._driver.find_elements(By.CSS_SELECTOR, '.armo-button.table-more-actions.md')
+        if not options:
+            raise Exception("No options buttons found")
+        return options
+        
     def run(self):
         logger.info("Starting Agent Access Keys test")
         
@@ -38,8 +61,7 @@ class AgentAccessKeys(BaseTest):
             logger.info("Successfully navigated to Agent Access Keys page")
             time.sleep(1)  # Wait for the page to load
         except Exception as e:
-            logger.error(f"Failed to navigate to Agent Access Keys page: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_navigate_agent_access_keys_{ClusterManager.get_current_timestamp()}.png")
+            self._handle_error("navigate to Agent Access Keys page", e)
             raise
 
     def create_new_key(self):
@@ -69,8 +91,7 @@ class AgentAccessKeys(BaseTest):
                         
             logger.info("New agent access key created successfully")
         except Exception as e:
-            logger.error(f"Failed to create new key: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_create_key_{ClusterManager.get_current_timestamp()}.png")
+            self._handle_error("create new key", e)
 
     def copy_key(self):
         logger.info("Copying agent access key")
@@ -141,7 +162,7 @@ class AgentAccessKeys(BaseTest):
             
             # Change the default key in the UI back to the original key
             logger.info("Changing default key back to the original key")
-            self._interaction_manager.click('settings-left-menu-item', By.ID)  # Click on settings page
+            self._interaction_manager.click('settings-left-menu-item', By.ID)
             self.navigate_to_agent_access_keys()
             # Click on the default radio button for the last row (the original key)
             buttons = self._driver.find_elements(By.TAG_NAME, 'mat-radio-button')
@@ -156,32 +177,18 @@ class AgentAccessKeys(BaseTest):
             
             logger.info("Default key changed successfully")
         except Exception as e:
-            logger.error(f"Failed to change default key: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_change_default_key_{ClusterManager.get_current_timestamp()}.png")
+            self._handle_error("change default key", e)
 
     def edit_key(self):
         logger.info("Editing agent access key")
-        wait = WebDriverWait(self._driver, 10, 0.001)
         
         try:
-            # Click on the edit button for the first row (the newly created key)
-            # Find row options buttons
-            buttons = wait.until(EC.visibility_of_all_elements_located((By.TAG_NAME, 'armo-row-options-button')))
-            
-            logger.info(f"Found {len(buttons)} row options buttons")
-
-            if not buttons:
-                raise Exception("No row options buttons found")
-            
-            # Click on the first button - this should be the newly created key
+            # Click on the edit button for the first row
+            buttons = self._find_row_options_buttons()
             buttons[0].click()
 
-            # Click on the edit option
-            options = self._driver.find_elements(By.CSS_SELECTOR, '.armo-button.table-more-actions.md')
-
-            if not options:
-                raise Exception("No options buttons found")
-            
+            # Click on the edit option (second option)
+            options = self._get_table_action_options()
             options[1].click()
 
             # Fill in new key name (append " edited" to the original name)
@@ -195,42 +202,29 @@ class AgentAccessKeys(BaseTest):
 
             # Verify the key was edited
             edited_key_name = self._interaction_manager.get_text('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/armo-agent-access-tokens-table/div/table/tbody/tr[1]/td[1]/span')
+            expected_name = f"{self.test_key_name} edited"
 
-            if edited_key_name != f"{self.test_key_name} edited":
-                raise Exception(f"Edited key name does not match expected value. Found: '{edited_key_name}', Expected: '{self.test_key_name} edited'")
+            if edited_key_name != expected_name:
+                raise Exception(f"Edited key name does not match expected value. Found: '{edited_key_name}', Expected: '{expected_name}'")
             
             logger.info("Agent access key edited successfully")
         except Exception as e:
-            logger.error(f"Failed to edit key: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_edit_key_{ClusterManager.get_current_timestamp()}.png")
+            self._handle_error("edit key", e)
 
     def delete_key(self):
         logger.info("Deleting agent access key")
-        wait = WebDriverWait(self._driver, 10, 0.001)
 
         num_of_access_keys = self._interaction_manager.count_rows(skip_header=False)
         logger.info(f"Current number of agent access keys: {num_of_access_keys}")
         
         try:
-            # Click on the delete button for the first row (the newly created key)
-            # Find row options buttons
-            buttons = wait.until(EC.visibility_of_all_elements_located((By.TAG_NAME, 'armo-row-options-button')))
-            
-            logger.info(f"Found {len(buttons)} row options buttons")
-
-            if not buttons:
-                raise Exception("No row options buttons found")
-            
-            # Click on the first button - this should be the newly created key
+            # Click on the delete button for the first row
+            buttons = self._find_row_options_buttons()
             buttons[0].click()
             time.sleep(1)  # Wait for the options to appear
 
-            # Click on the delete option
-            options = self._driver.find_elements(By.CSS_SELECTOR, '.armo-button.table-more-actions.md')
-
-            if not options:
-                raise Exception("No options buttons found")
-
+            # Click on the delete option (last option)
+            options = self._get_table_action_options()
             options[-1].click()
 
             time.sleep(1)  # Wait for the delete confirmation dialog to appear
@@ -250,5 +244,4 @@ class AgentAccessKeys(BaseTest):
             
             logger.info("Agent access key deleted successfully")
         except Exception as e:
-            logger.error(f"Failed to delete key: {str(e)}")
-            self._driver.save_screenshot(f"./failed_to_delete_key_{ClusterManager.get_current_timestamp()}.png")
+            self._handle_error("delete key", e)
