@@ -22,6 +22,7 @@ on:
         - vulnerabilities
         - attach-path
         - security-risk
+        - settings
         type: choice
         default: all
         required: true
