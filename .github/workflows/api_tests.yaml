@@ -374,8 +374,8 @@ jobs:
     - name: Run API test with VGW
       env:
         EMAIL: ${{ secrets.ST_EMAIL }}
-        CUSTOMER: ${{ secrets.ST_DEV_CUSTOMER }}
-        PASSWORD: ${{ secrets.ST_DEV_PASSWORD }}
+        CUSTOMER: ${{ secrets.ST_CUSTOMER }}
+        PASSWORD: ${{ secrets.ST_PASSWORD }}
         CUSTOMER_GUID: ${{ secrets.CUSTOMER_GUID_VGW }}
       run: |
         python test_api.py --email $EMAIL --customer $CUSTOMER --password $PASSWORD --customer_guid $CUSTOMER_GUID --log_name VGW
