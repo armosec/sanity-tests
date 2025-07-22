@@ -681,7 +681,7 @@ class IgnoreRule:
 
         # 2. Handle overlays more aggressively for headless mode
         try:
-            self._interaction_manager.handle_overlays_headless()
+            self._interaction_manager.close_all_overlays()
             # three_dots_xpath = "(//td[contains(@class, 'cdk-column-buttons')]//button[contains(@class, 'armo-button')])[1]"
             three_dots_xpath = '//armo-icon-button[contains(@svgsource, "more.svg#more")]//button'
             btn = self._interaction_manager.wait_until_interactable(three_dots_xpath)

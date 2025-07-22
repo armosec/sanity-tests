@@ -125,7 +125,7 @@ class AgentAccessKeys(BaseTest):
             helm_command = self._interaction_manager.get_text('div.command-area > span.ng-star-inserted', By.CSS_SELECTOR)
 
             # Close the side panel
-            self._interaction_manager.handle_overlays_headless()
+            self._interaction_manager.close_all_overlays()
 
             # Validate that the connect command contains the key value
             if f" --set accessKey={key_value}" not in helm_command:
