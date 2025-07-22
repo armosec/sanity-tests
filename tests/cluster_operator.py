@@ -243,10 +243,10 @@ class ClusterManager:
             self._driver.save_screenshot(f"./failed_to_click_second_overlay_button.png")
 
 
-    def click_button_by_text(self, button_text: str):
+    def click_button_by_text(self, button_text: str, button_type: str = "tertiary", button_size: str = "sm"):
         try:
             # Find all buttons with the specific class
-            buttons = self._driver.find_elements(By.CSS_SELECTOR, "button[class='armo-button tertiary sm']")
+            buttons = self._driver.find_elements(By.CSS_SELECTOR, f"button[class='armo-button {button_type} {button_size}']")
             
             for button in buttons:
                 if button.text.strip() == button_text:

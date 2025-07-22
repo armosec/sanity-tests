@@ -10,16 +10,15 @@ from ...cluster_operator import ClusterManager
 
 logger = logging.getLogger(__name__)
 
-class AgentAccessKeys(BaseTest):    
+class AgentAccessKeys(BaseTest):
     def run(self):
         logger.info("Starting Agent Access Keys test")
         
         self.navigate_to_agent_access_keys()
-        time.sleep(1)
         self.create_new_key()
         # copy is not working in headless mode
         # self.copy_key()
-        # self.change_default_key()
+        self.change_default_key()
         self.edit_key()
         self.delete_key()
         
@@ -29,6 +28,7 @@ class AgentAccessKeys(BaseTest):
         try:
             self._interaction_manager.click('agent-access-tokens-settings-left-menu-item', By.ID)
             logger.info("Successfully navigated to Agent Access Keys page")
+            time.sleep(1)  # Wait for the page to load
         except Exception as e:
             logger.error(f"Failed to navigate to Agent Access Keys page: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_navigate_agent_access_keys_{ClusterManager.get_current_timestamp()}.png")
@@ -100,19 +100,56 @@ class AgentAccessKeys(BaseTest):
             logger.error(f"Failed to copy key: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_copy_key_{ClusterManager.get_current_timestamp()}.png")
 
-    # def change_default_key(self):
-    #     logger.info("Changing default agent access key")
+    def change_default_key(self):
+        logger.info("Changing default agent access key")
         
-    #     # TODO: Implement default key change logic
-    #     try:
-    #         # Example placeholder logic:
-    #         # self._interaction_manager.click("//button[contains(text(), 'Set as Default')]", By.XPATH)
+        try:
+            # Click on the default radio button for the first row (the newly created key)
+            self._interaction_manager.click('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/armo-agent-access-tokens-table/div/table/tbody/tr[1]/td[5]/div/mat-radio-button')
+
+            # Get the key value
+            # Show the key value in the UI
+            self._interaction_manager.click('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/armo-agent-access-tokens-table/div/table/tbody/tr[1]/td[2]/div/armo-icon-button')
+            # Get the key value from the UI
+            key_value = self._interaction_manager.get_text('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/armo-agent-access-tokens-table/div/table/tbody/tr[1]/td[2]/div/span')
+
+            # Navigate to setup page
+            logger.info("Navigating to setup page to verify the default key")
+            self._interaction_manager.click('armo-finish-setup-navigation-widget', By.TAG_NAME)
+
+            # Open connect kubernetes cluster modal
+            self._interaction_manager.click('/html/body/armo-root/div/div/div/armo-finish-setup-page/armo-finish-setup-cards-list/div/armo-finish-setup-card[1]/armo-button')
+
+            # Get connection command
+            logger.info("Getting connection command from the modal")
+            helm_command = self._interaction_manager.get_text('div.command-area > span.ng-star-inserted', By.CSS_SELECTOR)
+
+            # Close the side panel
+            self._interaction_manager.handle_overlays_headless()
+
+            # Validate that the connect command contains the key value
+            if f" --set accessKey={key_value}" not in helm_command:
+                raise Exception(f"Default key value not found in connect command. Key: {key_value}, Command: {helm_command}")
             
-    #         logger.info("Default key changed successfully")
-    #         time.sleep(1)
-    #     except Exception as e:
-    #         logger.error(f"Failed to change default key: {str(e)}")
-    #         self._driver.save_screenshot(f"./failed_to_change_default_key_{ClusterManager.get_current_timestamp()}.png")
+            # Change the default key in the UI back to the original key
+            logger.info("Changing default key back to the original key")
+            self._interaction_manager.click('settings-left-menu-item', By.ID)  # Click on settings page
+            self.navigate_to_agent_access_keys()
+            # Click on the default radio button for the last row (the original key)
+            buttons = self._driver.find_elements(By.TAG_NAME, 'mat-radio-button')
+
+            logger.info(f"Found {len(buttons)} radio buttons")
+
+            if not buttons:
+                raise Exception("No radio buttons found")
+            
+            # Click on the last button - this should be the original key
+            buttons[-1].click()
+            
+            logger.info("Default key changed successfully")
+        except Exception as e:
+            logger.error(f"Failed to change default key: {str(e)}")
+            self._driver.save_screenshot(f"./failed_to_change_default_key_{ClusterManager.get_current_timestamp()}.png")
 
     def edit_key(self):
         logger.info("Editing agent access key")
@@ -132,15 +169,21 @@ class AgentAccessKeys(BaseTest):
             buttons[0].click()
 
             # Click on the edit option
-            self._interaction_manager.click('/html/body/div[5]/div[2]/div/div/div/div[2]/armo-button')
+            options = self._driver.find_elements(By.CSS_SELECTOR, '.armo-button.table-more-actions.md')
+
+            if not options:
+                raise Exception("No options buttons found")
+            
+            options[1].click()
 
             # Fill in new key name
-            self._interaction_manager.focus_and_send_text('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-agent-access-token-modal/div[2]/form/div/div[2]/mat-form-field/div[1]/div/div[2]/input', ' edited')
+            self._interaction_manager.focus_and_send_text('//*[@id="mat-input-1"]', ' edited')
 
             # Click on save button
-            self._interaction_manager.click('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-agent-access-token-modal/div[3]/armo-button[2]')
-            
-            time.sleep(1)  # Wait for the key to be edited
+            cluster_manager = ClusterManager(self._driver, self._wait)
+            cluster_manager.click_button_by_text('Save', 'primary', 'xl')
+
+            time.sleep(5)  # Wait for the changes to reflect and toast to disappear
 
             # Verify the key was edited
             edited_key_name = self._interaction_manager.get_text('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/armo-agent-access-tokens-table/div/table/tbody/tr[1]/td[1]/span')
@@ -172,12 +215,21 @@ class AgentAccessKeys(BaseTest):
             
             # Click on the first button - this should be the newly created key
             buttons[0].click()
+            time.sleep(1)  # Wait for the options to appear
 
             # Click on the delete option
-            self._interaction_manager.click('/html/body/div[5]/div[2]/div/div/div/div[3]/armo-button')
+            options = self._driver.find_elements(By.CSS_SELECTOR, '.armo-button.table-more-actions.md')
+
+            if not options:
+                raise Exception("No options buttons found")
+
+            options[-1].click()
+
+            time.sleep(1)  # Wait for the delete confirmation dialog to appear
 
             # Confirm deletion
-            self._interaction_manager.click('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-delete-confirm-modal/div[2]/armo-button[2]')
+            cluster_manager = ClusterManager(self._driver, self._wait)
+            cluster_manager.click_button_by_text('Delete', 'error', 'xl')
 
             time.sleep(1)  # Wait for the key to be deleted
 
