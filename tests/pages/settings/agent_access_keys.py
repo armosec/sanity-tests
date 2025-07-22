@@ -1,6 +1,7 @@
 import time
 import logging
 import pyperclip
+from datetime import datetime
 from ...base_test import BaseTest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -11,6 +12,13 @@ from ...cluster_operator import ClusterManager
 logger = logging.getLogger(__name__)
 
 class AgentAccessKeys(BaseTest):
+    def __init__(self, config):
+        super().__init__(config)
+        # Generate unique key name with readable date/time timestamp
+        readable_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.test_key_name = f"test {readable_timestamp}"
+        logger.info(f"Generated test key name: {self.test_key_name}")
+        
     def run(self):
         logger.info("Starting Agent Access Keys test")
         
@@ -35,7 +43,7 @@ class AgentAccessKeys(BaseTest):
             raise
 
     def create_new_key(self):
-        logger.info("Creating new agent access key")
+        logger.info(f"Creating new agent access key with name: {self.test_key_name}")
 
         # count_rows - skip_header=False so it counts all rows, there is probably an issue with the function
         num_of_access_keys = self._interaction_manager.count_rows(skip_header=False)
@@ -45,8 +53,8 @@ class AgentAccessKeys(BaseTest):
             # Click on "Create New Key" button (update selector as needed)
             self._interaction_manager.click('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/div/armo-button')
             
-            # Fill in key name
-            self._interaction_manager.focus_and_send_text('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-agent-access-token-modal/div[2]/form/div/div[2]/mat-form-field/div[1]/div/div[2]/input', 'test')
+            # Fill in key name with timestamp
+            self._interaction_manager.focus_and_send_text('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-agent-access-token-modal/div[2]/form/div/div[2]/mat-form-field/div[1]/div/div[2]/input', self.test_key_name)
 
             # Click on save button
             self._interaction_manager.click('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-agent-access-token-modal/div[3]/armo-button[2]', By.XPATH)
@@ -176,7 +184,7 @@ class AgentAccessKeys(BaseTest):
             
             options[1].click()
 
-            # Fill in new key name
+            # Fill in new key name (append " edited" to the original name)
             self._interaction_manager.focus_and_send_text('//*[@id="mat-input-1"]', ' edited')
 
             # Click on save button
@@ -188,8 +196,8 @@ class AgentAccessKeys(BaseTest):
             # Verify the key was edited
             edited_key_name = self._interaction_manager.get_text('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/armo-agent-access-tokens-table/div/table/tbody/tr[1]/td[1]/span')
 
-            if edited_key_name != 'test edited':
-                raise Exception(f"Edited key name does not match expected value. Found: {edited_key_name}, Expected: 'test edited'")
+            if edited_key_name != f"{self.test_key_name} edited":
+                raise Exception(f"Edited key name does not match expected value. Found: '{edited_key_name}', Expected: '{self.test_key_name} edited'")
             
             logger.info("Agent access key edited successfully")
         except Exception as e:
