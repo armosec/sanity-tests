@@ -1,4 +1,4 @@
-name: user-flow-tests-1clustert
+name: user-flow-tests-1cluster
 # this workflow is for testing the user flow on a single cluster
 
 on:
