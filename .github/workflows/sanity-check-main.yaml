@@ -28,32 +28,32 @@ jobs:
                       ]'
     secrets: inherit
 
-  # us-test:
-  #   permissions:  
-  #     contents: write 
-  #     actions: read
-  #   name: sanity-check-us
-  #   uses: ./.github/workflows/sanity-check-us.yaml 
-  #   with:
-  #     RETRY_JOB: false
-  #     BINARY_TESTS: '[ 
-  #                       "scan_nsa_and_submit_to_backend"
-  #                     ]'
-  #   secrets: inherit
+  us-test:
+    permissions:  
+      contents: write 
+      actions: read
+    name: sanity-check-us
+    uses: ./.github/workflows/sanity-check-us.yaml 
+    with:
+      RETRY_JOB: false
+      BINARY_TESTS: '[ 
+                        "scan_nsa_and_submit_to_backend"
+                      ]'
+    secrets: inherit
 
-  # better-up-time:
-  #   needs: [eu-test, us-test]
-  #   name: better-up-time
-  #   runs-on: ubuntu-latest
-  #   if: failure()
-  #   #if: ${{ contains(needs.*.result, 'failure') }}
-  #   steps:
-  #     - run: |
-  #         curl --request POST \
-  #           --url https://betteruptime.com/api/v2/incidents \
-  #           --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
-  #           --header 'Content-Type: application/json' \
-  #           --data '{"summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed ! "}'
+  better-up-time:
+    needs: [eu-test, us-test]
+    name: better-up-time
+    runs-on: ubuntu-latest
+    if: failure()
+    #if: ${{ contains(needs.*.result, 'failure') }}
+    steps:
+      - run: |
+          curl --request POST \
+            --url https://betteruptime.com/api/v2/incidents \
+            --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
+            --header 'Content-Type: application/json' \
+            --data '{"summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed ! "}'
 
   call-eu-reran:
     permissions:  
