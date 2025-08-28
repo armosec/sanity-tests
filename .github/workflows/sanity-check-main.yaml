@@ -41,20 +41,6 @@ jobs:
                       ]'
     secrets: inherit
 
-  better-up-time:
-    needs: [eu-test, us-test]
-    name: better-up-time
-    runs-on: ubuntu-latest
-    if: failure()
-    #if: ${{ contains(needs.*.result, 'failure') }}
-    steps:
-      - run: |
-          curl --request POST \
-            --url https://betteruptime.com/api/v2/incidents \
-            --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
-            --header 'Content-Type: application/json' \
-            --data '{"summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed ! "}'
-
   call-eu-reran:
     permissions:  
       contents: write 
@@ -70,17 +56,46 @@ jobs:
                       ]'
     secrets: inherit
 
-  # call-us-reran:
-  #   permissions:  
-  #     contents: write 
-  #     actions: read
-  #   needs: [us-test]
-  #   if: ${{ failure() && needs.us-test.result != 'success' }}  # Run only if us-test fails
-  #   name: repeated-us-test
-  #   uses: ./.github/workflows/sanity-check-us.yaml # @sanity_check
-  #   with:
-  #     RETRY_JOB: true
-  #     BINARY_TESTS: '[ 
-  #                       "scan_nsa_and_submit_to_backend"
-  #                     ]'
-  #   secrets: inherit
+  call-us-reran:
+    permissions:  
+      contents: write 
+      actions: read
+    needs: [us-test]
+    if: ${{ failure() && needs.us-test.result != 'success' }}  # Run only if us-test fails
+    name: repeated-us-test
+    uses: ./.github/workflows/sanity-check-us.yaml # @sanity_check
+    with:
+      RETRY_JOB: true
+      BINARY_TESTS: '[ 
+                        "scan_nsa_and_submit_to_backend"
+                      ]'
+    secrets: inherit
+
+  better-up-time-for-eu:
+    needs: [eu-test]
+    name: better-up-time-for-eu
+    runs-on: ubuntu-latest
+    if: failure()
+    #if: ${{ contains(needs.*.result, 'failure') }}
+    steps:
+      - run: |
+          curl --request POST \
+            --url https://uptime.betterstack.com/api/v3/incidents \
+            --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
+            --header 'Content-Type: application/json' \
+            --data '{"name": "Sanity check failed: EU","summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed on EU! "}'
+
+  better-up-time-for-us:
+    needs: [us-test]
+    name: better-up-time-for-us
+    runs-on: ubuntu-latest
+    if: failure()
+    #if: ${{ contains(needs.*.result, 'failure') }}
+    steps:
+      - run: |
+          curl --request POST \
+            --url https://uptime.betterstack.com/api/v3/incidents \
+            --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
+            --header 'Content-Type: application/json' \
+            --data '{"name": "Sanity check failed: US","summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed on US! "}'  
+            
