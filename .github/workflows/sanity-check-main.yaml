@@ -72,7 +72,7 @@ jobs:
     secrets: inherit
 
   better-up-time-for-eu:
-    needs: [eu-test]
+    needs: [call-eu-reran]
     name: better-up-time-for-eu
     runs-on: ubuntu-latest
     if: failure()
@@ -86,7 +86,7 @@ jobs:
             --data '{"name": "Sanity check failed: EU","summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed on EU! "}'
 
   better-up-time-for-us:
-    needs: [us-test]
+    needs: [call-us-reran]
     name: better-up-time-for-us
     runs-on: ubuntu-latest
     if: failure()
