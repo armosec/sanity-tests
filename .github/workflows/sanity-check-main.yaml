@@ -76,7 +76,7 @@ jobs:
     name: better-up-time-for-eu
     runs-on: ubuntu-latest
     # if: failure()
-    if: ${{ needs.call-eu-reran.result == 'failure' }}
+    if: ${{ always() && needs.call-eu-reran.result == 'failure' }}
     steps:
       - run: |
           curl --request POST \
@@ -90,7 +90,7 @@ jobs:
     name: better-up-time-for-us
     runs-on: ubuntu-latest
     # if: failure()
-    if: ${{ needs.call-us-reran.result == 'failure' }}
+    if: ${{ always() && needs.call-us-reran.result == 'failure' }}
     steps:
       - run: |
           curl --request POST \
