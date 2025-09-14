@@ -40,10 +40,10 @@ jobs:
           if: failure() && steps.sso-login-test.outcome == 'failure'
           run: |
             curl --request POST \
-              --url https://betteruptime.com/api/v2/incidents \
+              --url https://uptime.betterstack.com/api/v3/incidents \
               --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
               --header 'Content-Type: application/json' \
-              --data '{"summary": "Production Incident","sms": "true", "email": "true", "call": "false", "requester_email": "borisv@armosec.io", "description": "SSO login test failed ! "}'
+              --data '{"name": "SSO login test failed! ","summary": "SSO login test failed on EU!","sms": "true", "email": "true", "call": "false", "requester_email": "borisv@armosec.io", "description": "SSO login test failed on EU! "}'  
 
         - name: upload screenshots
           uses: actions/upload-artifact@v4
