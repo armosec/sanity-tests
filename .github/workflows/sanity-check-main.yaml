@@ -71,31 +71,31 @@ jobs:
                       ]'
     secrets: inherit
 
-  better-up-time-for-eu:
-    needs: [call-eu-reran]
-    name: better-up-time-for-eu
-    runs-on: ubuntu-latest
+  #better-up-time-for-eu:
+    #needs: [call-eu-reran]
+    #name: better-up-time-for-eu
+    #runs-on: ubuntu-latest
     # if: failure()
-    if: ${{ always() && needs.call-eu-reran.result == 'failure' }}
-    steps:
-      - run: |
-          curl --request POST \
-            --url https://uptime.betterstack.com/api/v3/incidents \
-            --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
-            --header 'Content-Type: application/json' \
-            --data '{"name": "Sanity check failed: EU","summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed on EU! "}'
+    #if: ${{ always() && needs.call-eu-reran.result == 'failure' }}
+    #steps:
+      #- run: |
+          #curl --request POST \
+            #--url https://uptime.betterstack.com/api/v3/incidents \
+           # --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
+          #  --header 'Content-Type: application/json' \
+         #   --data '{"name": "Sanity check failed: EU","summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed on EU! "}'
 
-  better-up-time-for-us:
-    needs: [call-us-reran]
-    name: better-up-time-for-us
-    runs-on: ubuntu-latest
+#  better-up-time-for-us:
+ #   needs: [call-us-reran]
+  #  name: better-up-time-for-us
+   # runs-on: ubuntu-latest
     # if: failure()
-    if: ${{ always() && needs.call-us-reran.result == 'failure' }}
-    steps:
-      - run: |
-          curl --request POST \
-            --url https://uptime.betterstack.com/api/v3/incidents \
-            --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
+    #if: ${{ always() && needs.call-us-reran.result == 'failure' }}
+    #steps:
+     # - run: |
+      #    curl --request POST \
+       #     --url https://uptime.betterstack.com/api/v3/incidents \
+        #    --header "Authorization: Bearer ${{ secrets.BETTER_UPTIME_TOKEN }}" \
             --header 'Content-Type: application/json' \
             --data '{"name": "Sanity check failed: US","summary": "Production Incident","sms": "false", "email": "true", "call": "true", "requester_email": "borisv@armosec.io", "description": "Sanity check failed on US! "}'  
             
