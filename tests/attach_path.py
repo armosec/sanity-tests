@@ -32,7 +32,7 @@ class AttachPath(BaseTest):
                 connect_cluster.view_connected_cluster()
                 
             self.navigate_to_attach_path()
-            # self.risk_acceptance_page()
+            self.risk_acceptance_page()
         finally:
             # Only perform cleanup if we created a cluster
             if self._create_cluster:
@@ -81,6 +81,8 @@ class AttachPath(BaseTest):
 
                 # Verify and click first description (attack path)
                 self.click_on_attach_path(1, wait, driver, interaction_manager)
+                ClusterManager.press_esc_key(driver)
+                time.sleep(1)
 
                 try:
                     interaction_manager.click("//button[contains(@class, 'armo-button') and contains(@class, 'tertiary') and contains(@class, 'lg') and text()=' Attack Path ']", by=By.XPATH)
@@ -106,6 +108,7 @@ class AttachPath(BaseTest):
 
     def click_on_attach_path(self, index, wait, driver, interaction_manager):
         cluster_manager = ClusterManager(driver, wait)
+        interaction_manager = InteractionManager(driver)
         try:
             descriptions = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[data-test-id='description']")))
             description_element = descriptions[index]
@@ -129,8 +132,8 @@ class AttachPath(BaseTest):
 
                 cluster_manager.press_esc_key(driver)
                 time.sleep(1)
-                # self.create_ignore_rule(driver) 
-                # time.sleep(3)
+                self.create_ignore_rule(driver) 
+                time.sleep(3)
              
                 interaction_manager.click("armo-attack-chain-graph-node[data-test-id='node-Initial Access']", by=By.CSS_SELECTOR)
                 logger.info("Clicked on 'Initial Access' node.")
@@ -148,6 +151,8 @@ class AttachPath(BaseTest):
                     logger.error("SBS yamls - The number of rows is NOT equal.")
                 time.sleep(2)
                 ClusterManager.press_esc_key(driver)
+                time.sleep(1)
+
             else:
                 interaction_manager.click("armo-fix-button[data-test-id='fix-button'] button", by=By.CSS_SELECTOR)
                 logger.info("Clicked on 'Fix' button.")

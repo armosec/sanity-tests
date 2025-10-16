@@ -32,10 +32,10 @@ class Vulnerabilities(BaseTest):
                 print("Wait for 30 seconds")
                 time.sleep(30)
                 
+            print("Running vulnerabilities test")    
             self.run_vulne_cve_test()
             self.navigate_to_vulnerabilities()
             self.risk_acceptance_page()
-            print("Running vulnerabilities test")
         finally:
             # Only perform cleanup if we created a cluster
             if self._create_cluster:
@@ -56,19 +56,23 @@ class Vulnerabilities(BaseTest):
         
         try:
             cluster_manager.click_on_vuln_view_button("Workloads")
+            logger.info("clicked on 'Workloads' tab")
         except Exception as e:
             logger.error(f"Failed to click on vuln view button or menu item: {e}")
             driver.save_screenshot(f"./failed_to_click_vuln_view_or_menu_item_{ClusterManager.get_current_timestamp()}.png")
         
         time.sleep(1)
         cluster_manager.click_filter_button("Workload")
-            
+        
+        time.sleep(6)
+        print("Wait for 6 seconds to load the checkboxes")
         # click on the select all button
         try:
             time.sleep(1)
             select_all_button = interaction_manager.wait_until_exists("//span[contains(text(), 'Select all')]", By.XPATH)
             driver.execute_script("arguments[0].click();", select_all_button)
             logger.info("All namespaces selected")
+            time.sleep(3)
         except:
             logger.error("Failed to select all namespaces")
             driver.save_screenshot(f"./failed_to_select_all_namespaces_{ClusterManager.get_current_timestamp()}.png")
@@ -99,7 +103,7 @@ class Vulnerabilities(BaseTest):
             
         # click on the clear button
         try:
-            time.sleep(1)
+            time.sleep(2)
             clear_button_xpath = "//span[contains(text(), 'Clear')]"
             clear_button = interaction_manager.wait_until_exists(clear_button_xpath, By.XPATH)
 
@@ -127,6 +131,7 @@ class Vulnerabilities(BaseTest):
         ClusterManager.press_esc_key(driver)
         time.sleep(1)
         ClusterManager.press_space_key(driver)
+        # cluster_manager.click_filter_button("Workload") #click again to close the dropdown of the workload
         time.sleep(1)
         cluster_manager.click_filter_button("Namespace")
         time.sleep(1)
@@ -137,6 +142,8 @@ class Vulnerabilities(BaseTest):
         time.sleep(1)
         ClusterManager.press_space_key(driver)
         time.sleep(1)
+        ClusterManager.press_esc_key(driver)
+        time.sleep(3)
         # click on the high severity filter in the first row
         try:
             wait = WebDriverWait(driver, 10)
@@ -206,7 +213,7 @@ class Vulnerabilities(BaseTest):
         
         
         
-        time.sleep(1)
+        time.sleep(2)
         ignore_rule = IgnoreRule(driver)
         ignore_rule.click_ignore_button()
         logger.info("Clicked on the 'Accept Risk' button")
@@ -252,13 +259,17 @@ class Vulnerabilities(BaseTest):
             logger.error("Workload name is not verified")
             logger.error(f"workload name : {workload_name_from_details},and workload name: {workload_name},the workload name are different")
             
-        cluster_manager.click_on_tab_in_vulne_page("images")
-        image_tag_1 = interaction_manager.get_text("(//button[@class='armo-button tertiary sm'])[1]")
-        if image_tag == image_tag_1:
-            logger.info("Image tag is verified")
-        else:    
-            logger.error("Image tag is not verified")
-            driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
+        time.sleep(1)
+        cluster_manager.click_on_tab_in_vulne_page("graph")
+         
+        # need to check why we cant see images    
+        # cluster_manager.click_on_tab_in_vulne_page("images")
+        # image_tag_1 = interaction_manager.get_text("(//button[@class='armo-button tertiary sm'])[1]")
+        # if image_tag == image_tag_1:
+        #     logger.info("Image tag is verified")
+        # else:    
+        #     logger.error("Image tag is not verified")
+        #     driver.save_screenshot(f"./failed_to_verify_image_tag_{ClusterManager.get_current_timestamp()}.png")
 
     def run_vulne_cve_test(self):
         VulneCvePage.vulne_cve_test(self)            

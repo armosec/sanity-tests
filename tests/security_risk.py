@@ -85,7 +85,7 @@ class SecurityRisk(BaseTest):
         Processes a given risk category by selecting the category, comparing values, applying filters, and verifying namespace.
         """
         cluster_manager = ClusterManager(self._driver, self._wait)
-        logger.info(f"Processing Risk Category: {category_name}")
+        logger.info(f"^^______Processing Risk Category:  {category_name} ______^^")
         cluster_manager.click_button_by_text(category_name)
         
         # Compare values on the page
@@ -154,14 +154,17 @@ class SecurityRisk(BaseTest):
             logger.info(f"Namespace {namespace} is verified") 
         else:
             logger.error(f"Namespace {namespace} is not verified")
-        print("TETST")
-        time.sleep(2)
-        # Click on the namespace row >
-        interaction_manager.click("armo-item-by-control button.armo-button.table-secondary.sm",by=By.CSS_SELECTOR)
-        # time.sleep(1)
-        # cluster_manager.click_button_in_namespace_row(category_name,namespace)
-        print("TEST2")
         time.sleep(1)
+        # if category_name == "Data" or category_name == "Workloads":
+        #     # Click on the namespace row >
+        #     interaction_manager.click("armo-item-by-control button.armo-button.table-secondary.sm",by=By.CSS_SELECTOR)
+        # elif category_name == "Attack path":
+            
+        #     interaction_manager.click("td.cdk-column-action button.armo-button.table-secondary.sm",by=By.CSS_SELECTOR)
+            
+        # time.sleep(1)
+        cluster_manager.click_button_in_namespace_row(category_name,namespace)
+        time.sleep(2)
         if category_name == "Data" or category_name == "Workloads":
             if AttachPath.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
                 logger.info("SBS yamls - The number of rows is equal .")
@@ -201,7 +204,7 @@ class SecurityRisk(BaseTest):
             
             after_risk, _ = self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
             
-            if int(before_risk[0]) == int(after_risk) + 1:
+            if int(before_risk) == int(after_risk) + 1:
                 logger.info("The risk has been accepted- and the counters are correct")
             else:
                 logger.error(f"The counters are incorrect: before_risk: {before_risk}, after_risk: {after_risk}") 
@@ -213,8 +216,8 @@ class SecurityRisk(BaseTest):
             time.sleep(2)
             
             after__delete_risk, _ = self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
-            
-            if int(after__delete_risk[0]) == int(after_risk) + 1:
+
+            if int(after__delete_risk) == int(after_risk) + 1:
                 logger.info("The risk has been accepted- and the counters are correct")
             else:
                 logger.error(f"The counters are incorrect: before_delete_risk: {before_risk}, after_delete_risk: {after_risk}") 
@@ -243,7 +246,7 @@ class SecurityRisk(BaseTest):
         else:
             risk_accept.click_ignore_rule_button_sidebar()
 
-        time.sleep(1)
+        time.sleep(2)
         container_name = risk_accept.get_ignore_rule_field(2)
         logger.info(f"Container name: {container_name}")
         time.sleep(1.5)

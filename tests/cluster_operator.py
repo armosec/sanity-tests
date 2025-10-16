@@ -313,6 +313,7 @@ class ClusterManager:
         except Exception as e:
             logger.error(f"Failed to click on the button with text '{button_text}' in the most recent cdk-overlay: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_button_in_cdk_overlay_{ClusterManager.get_current_timestamp()}.png")
+            raise
 
 
     def click_checkbox_by_name(self, label_name):
@@ -340,6 +341,7 @@ class ClusterManager:
             self._driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", checkbox_input)
 
             # Click the checkbox using JavaScript to bypass potential overlay issues
+            time.sleep(1)
             self._driver.execute_script("arguments[0].click();", checkbox_input)
             logger.info(f"Successfully clicked the checkbox labeled '{label_name}'.")
         except Exception as e:
@@ -374,7 +376,7 @@ class ClusterManager:
            
             
     def get_namespace_from_element(self, category_name: str):
-        logger.info(f"Category name: {category_name}")
+        logger.info(f"______Category name:  {category_name} ______")
         try:
             if category_name == "Workloads" or category_name == "Data":
                 wait = WebDriverWait(self._driver, 30)  # Wait for up to 30 seconds
@@ -419,18 +421,17 @@ class ClusterManager:
     def click_button_in_namespace_row(self, category_name, expected_namespace: str):
         try:
             if category_name == "Workloads" or category_name == "Data":
-                overlay_panes = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
-
-                if not overlay_panes:
-                    logger.error("No cdk-overlay-pane elements found.")
-                    return
-
-                most_recent_overlay = overlay_panes[-1]
-
-                buttons = most_recent_overlay.find_elements(By.CSS_SELECTOR, "button.armo-button.table-secondary.sm")
-
-                if len(buttons) < 2:
-                    logger.error("Less than two 'armo-button.table-secondary.sm' buttons found in the overlay.")
+                button_selector = "div.cdk-overlay-pane button.armo-button.table-secondary.sm"
+                
+                try:
+                    buttons = WebDriverWait(self._driver, 15).until(
+                        lambda d: d.find_elements(By.CSS_SELECTOR, button_selector) if len(d.find_elements(By.CSS_SELECTOR, button_selector)) >= 2 else None
+                    )
+                    logger.info(f"Found {len(buttons)} buttons in the overlay, proceeding.")
+                except TimeoutException:
+                    # If the wait times out, it means we never found 2 buttons.
+                    button_count = len(self._driver.find_elements(By.CSS_SELECTOR, button_selector))
+                    logger.error(f"Timed out waiting for at least 2 buttons. Found only {button_count}.")
                     self._driver.save_screenshot(f"./too_few_buttons_in_overlay_{ClusterManager.get_current_timestamp()}.png")
                     return
 
@@ -675,8 +676,6 @@ class IgnoreRule:
         """Click the 3-dots menu button and then click the ignore button - headless-friendly version"""
         # Allow the page to stabilize
         time.sleep(2)
-        # 1. Set a fixed window size that works consistently
-        self._driver.set_window_size(1920, 1080)
         accept_xpath = "//div[contains(@class, 'cdk-overlay-pane')]//button[.//span[normalize-space()='Accept Risk']]"
 
         # 2. Handle overlays more aggressively for headless mode
@@ -751,21 +750,30 @@ class IgnoreRule:
 
     def get_ignore_rule_field(self, index, timeout=10):
         css_selector = "div.mat-mdc-menu-trigger.field.pointer.ng-star-inserted"
-        save_button_xpath = "//button[contains(text(), 'Save')]"
         
-        WebDriverWait(self._driver, timeout).until(
-            EC.element_to_be_clickable((By.XPATH, save_button_xpath)))
-        logger.info("Save button is clickable - page fully loaded!")
+        try:
+            all_fields = WebDriverWait(self._driver, timeout).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, css_selector))
+            )
+            logger.info(f"Found {len(all_fields)} fields.")
 
-        all_fields = self._driver.find_elements(By.CSS_SELECTOR, css_selector)
-        logger.info(f"Found {len(all_fields)} fields.")
+            if index >= len(all_fields):
+                raise IndexError(f"Requested index {index}, but only {len(all_fields)} fields were found.")
 
-        if index >= len(all_fields):
-            raise IndexError(f"Requested index {index}, but only {len(all_fields)} fields were found.")
-
-        field_element = all_fields[index]
-        span = field_element.find_element(By.CSS_SELECTOR, "span.field-value")
-        return span.text.strip()
+            field_element = all_fields[index]
+            span = field_element.find_element(By.CSS_SELECTOR, "span.field-value")
+            
+            # Use get_attribute('textContent') for better reliability
+            resource_name = span.get_attribute('textContent').strip()
+            
+            # Add a log to see what was actually captured
+            logger.info(f"Field at index {index} has value: '{resource_name}'")
+            return resource_name
+            
+        except TimeoutException:
+            logger.error(f"Timed out waiting for fields with selector '{css_selector}' to appear.")
+            self._driver.save_screenshot(f"./headless_fields_not_found_{ClusterManager.get_current_timestamp()}.png")
+            raise
     
     def save_ignore_rule(self):
         save_xpath = "//mat-dialog-container//button[contains(text(), 'Save')]"
@@ -813,41 +821,33 @@ class IgnoreRule:
             logger.info("The icon changed to ignored.")
         else:
             logger.error("The icon does NOT change to ignored.")
-
-    def perform_delete_ignore_rule(self):
+            
+        
+    def click_delete_icon_in_modal(self):
+        """Waits for the edit modal to be stable, then clicks the delete (trash can) icon."""
         try:
-            # Step 1: Click the trash can icon to initiate the revoke dialog
-            logger.info("Looking for the 'Delete/Revoke' icon button...")
-            delete_btn_xpath = "//armo-icon-button[contains(@svgsource, 'trash-can.svg')]//button"
-            delete_btn = WebDriverWait(self._driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, delete_btn_xpath))
-            )
-            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", delete_btn)
-            time.sleep(0.5)
+            delete_btn_xpath = "//mat-dialog-container//armo-icon-button[contains(@svgsource, 'trash-can.svg')]//button"
+            delete_btn = self._driver.find_element(By.XPATH, delete_btn_xpath)
             self._driver.execute_script("arguments[0].click();", delete_btn)
             logger.info("Clicked on the delete/revoke icon button.")
 
-            # Step 2: Wait for the confirmation modal and click "Yes, Revoke"
-            logger.info("Waiting for confirmation modal...")
+        except Exception as e:
+            logger.error(f"Failed to click the delete icon in the modal: {e}")
+            self._driver.save_screenshot("error_clicking_delete_icon.png")
+            raise
+
+    def click_confirm_revoke_button(self):
+        """Waits for the confirmation dialog and clicks 'Yes, Revoke'."""
+        try:
             confirm_btn_xpath = "//mat-dialog-container//button[contains(text(), 'Yes, Revoke')]"
-            confirm_btn = WebDriverWait(self._driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, confirm_btn_xpath))
-            )
-            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", confirm_btn)
-            time.sleep(0.5)
+            confirm_btn = self._driver.find_element(By.XPATH, confirm_btn_xpath)
             self._driver.execute_script("arguments[0].click();", confirm_btn)
             logger.info("Clicked on 'Yes, Revoke' to confirm deletion.")
 
-            # Optional: wait until dialog disappears
-            WebDriverWait(self._driver, 10).until_not(
-                EC.presence_of_element_located((By.XPATH, confirm_btn_xpath))
-            )
-
         except Exception as e:
-            logger.error(f"Failed to delete/revoke ignore rule: {e}")
-            self._driver.save_screenshot("error_revoke_delete.png")
+            logger.error(f"Failed to click the 'Yes, Revoke' confirmation button: {e}")
+            self._driver.save_screenshot("error_confirming_revoke.png")
             raise
-
 
 class RiskAcceptancePage:
     def __init__(self, driver):
@@ -931,7 +931,11 @@ class RiskAcceptancePage:
     def delete_ignore_rule(self):
         try:
             ignore_rule = IgnoreRule(self._driver)
-            ignore_rule.perform_delete_ignore_rule()
+            # ignore_rule.perform_delete_ignore_rule()
+            ignore_rule.click_delete_icon_in_modal()
+            time.sleep(4)  # Short wait to allow the confirmation dialog to appear
+            ignore_rule.click_confirm_revoke_button()
+            logger.info("Ignore rule deleted successfully.")
             time.sleep(4)
         except Exception as e:
             logger.error(f"Failed to delete ignore rule: {e}")

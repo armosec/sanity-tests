@@ -33,6 +33,20 @@ class Compliance(BaseTest):
             self.navigate_to_compliance()
             self.risk_acceptance_page()
         finally:
+
+            try:
+                if len(self._driver.window_handles) > 1:
+                    main_window = self._driver.window_handles[0]
+                    # Close all other windows
+                    for handle in self._driver.window_handles[1:]:
+                        self._driver.switch_to.window(handle)
+                        self._driver.close()
+                    # Switch back to the main window for a clean exit
+                    self._driver.switch_to.window(main_window)
+            except Exception as e:
+                logger.warning(f"An error occurred while closing extra windows: {e}")
+            # *** END OF MODIFICATION ***
+
             # Only perform cleanup if we created a cluster
             if self._create_cluster:
                 self.perform_cleanup()
@@ -181,7 +195,7 @@ class Compliance(BaseTest):
         risk_acceptance.click_severity_element("td.mat-mdc-cell span.high-severity-color")
         time.sleep(1)
         risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
-        time.sleep(2.5)
+        time.sleep(4)
         risk_acceptance.delete_ignore_rule()
         time.sleep(3)
         

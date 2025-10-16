@@ -27,60 +27,79 @@ class VulneCvePage(BaseTest):
         
         time.sleep(1)    
         cluster_manager.click_filter_button("Namespace") 
-        time.sleep(1)
+        time.sleep(5)
         cluster_manager.click_checkbox_by_name("attack-suite")  #default
         time.sleep(1)
         ClusterManager.click_close_filter(driver)
         time.sleep(1)
         cluster_manager.click_filter_button("Workload")
-        time.sleep(1)
+        time.sleep(3)
         cluster_manager.click_checkbox_by_name("ping-app")   #alpine-deployment
         time.sleep(1)
         ClusterManager.click_close_filter(driver,index=1)
         time.sleep(1)   
         cluster_manager.click_filter_button("In Use")
-        time.sleep(0.5)
-        yes_inUse_xpath = "//li[contains(@class, 'd-flex align-items-center') and .//span[text()='Yes']]"
-        interaction_manager.click(yes_inUse_xpath, By.XPATH)
-        cluster_manager.press_esc_key(driver)
         time.sleep(1)
+
+        yes_inUse_xpath = "//li[contains(@class, 'd-flex align-items-center')]//span[text()='Yes']"
+        yes_element = interaction_manager.wait_until_exists(yes_inUse_xpath, By.XPATH)
+        driver.execute_script("arguments[0].click();", yes_element)
+        logger.info("Successfully clicked 'Yes' in the 'In Use' filter.")
+        # interaction_manager.click(yes_inUse_xpath, By.XPATH)
+        ClusterManager.press_space_key(driver)  
+        time.sleep(1)
+        # cluster_manager.press_esc_key(driver)
+        # time.sleep(1)
         cluster_manager.click_filter_button("Severity")
         time.sleep(1)
         cluster_manager.click_checkbox_by_name("Medium") 
         time.sleep(1)
         ClusterManager.press_space_key(driver)     
-        time.sleep(1)
+        time.sleep(2)
         
-        # ignore_rule = IgnoreRule(driver)
-        # ignore_rule.click_ignore_button()
-        # logger.info("Clicked on the 'Accept Risk' button")
-        # time.sleep(1)
-        # ignore_rule.save_ignore_rule()
+        ignore_rule = IgnoreRule(driver)
+        ignore_rule.click_ignore_button()
+        logger.info("Clicked on the 'Accept Risk' button")
+        time.sleep(1)
+        ignore_rule.save_ignore_rule()
         
         time.sleep(2)
         # Click on the first row
         try:
-            cve_cells = self._driver.find_elements(By.XPATH, "//span[normalize-space(text())='Medium']")
+            cve_cells = self._driver.find_elements(By.XPATH, "//span[contains(@class, 'medium-severity-color') and normalize-space(text())='Medium']")
 
             # Check if there are any elements found and click the first one
             if cve_cells:
-                cve_cells[0].click()
+                print("TEST")
+                # cve_cells[2].click()
+                interaction_manager.click("//span[contains(@class, 'medium-severity-color') and normalize-space(text())='Medium']", By.XPATH,index=2)
                 logger.info("Clicked on the first matching CVE cell.")
             else:
                 logger.error("No matching CVE cells found.")
                 driver.save_screenshot(f"./no_matching_cve_cells_{ClusterManager.get_current_timestamp()}.png")
         except TimeoutException:
             logger.error("Failed to click on the first row")
-        
-        time.sleep(1)
-
+        driver.save_screenshot(f"./cve_cell_clicked.png")
+        try:
+            # Wait for a unique and stable element in the sidebar that appears after the click.
+            sidebar_title_xpath = "//span[normalize-space(text())='Medium']"
+            WebDriverWait(self._driver, 15).until(
+                EC.visibility_of_element_located((By.XPATH, sidebar_title_xpath))
+            )
+            logger.info("CVE details table has appeared and is stable.")
+        except TimeoutException:
+            logger.error("CVE details table did not appear after clicking the CVE cell.")
+            self._driver.save_screenshot(f"./cve_details_table_failed_to_load_{ClusterManager.get_current_timestamp()}.png")
+            raise
 
         cve_severity = interaction_manager.get_text("//span[contains(@class, 'medium-severity-color') and normalize-space(text())='Medium']")
         logger.info(f"Severity: {cve_severity}")
      
+        driver.save_screenshot(f"./cve_details.png")
         button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//armo-button[contains(@class, 'link-button') and .//button[contains(@class, 'armo-button') and contains(@class, 'tertiary') and contains(@class, 'sm')]]")))
         button.click()
         time.sleep(1)
+
         cluster_manager.click_tab_on_sidebar(tab_name="Runtime Analysis")
         time.sleep(1)
         
@@ -90,7 +109,21 @@ class VulneCvePage(BaseTest):
         workload_name = interaction_manager.get_text("//span[text()='Workload']/ancestor::td/following-sibling::td")
         cluster_manager.press_esc_key(driver)
         time.sleep(1)
+
         cluster_manager.click_on_tab_in_vulne_page("images")
+        time.sleep(1)
+        
+        try:
+            # Wait for the table to load by checking for a known element
+            WebDriverWait(driver, 15).until(
+                EC.visibility_of_element_located((By.XPATH, "//td[contains(@class, 'cdk-column-workload')]//span[@uicustomtooltip]"))
+            )
+            logger.info("Images tab table loaded successfully.")
+        except TimeoutException:
+            logger.error("Images tab table did not load in time.")
+            driver.save_screenshot(f"./images_tab_table_failed_to_load_{ClusterManager.get_current_timestamp()}.png")
+            raise
+
         workload_name_1 = interaction_manager.get_text("//td[contains(@class, 'cdk-column-workload')]//span[@uicustomtooltip]")
 
         if workload_name == workload_name_1:
@@ -102,3 +135,17 @@ class VulneCvePage(BaseTest):
         time.sleep(1)
         cluster_manager.click_on_tab_in_vulne_page("workloads",index=1)
         time.sleep(1)
+        
+        risk_acceptance = RiskAcceptancePage(self._driver)
+        time.sleep(3)
+        risk_acceptance.navigate_to_page()
+        logger.info("Navigated to risk acceptance page")
+        time.sleep(1)
+        risk_acceptance.switch_tab("Vulnerabilities")
+        time.sleep(2)
+        risk_acceptance.click_severity_element("span.medium-severity-color")
+        time.sleep(2)
+        risk_acceptance.click_edit_button("//armo-button[@buttontype='primary']//button[text()='Edit']")
+        time.sleep(3)
+        risk_acceptance.delete_ignore_rule()
+        time.sleep(3)
