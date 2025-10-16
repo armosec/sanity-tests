@@ -45,11 +45,9 @@ class VulneCvePage(BaseTest):
         yes_element = interaction_manager.wait_until_exists(yes_inUse_xpath, By.XPATH)
         driver.execute_script("arguments[0].click();", yes_element)
         logger.info("Successfully clicked 'Yes' in the 'In Use' filter.")
-        # interaction_manager.click(yes_inUse_xpath, By.XPATH)
+
         ClusterManager.press_space_key(driver)  
         time.sleep(1)
-        # cluster_manager.press_esc_key(driver)
-        # time.sleep(1)
         cluster_manager.click_filter_button("Severity")
         time.sleep(1)
         cluster_manager.click_checkbox_by_name("Medium") 
@@ -70,7 +68,6 @@ class VulneCvePage(BaseTest):
 
             # Check if there are any elements found and click the first one
             if cve_cells:
-                print("TEST")
                 # cve_cells[2].click()
                 interaction_manager.click("//span[contains(@class, 'medium-severity-color') and normalize-space(text())='Medium']", By.XPATH,index=2)
                 logger.info("Clicked on the first matching CVE cell.")
@@ -79,7 +76,7 @@ class VulneCvePage(BaseTest):
                 driver.save_screenshot(f"./no_matching_cve_cells_{ClusterManager.get_current_timestamp()}.png")
         except TimeoutException:
             logger.error("Failed to click on the first row")
-        driver.save_screenshot(f"./cve_cell_clicked.png")
+            
         try:
             # Wait for a unique and stable element in the sidebar that appears after the click.
             sidebar_title_xpath = "//span[normalize-space(text())='Medium']"
@@ -95,7 +92,6 @@ class VulneCvePage(BaseTest):
         cve_severity = interaction_manager.get_text("//span[contains(@class, 'medium-severity-color') and normalize-space(text())='Medium']")
         logger.info(f"Severity: {cve_severity}")
      
-        driver.save_screenshot(f"./cve_details.png")
         button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//armo-button[contains(@class, 'link-button') and .//button[contains(@class, 'armo-button') and contains(@class, 'tertiary') and contains(@class, 'sm')]]")))
         button.click()
         time.sleep(1)
