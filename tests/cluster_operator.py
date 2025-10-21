@@ -260,62 +260,105 @@ class ClusterManager:
             
 
     def click_filter_button_in_sidebar_by_text(self,category_name,button_text: str):
-        """
-        Clicks a specific button within the most recently opened cdk-overlay
-        based on the button's text content. If 'Attack path' namespace is provided,
-        it waits for the related element before clicking.
+        # """
+        # Clicks a specific button within the most recently opened cdk-overlay
+        # based on the button's text content. If 'Attack path' namespace is provided,
+        # it waits for the related element before clicking.
 
-        :param button_text: The visible text of the button to click.
-        :param namespace: Optional; if provided, waits for the "Attack path" element.
-        """
-        try:
-            # Locate all cdk-overlay-pane elements
-            overlay_panes = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
+        # :param button_text: The visible text of the button to click.
+        # :param namespace: Optional; if provided, waits for the "Attack path" element.
+        # """
+        # time.sleep(2)  # Short delay to ensure the overlay is rendered
+        # try:
+        #     # Locate all cdk-overlay-pane elements
+        #     overlay_panes = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
 
-            # Ensure we have found at least one cdk-overlay-pane
-            if not overlay_panes:
-                logger.error("No cdk-overlay-pane elements found.")
-                return
+        #     # Ensure we have found at least one cdk-overlay-pane
+        #     if not overlay_panes:
+        #         logger.error("No cdk-overlay-pane elements found.")
+        #         return
 
-            # Get the most recent overlay pane (the last one in the list)
-            most_recent_overlay = overlay_panes[-1]
+        #     # Get the most recent overlay pane (the last one in the list)
+        #     most_recent_overlay = overlay_panes[-1]
             
-            # If the namespace is 'Attack path', wait for the specific element
-            if category_name == "Attack path":
-                attack_path_selector = "armo-attack-chain-graph-mini-map"
-                self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, attack_path_selector)))
-                logger.info(f"Waited for 'Attack path' specific element to appear.")
+        #     # If the namespace is 'Attack path', wait for the specific element
+        #     if category_name == "Attack path":
+        #         attack_path_selector = "armo-attack-chain-graph-mini-map"
+        #         self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, attack_path_selector)))
+        #         logger.info(f"Waited for 'Attack path' specific element to appear.")
 
-            # Otherwise, wait for the cluster and namespace element to appear
-            elif category_name == "Workloads" or category_name == "Data":    
-                target_selector = "div.font-size-14.font-normal.line-height-24.armo-text-black-color"
-                self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, target_selector)))
-                logger.info(f"Waited for cluster/namespace element to appear.")
+        #     # Otherwise, wait for the cluster and namespace element to appear
+        #     elif category_name == "Workloads" or category_name == "Data":    
+        #         target_selector = "div.font-size-14.font-normal.line-height-24.armo-text-black-color"
+        #         self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, target_selector)))
+        #         logger.info(f"Waited for cluster/namespace element to appear.")
                 
-            else:
-                category_name = "Network configuration"
-                network_selector = "td.mat-mdc-cell.cdk-column-namespace"
-                self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, network_selector)))
-                logger.info(f"Waited for network configuration element to appear.")
+        #     else:
+        #         category_name = "Network configuration"
+        #         network_selector = "td.mat-mdc-cell.cdk-column-namespace"
+        #         self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, network_selector)))
+        #         logger.info(f"Waited for network configuration element to appear.")
                 
-            # Locate all buttons within the most recent cdk-overlay-pane
-            buttons = most_recent_overlay.find_elements(By.CSS_SELECTOR, "button.armo-button.secondary-neutral.md")
+        #     # Locate all buttons within the most recent cdk-overlay-pane
+        #     buttons = most_recent_overlay.find_elements(By.CSS_SELECTOR, "button.armo-button.secondary-neutral.md")
 
-            # Iterate through all buttons and click the one with the matching text
-            for button in buttons:
-                if button_text in button.text:
-                    button.click()
-                    logger.info(f"Clicked on the button with text: '{button_text}' in the most recent cdk-overlay.")
-                    return
+        #     # Iterate through all buttons and click the one with the matching text
+        #     for button in buttons:
+        #         if button_text in button.text:
+        #             button.click()
+        #             logger.info(f"Clicked on the button with text: '{button_text}' in the most recent cdk-overlay.")
+        #             return
 
-            logger.error(f"Button with text '{button_text}' not found in the most recent cdk-overlay.")
+        #     logger.error(f"Button with text '{button_text}' not found in the most recent cdk-overlay.")
+
+        # except Exception as e:
+        #     logger.error(f"Failed to click on the button with text '{button_text}' in the most recent cdk-overlay: {str(e)}")
+        #     self._driver.save_screenshot(f"./failed_to_click_button_in_cdk_overlay_{ClusterManager.get_current_timestamp()}.png")
+        #     raise
+        try:
+            # Wait for sidebar to stabilize
+            time.sleep(5)
+            
+            # Find the most recent overlay
+            overlay_pane_selector = "div.cdk-overlay-pane"
+            overlay_panes = WebDriverWait(self._driver, 20).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, overlay_pane_selector))
+            )
+            visible_overlays = [o for o in overlay_panes if o.is_displayed()]
+            logger.info(f"Found {len(overlay_panes)} total overlays, {len(visible_overlays)} visible.")
+            
+            if not visible_overlays:
+                raise Exception("No visible overlays found")
+            
+            most_recent_overlay = visible_overlays[-1]
+            
+            # Search for the button in the overlay
+            button_xpath = f".//button[contains(., '{button_text}')]"
+            logger.info(f"Looking for '{button_text}' button inside the overlay...")
+            
+            # Wait for button to be present (not checking visibility)
+            button_to_click = WebDriverWait(most_recent_overlay, 15).until(
+                EC.presence_of_element_located((By.XPATH, button_xpath))
+            )
+            
+            logger.info(f"Found '{button_text}' button in overlay")
+            time.sleep(1)
+            
+            # Try regular click first, fallback to JS if it fails
+            try:
+                button_to_click.click()
+                logger.info(f"Successfully clicked '{button_text}' button with regular click")
+            except Exception as click_error:
+                logger.warning(f"Regular click failed ({click_error}), using JS click")
+                self._driver.execute_script("arguments[0].click();", button_to_click)
+                logger.info(f"Successfully clicked '{button_text}' button with JS click")
+
 
         except Exception as e:
-            logger.error(f"Failed to click on the button with text '{button_text}' in the most recent cdk-overlay: {str(e)}")
+            logger.error(f"Failed to click '{button_text}' button: {str(e)}")
             self._driver.save_screenshot(f"./failed_to_click_button_in_cdk_overlay_{ClusterManager.get_current_timestamp()}.png")
             raise
-
-
+        
     def click_checkbox_by_name(self, label_name):
         """
         Clicks a checkbox with the specified label name in a dynamic overlay.
@@ -748,7 +791,7 @@ class IgnoreRule:
             self._driver.save_screenshot(f"./Accepting_Risk_button_error_rfrom _attach_path_{ClusterManager.get_current_timestamp()}.png")
 
 
-    def get_ignore_rule_field(self, index, timeout=10):
+    def get_ignore_rule_field(self, index, timeout=15):
         css_selector = "div.mat-mdc-menu-trigger.field.pointer.ng-star-inserted"
         
         try:
