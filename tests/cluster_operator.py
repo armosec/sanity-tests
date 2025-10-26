@@ -119,9 +119,35 @@ class ClusterManager:
         except IndexError as e:
             logger.error(f"Index error: {e}")
         except Exception as e:
-            logger.error(f"Failed to click on the close element at index {index}: {str(e)}")
+            logger.error(f"Failed to click on the close filter element at index {index}: {str(e)}")
             driver.save_screenshot(f"./failed_to_click_armo_icon_{ClusterManager.get_current_timestamp()}.png")
 
+    def click_clear_button(driver):
+        """
+        Waits for and clicks the 'Clear' button.
+        """
+        time.sleep(2)
+        try:
+            # The XPath you provided
+            clear_button_xpath = "//button[normalize-space(text())='Clear']"
+
+            # 1. Wait for the overlay to disappear (kept from your original function)
+            WebDriverWait(driver, 10).until(
+                EC.invisibility_of_element_located((By.CLASS_NAME, "cdk-overlay-backdrop"))
+            )
+
+            # 2. Wait for the 'Clear' button to be clickable (visible and enabled)
+            clear_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, clear_button_xpath))
+            )
+
+            # 3. Click the button
+            clear_button.click()
+
+        except TimeoutException:
+            print("Error: Could not find or click the 'Clear' button in time.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
     def click_filter_button(self, filter_name):
         try:
