@@ -75,6 +75,7 @@ class SecurityRisk(BaseTest):
             logger.info("=" * 60)
             logger.info("Resetting page for next category...")
             logger.info("=" * 60)
+            time.sleep(1)
             ClusterManager.click_close_filter(self._driver)
             time.sleep(1)
             # Full page refresh
