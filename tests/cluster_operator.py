@@ -285,7 +285,7 @@ class ClusterManager:
             self._driver.save_screenshot(f"./failed_to_click_button_{button_text.replace(' ', '_')}_{ClusterManager.get_current_timestamp()}.png")
             
 
-    def click_filter_button_in_sidebar_by_text(self, button_text: str):
+    def click_filter_button_in_sidebar_by_text(self, category_name: str, button_text: str):
         try:
             # Wait for sidebar to stabilize
             time.sleep(5)
