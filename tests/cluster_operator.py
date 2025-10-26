@@ -750,11 +750,32 @@ class IgnoreRule:
         
     def click_ignore_rule_button_sidebar(self):
         try:
-            self._interaction_manager.click('armo-ignore-rules-button button.armo-button.table-secondary.sm', By.CSS_SELECTOR)
+            time.sleep(2)
+            
+            # Get all overlays and use the most recent one
+            overlays = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
+            if not overlays:
+                raise Exception("No overlay found")
+            
+            current_overlay = overlays[-1]
+            logger.info(f"Found {len(overlays)} overlays, using the most recent")
+            
+            # Find button within the current overlay
+            button = current_overlay.find_element(
+                By.CSS_SELECTOR, 
+                'armo-ignore-rules-button button.armo-button.table-secondary.sm'
+            )
+            
+            # Scroll into view and click
+            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
+            time.sleep(0.5)
+            self._driver.execute_script("arguments[0].click();", button)
             logger.info("Click on ignore rule button on side sidebar.")
-        except:
-            logger.error("failed to click on ignore rule button on sidebar")
+            
+        except Exception as e:
+            logger.error(f"Failed to click on ignore rule button on sidebar: {e}")
             self._driver.save_screenshot(f"./ignore_rule_button_error_sidebar_{ClusterManager.get_current_timestamp()}.png")
+            raise
             
     def get_workload_name(self, timeout=15) -> str:
         try:
@@ -931,9 +952,18 @@ class RiskAcceptancePage:
             risk_acceptance_button = WebDriverWait(most_recent_overlay, 10).until(
                 EC.presence_of_element_located((By.XPATH, button_XPATH)))
             
-            # Click the button
-            risk_acceptance_button.click()   
-            logger.info("Clicked on the 'Risk Acceptance' button inside.")
+            time.sleep(3)
+
+            # Scroll into view
+            self._driver.execute_script(
+                "arguments[0].scrollIntoView({block: 'center'});", 
+                risk_acceptance_button
+            )
+            time.sleep(1)
+
+            # Use JS click (more reliable)
+            self._driver.execute_script("arguments[0].click();", risk_acceptance_button)
+            time.sleep(2)
         
         except Exception as e:
             logger.error(f"Failed to click on the 'Risk Acceptance' button in the sidebar: {str(e)}")

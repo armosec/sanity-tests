@@ -108,7 +108,7 @@ class SecurityRisk(BaseTest):
         Processes a given risk category by selecting the category, comparing values, applying filters, and verifying namespace.
         """
         cluster_manager = ClusterManager(self._driver, self._wait)
-        logger.info(f"^^______Processing Risk Category:  {category_name} ______^^")
+        logger.info(f"###______Processing Risk Category:  {category_name} ______###")
         
         # 1. Open category and get risk count
         cluster_manager.click_button_by_text(category_name)
@@ -165,18 +165,7 @@ class SecurityRisk(BaseTest):
             logger.error(f"Sidebar overlay not found: {str(e)}")
             self._driver.save_screenshot(f"./sidebar_overlay_not_found_{ClusterManager.get_current_timestamp()}.png")
         
-        # 4. Apply Namespace filter
         
-        # Original approach commented out for reference
-        # cluster_manager.click_filter_button_in_sidebar_by_text(category_name=category_name, button_text="Namespace")
-        # time.sleep(2)
-        # cluster_manager.click_on_filter_checkbox_sidebar(namespace)
-        # time.sleep(1)
-        # cluster_manager.press_esc_key(self._driver)
-        # time.sleep(1)
-        # cluster_manager.press_space_key(self._driver)
-        # time.sleep(1)
-        # # # Close the dropdown by clicking outside of it or pressing ESC multiple times
         if category_name != "Attack path" and category_name != "Network configuration":
             cluster_manager.click_filter_button_in_sidebar_by_text(category_name=category_name, button_text="Namespace")
             time.sleep(2)
@@ -208,26 +197,19 @@ class SecurityRisk(BaseTest):
                 logger.warning(f"Could not remove overlays: {e}")
             
             time.sleep(2)  
-
-        # # 5. Verify namespace -  need to re check
-        # if cluster_manager.get_namespace_from_element(category_name) == namespace:
-        #     logger.info(f"Namespace {namespace} is verified") 
-        # else:
-        #     logger.error(f"Namespace {namespace} is not verified")
-        # time.sleep(1)
         
-        # 6. Click button in namespace row to open detailed view
+        # 4. Click button in namespace row to open detailed view
         cluster_manager.click_button_in_namespace_row(category_name, namespace)
         time.sleep(2)
 
-        # 7. Compare YAML for Data/Workloads
+        # 5. Compare YAML for Data/Workloads
         if category_name == "Data" or category_name == "Workloads":
             if AttachPath.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
                 logger.info("SBS yamls - The number of rows is equal .")
             else:
                 logger.error("SBS yamls - The number of rows is NOT equal.")
 
-        # 8. Verify Attack path page loaded
+        # 6. Verify Attack path page loaded
         if category_name == "Attack path":
             try:
                 element = WebDriverWait(self._driver, 10).until(
@@ -237,12 +219,12 @@ class SecurityRisk(BaseTest):
                 logger.error("Attack path page not loaded")
                 self._driver.save_screenshot(f"./failed_to_load_attack_path_page_{ClusterManager.get_current_timestamp()}.png")
 
-        # 9. Create risk acceptance
+        # 7. Create risk acceptance
         time.sleep(2)
         self.create_risk_accept(self._driver, category_name)
         time.sleep(2)
 
-        # 10. Navigate to Risk Acceptance page
+        # 8. Navigate to Risk Acceptance page
         RiskAcceptancePage.navigate_to_risk_acceptance_form_sidebar(self, category_name)
 
         try:
@@ -253,7 +235,7 @@ class SecurityRisk(BaseTest):
             logger.error("Risk Acceptance page not loaded")
             self._driver.save_screenshot(f"./failed_to_load_risk_acceptance_page_{ClusterManager.get_current_timestamp()}.png")
 
-        # 11. Navigate back and verify counters
+        # 9. Navigate back and verify counters
         if category_name == "Attack path":
             self.risk_acceptance_page()
             self.click_security_risks_menu()
@@ -293,156 +275,6 @@ class SecurityRisk(BaseTest):
             else:
                 logger.error(f"The counters are incorrect: after_risk: {after_risk}, after_delete_risk: {after_delete_risk}")
         
-        # # 12. Close the filter pill
-        # if not category_name == "Attack path":
-        #     cluster_manager.click_close_icon_in_filter_button(category_name)
-
-        # NEW: Full page refresh to reset Angular state
-        # try:
-        #     logger.info("Performing full page refresh to reset Angular state...")
-        #     current_url = self._driver.current_url
-        #     self._driver.refresh()
-        #     time.sleep(5)  # Wait for page to reload
-        #     logger.info("Page refreshed, waiting for page to be ready...")
-            
-        #     # Wait for the page to be interactive again
-        #     WebDriverWait(self._driver, 15).until(
-        #         EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Attack path')]"))
-        #     )
-        #     logger.info("Page is ready after refresh")
-        # except Exception as e:
-        #     logger.error(f"Error during page refresh: {e}")
-
-        # logger.info("State reset. Ready for the next category.")
-        
-    # def process_first_security_risk(self, category_name, namespace, before_risk):
-    #     """
-    #     Clicks on the first security risk and applies namespace filter.
-    #     """
-    #     interaction_manager = InteractionManager(self._driver)
-    #     cluster_manager = ClusterManager(self._driver, self._wait)
-        
-    #     time.sleep(5)
-    #     first_security_risk_CSS_SELECTOR = "button.armo-button.table-secondary.sm"
-
-    #     # Wait until the elements are located
-    #     first_security_risks = WebDriverWait(self._driver, 10).until(
-    #         EC.presence_of_all_elements_located((By.CSS_SELECTOR, first_security_risk_CSS_SELECTOR)))
-
-    #     # Determine which button to click based on category
-    #     if category_name == "Workloads" or category_name == "Attack path":
-    #         required_index = 3
-    #     else:
-    #         required_index = 2
-
-    #     # Check if we have enough elements
-    #     if len(first_security_risks) > required_index:
-    #         time.sleep(0.5)
-    #         first_security_risks[required_index].click()
-    #         logger.info(f"Successfully clicked on the security risk button (index {required_index}).")
-    #     else:
-    #         logger.error(f"Expected at least {required_index + 1} elements, but found {len(first_security_risks)}.")
-        
-    #     time.sleep(3.5)
-    #     try:
-    #         WebDriverWait(self._driver, 15).until(
-    #             EC.presence_of_element_located((By.CSS_SELECTOR, "div.cdk-overlay-pane"))
-    #         )
-    #         logger.info("Sidebar overlay is present")
-    #     except Exception as e:
-    #         logger.error(f"Sidebar overlay not found: {str(e)}")
-    #         self._driver.save_screenshot(f"./sidebar_overlay_not_found_{ClusterManager.get_current_timestamp()}.png")
-        
-    #     # Apply Namespace filter
-    #     cluster_manager.click_filter_button_in_sidebar_by_text(category_name=category_name, button_text="Namespace")
-    #     time.sleep(2)
-    #     cluster_manager.click_on_filter_checkbox_sidebar(namespace)
-    #     time.sleep(1)
-    #     cluster_manager.press_esc_key(self._driver)
-    #     time.sleep(1)
-    #     cluster_manager.press_space_key(self._driver)
-    #     time.sleep(1)
-
-    #     # Verify namespace
-    #     if cluster_manager.get_namespace_from_element(category_name) == namespace:
-    #         logger.info(f"Namespace {namespace} is verified") 
-    #     else:
-    #         logger.error(f"Namespace {namespace} is not verified")
-    #     time.sleep(1)
-        
-    #     cluster_manager.click_button_in_namespace_row(category_name, namespace)
-    #     time.sleep(2)
-
-    #     if category_name == "Data" or category_name == "Workloads":
-    #         if AttachPath.compare_yaml_code_elements(self._driver, "div.row-container.yaml-code-row"):
-    #             logger.info("SBS yamls - The number of rows is equal .")
-    #         else:
-    #             logger.error("SBS yamls - The number of rows is NOT equal.")
-
-    #     if category_name == "Attack path":
-    #         try:
-    #             element = WebDriverWait(self._driver, 10).until(
-    #             EC.presence_of_element_located((By.CSS_SELECTOR, "td.cdk-column-baseScore .severity")))
-    #             logger.info("Attack path page loaded")
-    #         except TimeoutException:
-    #             logger.error("Attack path page not loaded")
-    #             self._driver.save_screenshot(f"./failed_to_load_attack_path_page_{ClusterManager.get_current_timestamp()}.png")
-
-    #     # CREATE RISK ACCEPTANCE - ONLY ONCE!
-    #     time.sleep(2)
-    #     self.create_risk_accept(self._driver, category_name)
-    #     time.sleep(2)
-
-    #     # Navigate to Risk Acceptance page
-    #     RiskAcceptancePage.navigate_to_risk_acceptance_form_sidebar(self, category_name)
-
-    #     try:
-    #         element = WebDriverWait(self._driver, 15).until(
-    #         EC.presence_of_element_located((By.CSS_SELECTOR, "td.cdk-column-severity .severity")))
-    #         logger.info("Risk Acceptance page loaded")
-    #     except TimeoutException:
-    #         logger.error("Risk Acceptance page not loaded")
-    #         self._driver.save_screenshot(f"./failed_to_load_risk_acceptance_page_{ClusterManager.get_current_timestamp()}.png")
-
-    #     # NOW NAVIGATE BACK TO VERIFY COUNTERS
-    #     if category_name == "Attack path":
-    #         self.risk_acceptance_page()
-    #         self.click_security_risks_menu()
-    #     else:
-    #         self._driver.back()
-    #         logger.info("Navigated back to the main Security Risks page after risk acceptance")
-            
-    #         # Clean up any stale overlays after navigation
-    #         try:
-    #             self._driver.execute_script("""
-    #                 document.querySelectorAll('div.cdk-overlay-pane, .cdk-overlay-backdrop').forEach(el => el.remove());
-    #             """)
-    #         except:
-    #             pass
-            
-    #         time.sleep(2)
-            
-    #         # Verify counter after accepting risk
-    #         after_risk, _ = self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
-            
-    #         if int(before_risk) == int(after_risk) + 1:
-    #             logger.info("The risk has been accepted - counters are correct")
-    #         else:
-    #             logger.error(f"The counters are incorrect: before_risk: {before_risk}, after_risk: {after_risk}") 
-
-    #         # Now delete the risk acceptance to verify counter goes back up
-    #         self.risk_acceptance_page()
-
-    #         self._driver.back()
-    #         logger.info("Navigated back after deleting risk acceptance")
-    #         time.sleep(2)
-            
-    #         after_delete_risk, _ = self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
-
-    #         if int(after_delete_risk) == int(after_risk) + 1:
-    #             logger.info("The risk has been revoked - counters are correct")
-    #         else:
-    #             logger.error(f"The counters are incorrect: after_risk: {after_risk}, after_delete_risk: {after_delete_risk}")
         
     def click_security_risks_menu(self):  # ← Make sure this exists!
         """
@@ -474,7 +306,7 @@ class SecurityRisk(BaseTest):
     def create_risk_accept(self, driver, category_name):
 
         risk_accept = IgnoreRule(driver)
-        time.sleep(3)
+        time.sleep(4)
 
         if category_name == "Attack path":
             risk_accept.click_ignore_on_from_attach_path()
