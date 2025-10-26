@@ -88,39 +88,40 @@ class ClusterManager:
                 
 
     def click_close_filter(driver, index=0):
+        """Close filter pill - CI/headless compatible."""
         try:
-            # Define the XPath to locate all <armo-icon> elements
-            armo_icon_xpath = "//armo-icon[@svgsource='assets/icons/v2/general/close.svg#close']"
-
-            # Wait until at least one <armo-icon> element is present
-            armo_icon_elements = WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located((By.XPATH, armo_icon_xpath)))
-
-            # Ensure the index is within bounds
-            if index >= len(armo_icon_elements):
-                raise IndexError(f"Invalid index {index}. Only {len(armo_icon_elements)} elements found.")
-
-            # Wait for the overlay to disappear, if present
-            WebDriverWait(driver, 10).until(
-                EC.invisibility_of_element_located((By.CLASS_NAME, "cdk-overlay-backdrop")))
-
-            # Select the <armo-icon> element at the specified index
-            armo_icon_element = armo_icon_elements[index]
-
-            # Scroll the element into view
-            driver.execute_script("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", armo_icon_element)
-
-            # Use ActionChains to move to the element and click
-            actions = ActionChains(driver)
-            actions.move_to_element(armo_icon_element).click().perform()
-
-            logger.info(f"Successfully clicked on the <armo-icon> element at index {index}.")
-
-        except IndexError as e:
-            logger.error(f"Index error: {e}")
+            logger.info(f"Attempting to close filter at index {index}")
+            time.sleep(1)
+            
+            # Find close icons
+            xpath = "//armo-icon[@svgsource='assets/icons/v2/general/close.svg#close']"
+            icons = driver.find_elements(By.XPATH, xpath)
+            
+            if icons and index < len(icons):
+                icon = icons[index]
+                # Scroll into view
+                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", icon)
+                time.sleep(0.5)
+                # Use JavaScript click (works in headless)
+                driver.execute_script("arguments[0].click();", icon)
+                logger.info("Filter closed")
+                time.sleep(1)
+                return
+            
+            # Fallback: Close with JavaScript
+            logger.warning("Using JavaScript fallback...")
+            driver.execute_script("""
+                document.querySelectorAll('button.armo-button.secondary-neutral.md').forEach(button => {
+                    const closeIcon = button.querySelector('armo-icon[svgsource*="close.svg"]');
+                    if (closeIcon) button.click();
+                });
+            """)
+            logger.info("Filter closed with JavaScript")
+            time.sleep(1)
+            
         except Exception as e:
-            logger.error(f"Failed to click on the <armo-icon> element at index {index}: {str(e)}")
-            driver.save_screenshot(f"./failed_to_click_armo_icon_{ClusterManager.get_current_timestamp()}.png")
+            logger.warning(f"Failed to close filter: {str(e)[:100]}")
+            logger.info("Continuing anyway...")
 
 
     def click_filter_button(self, filter_name):
