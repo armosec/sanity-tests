@@ -51,17 +51,17 @@ class SecurityRisk(BaseTest):
             logger.info("Comparing values on the main page")
             self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
             
-            # Process each category with refresh between them
-            self.process_risk_category("Workloads", "default")
+            # Process each category with refresh between them           
+            self.process_risk_category("Attack path", "attack-suite")
             self.reset_page_for_next_category()
             
+            self.process_risk_category("Workloads", "default")
+            self.reset_page_for_next_category()
+        
             self.process_risk_category("Data", "None")
             self.reset_page_for_next_category()
             
             self.process_risk_category("Network configuration", "default")
-            self.reset_page_for_next_category()
-            
-            self.process_risk_category("Attack path", "attack-suite")
 
         except Exception as e:
             logger.error(f"Error navigating in security risk page: {e}")

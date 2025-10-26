@@ -743,7 +743,7 @@ class IgnoreRule:
             
             # Scroll into view and click
             self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
-            time.sleep(0.5)
+            time.sleep(1)
             self._driver.execute_script("arguments[0].click();", button)
             logger.info("Click on ignore rule button on side sidebar.")
             
