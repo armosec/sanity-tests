@@ -58,45 +58,58 @@ class InteractionManager:
         )
         return element
 
-    def click(self, xpath: str, by=By.XPATH, click_delay: Optional[float] = None, index: int = 0) -> WebElement:
+    def click(self, xpath: str, by=By.XPATH, click_delay: Optional[float] = None, index: int = 0, max_retries: int = 3) -> WebElement:
             _logger.info(f'Clicking "{xpath}" at index {index}')
         
-            # Find all elements that match the locator
-            elements = WebDriverWait(self._driver, self._timeout).until(
-                EC.presence_of_all_elements_located((by, xpath))
-            )
-        
-            # Ensure that we have enough elements to access the desired index
-            if len(elements) <= index:
-                _logger.error(f"Not enough elements found for '{xpath}'. Expected at least {index + 1} elements.")
-                raise IndexError(f"Element at index {index} not found for '{xpath}'.")
-        
-            # Ensure the element at the specified index is interactable and in viewport
-            element = self.wait_until_interactable(xpath, by)
-        
-            if click_delay:
-                sleep(click_delay)
-        
-            try:
-                elements[index].click()
-            except ElementClickInterceptedException as e:
-                _logger.error(
-                    f'Failed to click "{xpath}" at index {index} due to ElementClickInterceptedException. Trying to click using JavaScript.',
-                    exc_info=True,
-                    stack_info=True,
-                    extra={"screenshot": False},
-                )
-                self._driver.execute_script("arguments[0].click();", elements[index])
-            except Exception as e:
-                _logger.error(
-                    f'Failed to click "{xpath}" at index {index}. Element might not be interactable.',
-                    exc_info=True,
-                    stack_info=True,
-                    extra={"screenshot": True},  # Take a screenshot on error
-                )
-                raise e
-        
-            return elements[index]
+            for retry in range(max_retries):
+                try:
+                    # Find all elements that match the locator
+                    elements = WebDriverWait(self._driver, self._timeout).until(
+                        EC.presence_of_all_elements_located((by, xpath))
+                    )
+                
+                    # Ensure that we have enough elements to access the desired index
+                    if len(elements) <= index:
+                        _logger.error(f"Not enough elements found for '{xpath}'. Expected at least {index + 1} elements.")
+                        raise IndexError(f"Element at index {index} not found for '{xpath}'.")
+                
+                    # Ensure the element at the specified index is interactable and in viewport
+                    element = self.wait_until_interactable(xpath, by)
+                
+                    if click_delay:
+                        sleep(click_delay)
+                
+                    try:
+                        elements[index].click()
+                        _logger.info(f"Successfully clicked element at index {index}")
+                        return elements[index]
+                    except ElementClickInterceptedException as e:
+                        _logger.error(
+                            f'Failed to click "{xpath}" at index {index} due to ElementClickInterceptedException. Trying to click using JavaScript.',
+                            exc_info=True,
+                            stack_info=True,
+                            extra={"screenshot": False},
+                        )
+                        self._driver.execute_script("arguments[0].click();", elements[index])
+                        _logger.info(f"Successfully clicked element at index {index} using JavaScript")
+                        return elements[index]
+                        
+                except Exception as e:
+                    error_msg = str(e)
+                    if "stale element" in error_msg.lower() and retry < max_retries - 1:
+                        _logger.warning(f'Stale element on attempt {retry + 1}/{max_retries}, retrying...')
+                        time.sleep(1)
+                        continue
+                    else:
+                        _logger.error(
+                            f'Failed to click "{xpath}" at index {index}. Element might not be interactable. Error: {error_msg[:200]}',
+                            exc_info=True,
+                            stack_info=True,
+                            extra={"screenshot": True},
+                        )
+                        raise e
+            
+            raise Exception(f"Failed to click element after {max_retries} retries")
 
 
     def close_all_overlays(self):
