@@ -485,10 +485,14 @@ class ClusterManager:
 
             elif category_name == "Network configuration":
                 try:
-                    network_selector = "td.mat-mdc-cell.cdk-column-namespace"
-                    namespace_element = self._wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, network_selector)))
-                    namespace_element.click()
-                    logger.info("Clicked on the namespace element in the Network configuration category.")
+                    chevron_selector = "td.mat-mdc-cell.cdk-column-action button.armo-button"
+                    chevron_button = WebDriverWait(self._driver, 15).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, chevron_selector))
+                    )
+                    self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", chevron_button)
+                    time.sleep(0.5)
+                    self._driver.execute_script("arguments[0].click();", chevron_button)
+                    logger.info("Clicked chevron button in Network configuration category.")
                 except Exception as e:
                     logger.error(f"Failed to click on the namespace element in the Network configuration category: {str(e)}")
                     self._driver.save_screenshot(f"./failed_to_click_on_namespace_element_{ClusterManager.get_current_timestamp()}.png")

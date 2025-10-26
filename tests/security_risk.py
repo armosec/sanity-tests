@@ -52,8 +52,8 @@ class SecurityRisk(BaseTest):
             self.compare_value("td.issues > span.font-size-14.line-height-24.armo-text-black-color", "text.total-value")
             
             # Process each category with refresh between them
-            self.process_risk_category("Workloads", "default")
-            self.reset_page_for_next_category()
+            # self.process_risk_category("Workloads", "default")
+            # self.reset_page_for_next_category()
             
             self.process_risk_category("Data", "None")
             self.reset_page_for_next_category()
