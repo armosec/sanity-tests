@@ -101,6 +101,7 @@ class SecurityRisk(BaseTest):
             
         except Exception as e:
             logger.error(f"Failed to reset page: {e}")
+            self._driver.save_screenshot(f"./failed_to_reset_page_{ClusterManager.get_current_timestamp()}.png")
             raise
     
     def process_risk_category(self, category_name, namespace):
