@@ -53,20 +53,20 @@ class SecurityRisk(BaseTest):
             
             # Process each category with refresh between them           
             self.process_risk_category("Attack path", "attack-suite")
-            self.reset_page_for_next_category()
+            self.reset_page_for_next_category("Attack path")
             
             self.process_risk_category("Workloads", "default")
-            self.reset_page_for_next_category()
-        
+            self.reset_page_for_next_category("Workloads")
+
             self.process_risk_category("Data", "None")
-            self.reset_page_for_next_category()
-            
+            self.reset_page_for_next_category("Data")
+
             self.process_risk_category("Network configuration", "default")
 
         except Exception as e:
             logger.error(f"Error navigating in security risk page: {e}")
 
-    def reset_page_for_next_category(self):
+    def reset_page_for_next_category(self, category_name=None):
         """
         Resets the page state by refreshing and navigating back to Security Risks.
         This ensures Angular is in a clean state for the next category.
@@ -76,23 +76,20 @@ class SecurityRisk(BaseTest):
             logger.info("Resetting page for next category...")
             logger.info("=" * 60)
             time.sleep(1)
-            ClusterManager.click_clear_button(self._driver)
-            time.sleep(1)
-            # Full page refresh
+            if category_name != "Attack path":
+                time.sleep(1)
+                ClusterManager.click_clear_button(self._driver)
             self._driver.refresh()
-            time.sleep(5)  # Wait for page to reload
-            
-            # Wait for page to be interactive
+            time.sleep(5)  
+        
             WebDriverWait(self._driver, 20).until(
                 EC.element_to_be_clickable((By.ID, "security-risks-left-menu-item"))
             )
             logger.info("Page refreshed successfully")
             
-            # Navigate back to Security Risks
             self.click_security_risks_menu()
             time.sleep(3)
             
-            # Wait for category buttons to be ready
             WebDriverWait(self._driver, 15).until(
                 EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Attack path')]"))
             )
@@ -277,7 +274,7 @@ class SecurityRisk(BaseTest):
                 logger.error(f"The counters are incorrect: after_risk: {after_risk}, after_delete_risk: {after_delete_risk}")
         
         
-    def click_security_risks_menu(self):  # ← Make sure this exists!
+    def click_security_risks_menu(self):
         """
         Clicks on the Security Risks left menu item.
         """

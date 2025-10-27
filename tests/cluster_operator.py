@@ -12,6 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from .interaction_manager import InteractionManager
 from .login_manager import LoginManager
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
 
 logger = logging.getLogger(__name__)
 # FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
@@ -145,9 +146,10 @@ class ClusterManager:
             clear_button.click()
 
         except TimeoutException:
-            print("Error: Could not find or click the 'Clear' button in time.")
+            logger.error("Timeout: Could not find or click the 'Clear' button in time.")
+            driver.save_screenshot(f"./failed_to_click_clear_button_{ClusterManager.get_current_timestamp()}.png")
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
 
     def click_filter_button(self, filter_name):
         try:
@@ -314,15 +316,8 @@ class ClusterManager:
             
             logger.info(f"Found '{button_text}' button in overlay")
             time.sleep(1)
-            
-            # Try regular click first, fallback to JS if it fails
-            try:
-                button_to_click.click()
-                logger.info(f"Successfully clicked '{button_text}' button with regular click")
-            except Exception as click_error:
-                logger.warning(f"Regular click failed ({click_error}), using JS click")
-                self._driver.execute_script("arguments[0].click();", button_to_click)
-                logger.info(f"Successfully clicked '{button_text}' button with JS click")
+            self._driver.execute_script("arguments[0].click();", button_to_click)
+            logger.info(f"Successfully clicked '{button_text}' button with JS click")
 
 
         except Exception as e:
@@ -689,6 +684,7 @@ class IgnoreRule:
         self._driver = driver
         self.wait = WebDriverWait(self._driver, timeout=60, poll_frequency=0.001)
         self._interaction_manager = InteractionManager(driver)
+        self.logger = logger or logging.getLogger(__name__)
 
     def click_ignore_button(self):
         """Click the 3-dots menu button and then click the ignore button - headless-friendly version"""
@@ -722,43 +718,127 @@ class IgnoreRule:
             logger.error(f"JS click failed: {e}")
             self._driver.save_screenshot("accept_risk_js_fail.png")
             raise
+            
+    def click_ignore_rule_button_sidebar(self, timeout: int = 12) -> bool:
+        driver = self._driver
+        time.sleep(2)
         
-    def click_ignore_rule_button_sidebar(self):
+        def _scope_candidates():
+            roots = []
+            try:
+                roots.extend(driver.find_elements(By.CSS_SELECTOR, "armo-side-by-side-remediation-container"))
+                logger.info(f"DEBUG: Found {len(roots)} SBS containers")
+            except Exception:
+                pass
+            try:
+                more_roots = driver.find_elements(By.CSS_SELECTOR, "armo-overlay, .right-side-bar, armo-side-bar")
+                roots.extend(more_roots)
+                logger.info(f"DEBUG: Found {len(more_roots)} additional overlay roots")
+            except Exception:
+                pass
+
+            try:
+                expanded_rows = driver.find_elements(By.CSS_SELECTOR, "tr.row-expandedDetails")
+                roots.extend(expanded_rows)
+                logger.info(f"DEBUG: Found {len(expanded_rows)} expanded table rows")
+            except Exception:
+                pass
+
+            try:
+                overlays = driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
+                roots.extend(overlays)
+                logger.info(f"DEBUG: Found {len(overlays)} cdk-overlay-pane elements")
+            except Exception:
+                pass
+                
+            return list(reversed(roots)) if roots else []
+
+        def _first_present_in(root, css: str):
+            try:
+                return root.find_element(By.CSS_SELECTOR, css)
+            except Exception:
+                return None
+
+        def _click(el):
+            try:
+                WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(el))
+            except Exception:
+                pass
+            try:
+                driver.execute_script("arguments[0].scrollIntoView({block:'center'});", el)
+                driver.execute_script("arguments[0].click();", el)
+                return True
+            except (StaleElementReferenceException, NoSuchElementException):
+                try:
+                    el.click()
+                    return True
+                except Exception as e2:
+                    logger.debug(f"Direct click also failed: {e2}")
+                    return False
+
+        # Search SBS containers first
         try:
-            time.sleep(2)
-            
-            # Get all overlays and use the most recent one
-            overlays = self._driver.find_elements(By.CSS_SELECTOR, "div.cdk-overlay-pane")
-            if not overlays:
-                raise Exception("No overlay found")
-            
-            current_overlay = overlays[-1]
-            logger.info(f"Found {len(overlays)} overlays, using the most recent")
-            
-            # Find button within the current overlay
-            button = current_overlay.find_element(
-                By.CSS_SELECTOR, 
-                'armo-ignore-rules-button button.armo-button.table-secondary.sm'
+            sbs = WebDriverWait(driver, timeout).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "armo-side-by-side-remediation-container"))
             )
-            
-            # Scroll into view and click
-            self._driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
-            time.sleep(1)
-            self._driver.execute_script("arguments[0].click();", button)
-            logger.info("Click on ignore rule button on side sidebar.")
-            
-        except Exception as e:
-            logger.error(f"Failed to click on ignore rule button on sidebar: {e}")
-            self._driver.save_screenshot(f"./ignore_rule_button_error_sidebar_{ClusterManager.get_current_timestamp()}.png")
-            raise
-            
+            logger.info(f"DEBUG: WebDriverWait found {len(sbs)} SBS containers")
+        except TimeoutException:
+            logger.info("DEBUG: No SBS containers found (TimeoutException)")
+            sbs = []
+
+        candidate_selectors = [
+            "armo-ignore-rules-button button.armo-button.table-secondary.sm",
+            "armo-ignore-rules-button button.armo-button",
+            "armo-ignore-rules-button",
+            "armo-icon-button[mattooltip='Accept the risk'] button.armo-button.table-secondary.sm",
+            "armo-icon-button[mattooltip='Accept the risk'] button.armo-button",
+            "armo-icon-button[svgsource*='ignore.svg'] button.armo-button",
+            "armo-icon-button[svgsource*='ignore.svg']",
+        ]
+
+        logger.info(f"DEBUG: Searching with {len(candidate_selectors)} different selectors")
+        
+        for container in reversed(sbs):
+            for sel in candidate_selectors:
+                el = _first_present_in(container, sel)
+                if el:
+                    logger.info(f"Found Ignore/Accept control using '{sel}' inside SBS container.")
+                    if _click(el):
+                        logger.info("Clicked the 'Ignore/Accept risk' button inside SBS container.")
+                        return True
+
+        roots = _scope_candidates()
+        logger.info(f"DEBUG: Searching in {len(roots)} root elements")
+        
+        for root in roots:
+            for sel in candidate_selectors:
+                el = _first_present_in(root, sel)
+                if el:
+                    logger.info(f"Found Ignore/Accept control using '{sel}' inside overlay/root.")
+                    if _click(el):
+                        logger.info("Clicked the 'Ignore/Accept risk' button inside overlay/root.")
+                        return True
+
+        logger.info("DEBUG: Trying global search on entire page...")
+        for sel in candidate_selectors:
+            try:
+                el = driver.find_element(By.CSS_SELECTOR, sel)
+                logger.info(f"DEBUG: Found button globally with selector '{sel}'")
+                if _click(el):
+                    logger.info("Clicked button found via global search")
+                    return True
+            except:
+                continue
+
+        logger.warning("Ignore/Accept control not found anywhere on the page!")
+        driver.save_screenshot(f"./button_not_found_debug_{int(time.time())}.png")
+        return False
+
     def get_workload_name(self, timeout=15) -> str:
         try:
-            # Wait until the Save button is clickable, which means modal is fully loaded
             WebDriverWait(self._driver, timeout).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Save')]")))
             logger.info("Save button is clickable - modal is ready.")
 
-            # Locate all field containers
             fields = self._driver.find_elements(By.CSS_SELECTOR, "div.mat-mdc-menu-trigger.field.pointer.ng-star-inserted")
 
             for field in fields:
