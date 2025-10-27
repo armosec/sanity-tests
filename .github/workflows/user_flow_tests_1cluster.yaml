@@ -26,6 +26,8 @@ on:
         type: choice
         default: all
         required: true
+  schedule:
+    - cron: "0 */2 * * *" # every 2 hours (UTC)
 
 jobs:
   setup:
@@ -34,20 +36,21 @@ jobs:
       environment: ${{ steps.set-environment.outputs.environment }}
       test_type: ${{ steps.set-test-type.outputs.test_type }}
     steps:
-    - name: Print trigger info
+    - name: Print trigger info (resolved)
       run: |
-        echo "ENVIRONMENT=${{ inputs.ENVIRONMENT }}"
-        echo "TEST_TYPE=${{ inputs.TEST_TYPE }}"
+        echo "EVENT=${{ github.event_name }}"
+        echo "Resolved ENVIRONMENT=${{ inputs.ENVIRONMENT || 'production' }}"
+        echo "Resolved TEST_TYPE=${{ inputs.TEST_TYPE || 'all' }}"
 
     - name: Set environment output
       id: set-environment
       run: |
-        echo "environment=${{ inputs.ENVIRONMENT }}" >> $GITHUB_OUTPUT
+        echo "environment=${{ inputs.ENVIRONMENT || 'production' }}" >> $GITHUB_OUTPUT
 
     - name: Set test type output
       id: set-test-type
       run: |
-        echo "test_type=${{ inputs.TEST_TYPE }}" >> $GITHUB_OUTPUT
+        echo "test_type=${{ inputs.TEST_TYPE || 'all' }}" >> $GITHUB_OUTPUT
 
   test_vulnerabilities:
     needs: setup
@@ -60,20 +63,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
-    # - name: Install doctl
-    #   run: |
-    #     sudo snap install doctl --classic
-
-    # - name: Authenticate doctl and set kubeconfig
-    #   run: |
-    #     doctl auth init --access-token ${{ secrets.DIGITALOCEAN_TOKEN }}
-    #     doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER_ID }}
-
-    # - name: Install kubectl
-    #   run: |
-    #     sudo snap install kubectl --classic
-    #     kubectl version --client --output=yaml
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -110,20 +99,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # - name: Install doctl
-    #   run: |
-    #     sudo snap install doctl --classic
-
-    # - name: Authenticate doctl and set kubeconfig
-    #   run: |
-    #     doctl auth init --access-token ${{ secrets.DIGITALOCEAN_TOKEN }}
-    #     doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER_ID }}
-
-    # - name: Install kubectl
-    #   run: |
-    #     sudo snap install kubectl --classic
-    #     kubectl version --client --output=yaml
-
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -158,20 +133,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
-    # - name: Install doctl
-    #   run: |
-    #     sudo snap install doctl --classic
-
-    # - name: Authenticate doctl and set kubeconfig
-    #   run: |
-    #     doctl auth init --access-token ${{ secrets.DIGITALOCEAN_TOKEN }}
-    #     doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER_ID }}
-
-    # - name: Install kubectl
-    #   run: |
-    #     sudo snap install kubectl --classic
-    #     kubectl version --client --output=yaml
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -208,20 +169,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # - name: Install doctl
-    #   run: |
-    #     sudo snap install doctl --classic
-
-    # - name: Authenticate doctl and set kubeconfig
-    #   run: |
-    #     doctl auth init --access-token ${{ secrets.DIGITALOCEAN_TOKEN }}
-    #     doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER_ID }}
-
-    # - name: Install kubectl
-    #   run: |
-    #     sudo snap install kubectl --classic
-    #     kubectl version --client --output=yaml
-
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -256,20 +203,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
-    # - name: Install doctl
-    #   run: |
-    #     sudo snap install doctl --classic
-
-    # - name: Authenticate doctl and set kubeconfig
-    #   run: |
-    #     doctl auth init --access-token ${{ secrets.DIGITALOCEAN_TOKEN }}
-    #     doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER_ID }}
-
-    # - name: Install kubectl
-    #   run: |
-    #     sudo snap install kubectl --classic
-    #     kubectl version --client --output=yaml
 
     - name: Set up Python
       uses: actions/setup-python@v4
