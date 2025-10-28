@@ -138,9 +138,9 @@ class AgentAccessKeys(BaseTest):
 
             # Get the key value
             # Show the key value in the UI
-            self._interaction_manager.click('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/armo-agent-access-tokens-table/div/table/tbody/tr[1]/td[2]/div/armo-icon-button')
+            self._interaction_manager.click("//armo-icon-button[@data-test-id='show-value-button']//button")
             # Get the key value from the UI
-            key_value = self._interaction_manager.get_text('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/armo-agent-access-tokens-table/div/table/tbody/tr[1]/td[2]/div/span')
+            key_value = self._interaction_manager.get_text("//span[@data-test-id='value-span' or @data-test-id='token-span']")
 
             # Navigate to setup page
             logger.info("Navigating to setup page to verify the default key")
