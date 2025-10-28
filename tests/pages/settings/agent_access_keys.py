@@ -76,10 +76,10 @@ class AgentAccessKeys(BaseTest):
             self._interaction_manager.click('/html/body/armo-root/div/div/div/div/armo-agent-access-tokens-page/div/armo-button')
             
             # Fill in key name with timestamp
-            self._interaction_manager.focus_and_send_text('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-agent-access-token-modal/div[2]/form/div/div[2]/mat-form-field/div[1]/div/div[2]/input', self.test_key_name)
+            self._interaction_manager.focus_and_send_text("//input[@formcontrolname='name']", self.test_key_name)
 
             # Click on save button
-            self._interaction_manager.click('/html/body/div[5]/div[2]/div/mat-dialog-container/div/div/armo-agent-access-token-modal/div[3]/armo-button[2]', By.XPATH)
+            self._interaction_manager.click('//button[normalize-space(text())="Save"]', By.XPATH)
             time.sleep(1)  # Wait for the key to be created
 
             # Verify the number of access keys increased
