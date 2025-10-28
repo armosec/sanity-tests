@@ -138,7 +138,7 @@ class AgentAccessKeys(BaseTest):
 
             # Get the key value
             # Show the key value in the UI
-            self._interaction_manager.click("//armo-icon-button[@data-test-id='show-value-button']//button")
+            self._interaction_manager.click("//armo-icon-button[@data-test-id='show-token-button' or @data-test-id='show-value-button']//button")
             # Get the key value from the UI
             key_value = self._interaction_manager.get_text("//span[@data-test-id='value-span' or @data-test-id='token-span']")
 
