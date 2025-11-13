@@ -77,15 +77,15 @@ class AgentAccessKeys(BaseTest):
             
             # Fill in key name with timestamp
             self._interaction_manager.focus_and_send_text("//input[@formcontrolname='name']", self.test_key_name)
-
+            time.sleep(1)  # Wait for the key to be created
             # Click on save button
             self._interaction_manager.click('//button[normalize-space(text())="Save"]', By.XPATH)
-            time.sleep(1)  # Wait for the key to be created
+            time.sleep(5)  # Wait for the key to be created
 
             # Verify the number of access keys increased
             num_of_access_keys_after = self._interaction_manager.count_rows(skip_header=False)
             logger.info(f"Number of agent access keys after creation: {num_of_access_keys_after}")
-
+            time.sleep(1)  # Wait for the key to be created
             if num_of_access_keys_after != num_of_access_keys + 1:
                 raise Exception("Number of agent access keys did not increase as expected")
                         
