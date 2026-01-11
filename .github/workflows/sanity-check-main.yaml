@@ -24,7 +24,7 @@ jobs:
     with:
       RETRY_JOB: false
       BINARY_TESTS: '[ 
-                        "scan_nsa_and_submit_to_backend"
+                        "scan_and_submit_to_backend"
                       ]'
     secrets: inherit
 
@@ -37,7 +37,7 @@ jobs:
     with:
       RETRY_JOB: false
       BINARY_TESTS: '[ 
-                        "scan_nsa_and_submit_to_backend"
+                        "scan_and_submit_to_backend"
                       ]'
     secrets: inherit
 
@@ -52,7 +52,7 @@ jobs:
     with:
       RETRY_JOB: true
       BINARY_TESTS: '[ 
-                        "scan_nsa_and_submit_to_backend"
+                        "scan_and_submit_to_backend"
                       ]'
     secrets: inherit
 
@@ -67,7 +67,7 @@ jobs:
     with:
       RETRY_JOB: true
       BINARY_TESTS: '[ 
-                        "scan_nsa_and_submit_to_backend"
+                        "scan_and_submit_to_backend"
                       ]'
     secrets: inherit
 
