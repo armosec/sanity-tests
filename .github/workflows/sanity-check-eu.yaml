@@ -69,6 +69,7 @@ jobs:
           with:
             repository: armosec/system-tests
             path: .
+            token: ${{ secrets.ARMOSEC_GITHUB_ACCESS_TOKEN }}
 
         - uses: actions/setup-python@v4
           timeout-minutes: 10
