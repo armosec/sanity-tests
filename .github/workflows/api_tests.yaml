@@ -14,17 +14,8 @@ jobs:
     name: Run API Test AKME
     runs-on: ubuntu-latest
     steps:
-    - name: Generate GitHub App token
-      id: app-token
-      uses: tibdex/github-app-token@v2
-      with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
-
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        token: ${{ steps.app-token.outputs.token }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -51,28 +42,18 @@ jobs:
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update logs with new data for AKME"
-        author_name: bvolovat
-        author_email: borisv@armosec.io
+        author_name: armobot
+        author_email: devops@armosec.io
         commit: --signoff
         pull: '--ff-only'
         add: ./logs/api_test_log_AKME.csv
-        github_token: ${{ steps.app-token.outputs.token }}
 
   run-api-test-ARMO:
     name: Run API Test ARMO
     runs-on: ubuntu-latest
     steps:
-    - name: Generate GitHub App token
-      id: app-token
-      uses: tibdex/github-app-token@v2
-      with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
-
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        token: ${{ steps.app-token.outputs.token }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -99,28 +80,18 @@ jobs:
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update logs with new data for ARMO"
-        author_name: bvolovat
-        author_email: borisv@armosec.io
+        author_name: armobot
+        author_email: devops@armosec.io
         commit: --signoff
         pull: '--ff-only'
         add: ./logs/api_test_log_ARMO.csv
-        github_token: ${{ steps.app-token.outputs.token }}
 
   run-api-test-Billogram:
     name: Run API Test Billogram
     runs-on: ubuntu-latest
     steps:
-    - name: Generate GitHub App token
-      id: app-token
-      uses: tibdex/github-app-token@v2
-      with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
-
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        token: ${{ steps.app-token.outputs.token }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -147,28 +118,18 @@ jobs:
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update logs with new data for Billogram"
-        author_name: bvolovat
-        author_email: borisv@armosec.io
+        author_name: armobot
+        author_email: devops@armosec.io
         commit: --signoff
         pull: '--ff-only'
         add: ./logs/api_test_log_Billogram.csv
-        github_token: ${{ steps.app-token.outputs.token }}
 
   run-api-test-AXUAL:
     name: Run API Test AXUAL
     runs-on: ubuntu-latest
     steps:
-    - name: Generate GitHub App token
-      id: app-token
-      uses: tibdex/github-app-token@v2
-      with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
-
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        token: ${{ steps.app-token.outputs.token }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -195,28 +156,18 @@ jobs:
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update logs with new data for AXUAL"
-        author_name: bvolovat
-        author_email: borisv@armosec.io
+        author_name: armobot
+        author_email: devops@armosec.io
         commit: --signoff
         pull: '--ff-only'
         add: ./logs/api_test_log_AXUAL.csv
-        github_token: ${{ steps.app-token.outputs.token }}
 
   run-api-test-Kyos:
     name: Run API Test Kyos
     runs-on: ubuntu-latest
     steps:
-    - name: Generate GitHub App token
-      id: app-token
-      uses: tibdex/github-app-token@v2
-      with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
-
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        token: ${{ steps.app-token.outputs.token }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -243,28 +194,18 @@ jobs:
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update logs with new data for Kyos"
-        author_name: bvolovat
-        author_email: borisv@armosec.io
+        author_name: armobot
+        author_email: devops@armosec.io
         commit: --signoff
         pull: '--ff-only'
-        add: ./logs/api_test_log_Kyos.csv
-        github_token: ${{ steps.app-token.outputs.token }}
+        add: ./logs/api_test_log_Kyos.csv  
 
   run-api-test-Schuberg-Philis:
     name: Run API Test Schuberg-Philis
     runs-on: ubuntu-latest
     steps:
-    - name: Generate GitHub App token
-      id: app-token
-      uses: tibdex/github-app-token@v2
-      with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
-
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        token: ${{ steps.app-token.outputs.token }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -291,28 +232,18 @@ jobs:
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update logs with new data for Schuberg_Philis"
-        author_name: bvolovat
-        author_email: borisv@armosec.io
+        author_name: armobot
+        author_email: devops@armosec.io
         commit: --signoff
         pull: '--ff-only'
-        add: ./logs/api_test_log_Schuberg_Philis.csv
-        github_token: ${{ steps.app-token.outputs.token }}
+        add: ./logs/api_test_log_Schuberg_Philis.csv 
 
   run-api-test-Mimecast:
     name: Run API Test Mimecast
     runs-on: ubuntu-latest
     steps:
-    - name: Generate GitHub App token
-      id: app-token
-      uses: tibdex/github-app-token@v2
-      with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
-
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        token: ${{ steps.app-token.outputs.token }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -339,28 +270,18 @@ jobs:
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update logs with new data for Mimecast"
-        author_name: bvolovat
-        author_email: borisv@armosec.io
+        author_name: armobot
+        author_email: devops@armosec.io
         commit: --signoff
         pull: '--ff-only'
-        add: ./logs/api_test_log_Mimecast.csv
-        github_token: ${{ steps.app-token.outputs.token }}
+        add: ./logs/api_test_log_Mimecast.csv 
 
   run-api-test-ARMO-EEE:
     name: Run API Test ARMO-EEE
     runs-on: ubuntu-latest
     steps:
-    - name: Generate GitHub App token
-      id: app-token
-      uses: tibdex/github-app-token@v2
-      with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
-
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        token: ${{ steps.app-token.outputs.token }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -387,28 +308,18 @@ jobs:
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update logs with new data for ARMO-EEE"
-        author_name: bvolovat
-        author_email: borisv@armosec.io
+        author_name: armobot
+        author_email: devops@armosec.io
         commit: --signoff
         pull: '--ff-only'
-        add: ./logs/api_test_log_ARMO_EEE.csv
-        github_token: ${{ steps.app-token.outputs.token }}
+        add: ./logs/api_test_log_ARMO_EEE.csv 
 
   run-api-test-VGW:
     name: Run API Test VGW
     runs-on: ubuntu-latest
     steps:
-    - name: Generate GitHub App token
-      id: app-token
-      uses: tibdex/github-app-token@v2
-      with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
-
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        token: ${{ steps.app-token.outputs.token }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -435,9 +346,8 @@ jobs:
       uses: EndBug/add-and-commit@v9
       with:
         message: "Update logs with new data for VGW"
-        author_name: bvolovat
-        author_email: borisv@armosec.io
+        author_name: armobot
+        author_email: devops@armosec.io
         commit: --signoff
         pull: '--ff-only'
         add: ./logs/api_test_log_VGW.csv
-        github_token: ${{ steps.app-token.outputs.token }}
