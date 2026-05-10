@@ -16,10 +16,10 @@ jobs:
     steps:
     - name: Generate GitHub App token
       id: app-token
-      uses: tibdex/github-app-token@v2
+      uses: actions/create-github-app-token@v2.2.1
       with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
+        app-id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
+        private-key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
 
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -64,10 +64,10 @@ jobs:
     steps:
     - name: Generate GitHub App token
       id: app-token
-      uses: tibdex/github-app-token@v2
+      uses: actions/create-github-app-token@v2.2.1
       with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
+        app-id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
+        private-key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
 
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -112,10 +112,10 @@ jobs:
     steps:
     - name: Generate GitHub App token
       id: app-token
-      uses: tibdex/github-app-token@v2
+      uses: actions/create-github-app-token@v2.2.1
       with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
+        app-id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
+        private-key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
 
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -160,10 +160,10 @@ jobs:
     steps:
     - name: Generate GitHub App token
       id: app-token
-      uses: tibdex/github-app-token@v2
+      uses: actions/create-github-app-token@v2.2.1
       with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
+        app-id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
+        private-key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
 
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -208,10 +208,10 @@ jobs:
     steps:
     - name: Generate GitHub App token
       id: app-token
-      uses: tibdex/github-app-token@v2
+      uses: actions/create-github-app-token@v2.2.1
       with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
+        app-id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
+        private-key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
 
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -256,10 +256,10 @@ jobs:
     steps:
     - name: Generate GitHub App token
       id: app-token
-      uses: tibdex/github-app-token@v2
+      uses: actions/create-github-app-token@v2.2.1
       with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
+        app-id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
+        private-key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
 
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -304,10 +304,10 @@ jobs:
     steps:
     - name: Generate GitHub App token
       id: app-token
-      uses: tibdex/github-app-token@v2
+      uses: actions/create-github-app-token@v2.2.1
       with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
+        app-id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
+        private-key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
 
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -352,10 +352,10 @@ jobs:
     steps:
     - name: Generate GitHub App token
       id: app-token
-      uses: tibdex/github-app-token@v2
+      uses: actions/create-github-app-token@v2.2.1
       with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
+        app-id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
+        private-key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
 
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -400,10 +400,10 @@ jobs:
     steps:
     - name: Generate GitHub App token
       id: app-token
-      uses: tibdex/github-app-token@v2
+      uses: actions/create-github-app-token@v2.2.1
       with:
-        app_id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
-        private_key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
+        app-id: ${{ secrets.REPO_READ_WRITE_APP_ID }}
+        private-key: ${{ secrets.REPO_READ_WRITE_APP_PRIVATE_KEY }}
 
     - name: Checkout repository
       uses: actions/checkout@v3
